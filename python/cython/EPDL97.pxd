@@ -1,0 +1,23 @@
+#import numpy as np
+#cimport numpy as np
+cimport cython
+
+from libcpp.string cimport string as std_string
+from libcpp.vector cimport vector as std_vector
+from libcpp.map cimport map as std_map
+
+cdef extern from "fisx_epdl97.h":
+    cdef cppclass EPDL97:
+        EPDL97(std_string) except +
+        void setDataDirectory(std_string) except +        
+        void setBindingEnergies(int, std_map[std_string, double])  except +
+        std_map[std_string, double] & getBindingEnergies(int)
+                                                
+        std_map[std_string, std_vector[double]] getMassAttenuationCoefficients(int) except +
+        std_map[std_string, double] getMassAttenuationCoefficients(int, double) except +
+        std_map[std_string, std_vector[double]] \
+                            getMassAttenuationCoefficients(int, std_vector[double]) except +
+
+        std_map[std_string, double] getPhotoelectricWeights(int, double) except +
+        std_map[std_string, std_vector[double]] \
+                            getPhotoelectricWeights(int, std_vector[double]) except +
