@@ -89,7 +89,7 @@ std::vector<std::string> SimpleSpecfile::getScanLabels(int scanIndex)
 	std::vector<std::string> result;
 
 	// fileInstance.seekg(0, std::ifstream::beg);
-	if((scanIndex > (long) this->getNumberOfScans()) || (scanIndex < 0))
+	if((scanIndex >= (long) this->getNumberOfScans()) || (scanIndex < 0))
 	{
 		throw std::invalid_argument("Not a valid scan index");
 	}
@@ -189,7 +189,7 @@ std::vector<std::vector<double> > SimpleSpecfile::getScanData(int scanIndex)
 		replaceDot = false;
 	}
 
-	if((scanIndex > (long) this->getNumberOfScans()) || (scanIndex < 0))
+	if((scanIndex >= (long) this->getNumberOfScans()) || (scanIndex < 0))
 	{
 		throw std::invalid_argument("Not a valid scan index");
 	}
