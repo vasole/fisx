@@ -1,4 +1,4 @@
 fisx
 ====
 
-Enhanced C++ port of the Physics routines used by PyMca
+C++ port (with enhancements) of the PyMca Physics routines.
