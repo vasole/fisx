@@ -1,5 +1,6 @@
 #ifndef FISX_XRF_H
 #define FISX_XRF_H
+#include "fisx_beam.h"
 
 class XRF
 {
@@ -9,7 +10,7 @@ public:
     /*!
     Set the excitation beam
     */
-    void setBeam();
+    void setBeam(Beam beam);
 
     /*!
     Set the beam filters to be applied
@@ -77,9 +78,9 @@ public:
     void peakRatios();
 
 private:
+    Beam beam;
     /*
     The Attenuators have methods getTransmission(double Energy) and getTransmissions(std::vector<double> Energies)
-    Beam beam;
     std::map<std::string, Attenuators>  beamFilters;
     geometry
     std::map<std::string, Attenuators> Sample; #Funny set to 1
