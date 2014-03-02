@@ -17,3 +17,4 @@ if 0:
 from fisx.tests.testAll import main as testAll
 from fisx.tests.testSimpleSpecfile import test as testSimpleSpecfile
 from fisx.tests.testEPDL97 import test as testEPDL97
+from fisx.tests.testDataDir import test as testDataDir

@@ -9,10 +9,11 @@ try:
 except:
     build_ext = None
 import numpy
-
 # deal with required data
-DATA_DIR = os.path.join('fisx','fisx_data')
-DOC_DIR = os.path.join('fisx','fisx_doc')
+
+#for the time being there is no doc directory
+DATA_DIR = os.path.join('fisx', 'fisx_data')
+DOC_DIR = os.path.join('fisx', 'fisx_data')
 
 from distutils.command.build_py import build_py
 class smart_build_py(build_py):
@@ -21,8 +22,8 @@ class smart_build_py(build_py):
         global DATA_DIR
         global DOC_DIR
         global INSTALL_DIR
-        defaultDataPath = os.path.join('fisx','fisx_data')
-        defaultDocPath = os.path.join('fisx','fisx_doc')
+        defaultDataPath = os.path.join('fisx', 'fisx_data')
+        defaultDocPath = os.path.join('fisx', 'fisx_data')
         if (DATA_DIR == defaultDataPath) or\
            (DOC_DIR == defaultDocPath):
             #default, just make sure the complete path is there
@@ -43,12 +44,10 @@ class smart_build_py(build_py):
         fid = open(target,'w')
         for line in content:
             lineToBeWritten = line
-            txt = 'DATA_DIR_FROM_SETUP'
-            if txt in line:
-                lineToBeWritten = line.replace(txt, DATA_DIR)
-            txt = 'DOC_DIR_FROM_SETUP'
-            if txt in line:
-                lineToBeWritten = line.replace(txt, DOC_DIR)
+            if lineToBeWritten.startswith("DATA_DIR"):
+                lineToBeWritten = "DATA_DIR = r'%s'\n" % DATA_DIR
+            if line.startswith("DOC_DIR"):
+                lineToBeWritten = "DOC_DIR = r'%s'\n" % DOC_DIR
             fid.write(lineToBeWritten)
         fid.close()
         return toReturn
