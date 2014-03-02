@@ -64,7 +64,7 @@ def buildExtension():
 
 ext_modules = [buildExtension()]
 
-packages = ['fisx']
+packages = ['fisx', 'fisx.tests']
 setup(
     name='fisx',
     author="V. Armando Sole",
