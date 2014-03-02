@@ -3,7 +3,7 @@ import unittest
 import os
 import sys
 
-class testData(unittest.TestCase):
+class testDataDir(unittest.TestCase):
     ELEMENTS = ['H', 'He', 
                 'Li', 'Be', 'B', 'C', 'N', 'O', 'F', 'Ne',
                 'Na', 'Mg', 'Al', 'Si', 'P', 'S', 'Cl', 'Ar',
@@ -85,11 +85,11 @@ class testData(unittest.TestCase):
 def getSuite(auto=True):
     testSuite = unittest.TestSuite()
     if auto:
-        testSuite.addTest(unittest.TestLoader().loadTestsFromTestCase(testData))
+        testSuite.addTest(unittest.TestLoader().loadTestsFromTestCase(testDataDir))
     else:
         # use a predefined order
-        testSuite.addTest(testData("testDataDirectoryPresence"))
-        testSuite.addTest(testData("testDataFilePresence"))
+        testSuite.addTest(testDataDir("testDataDirectoryPresence"))
+        testSuite.addTest(testDataDir("testDataFilePresence"))
         #testSuite.addTest(testData("testDocDirectoryPresence"))
     return testSuite
 
