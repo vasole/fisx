@@ -1,6 +1,8 @@
 #include <iostream>
 #include <math.h>
 #include <stdexcept>
+#include <cctype>
+#include <sstream>
 #include "fisx_elements.h"
 
 Elements::Elements(std::string epdl97Directory, std::string bindingEnergiesFileName, std::string crossSectionsFile)
@@ -715,19 +717,33 @@ void Elements::addMaterial(Material & material)
     this->materialList.push_back(material);
 }
 
-std::map<std::string, double> Elements::getCompositionFromFormula(const std::string & formula)
+std::map<std::string, double> Elements::parseFormula(const std::string & formula)
 {
     std::map<std::string, double> composition;
     std::map<std::string, double> tmpComposition;
-    std::string::size_type i, p1, p2;
+    std::map<std::string, double>::iterator it;
+    std::string::size_type i, p1, p2, length;
     std::string::const_iterator c_it;
     std::vector<int> openParenthesis;
     std::vector<int> closeParenthesis;
-    std::vector<int> treatedIndices;
-    int length;
+    std::vector<int>::size_type nParenthesis;
+    std::string newFormula;
+    bool parsingKey;
+    std::string lastKey;
+    std::string lastNumber;
+    std::vector<std::string> keys;
+    std::vector<double> numbers;
     bool spacesPresent;
+    double factor;
 
     composition.clear();
+
+    if (formula.size() < 1)
+        return composition;
+
+    if (islower(formula[0]) || isdigit(formula[0])) {
+        return composition;
+    }
 
     // look for parenthesis
     for(i=0; i < formula.size(); i++)
@@ -757,38 +773,178 @@ std::map<std::string, double> Elements::getCompositionFromFormula(const std::str
         return composition;
     }
 
-    treatedIndices.resize(formula.size());
-
-    if (openParenthesis.size() > 0)
+    nParenthesis = openParenthesis.size();
+    if ( nParenthesis > 0)
     {
-        p1 = openParenthesis.size() - 1 ;
-        p2 = closeParenthesis[0];
-        length =p2 - p1;
-        if(length < 2)
+        if (nParenthesis > 1)
         {
-            // empty substring
-            ;
+            p1 = 0;
+            for (i = 0; i < nParenthesis; ++i)
+            {
+                if (openParenthesis[i] < closeParenthesis[0])
+                    p1 = openParenthesis[i];
+            }
         }
         else
         {
-            tmpComposition = this->getCompositionFromFormula(formula.substr(p1 + 1, length));
-            if (tmpComposition.size() < 1)
+            p1 = openParenthesis[0];
+        }
+        p2 = closeParenthesis[0];
+        length = p2 - p1;
+        if(length < 1)
+        {
+            // empty substring
+            return composition;
+        }
+        tmpComposition = this->getCompositionFromFormula(formula.substr(p1 + 1, length));
+        if (tmpComposition.size() < 1)
+        {
+            return tmpComposition;
+        }
+        // get the numbers assoiated to the parenthesis
+        if ((p2+1) == formula.size())
+        {
+            // the number associated  to that parenthesis is 1
+            factor = 1.0;
+        }
+        else
+        {
+            i = p2 + 1;
+            while( i < formula.size())
             {
-                return tmpComposition;
+                if (isupper(formula[i]) || islower(formula[i]) || (formula[i] == '(') || (formula[i] == ')'))
+                {
+                    break;
+                }
+                i += 1;
+            }
+            if (!this->StringToDouble(formula.substr(p2+1, i - (p2+1)), factor))
+            {
+                return composition;
+            };
+        }
+        for(it = tmpComposition.begin(); it != tmpComposition.end(); ++it)
+        {
+            tmpComposition[it->first] *= factor;
+        }
+        if (p1 == 0)
+        {
+            newFormula = "";
+        }
+        else
+        {
+            newFormula = formula.substr(0, p1 - 1);
+        }
+        for(it = tmpComposition.begin(); it != tmpComposition.end(); ++it)
+        {
+            newFormula += it->first + this->toString(it->second * factor);
+        }
+        if (i < (formula.size()-1))
+        {
+            newFormula += formula.substr(i, formula.size() - i);
+        }
+        return this->getCompositionFromFormula(newFormula);
+    }
+    else
+    {
+        // when we arrive here we have a string without parenthesis
+        if (!isupper(formula[0]))
+        {
+            // invalid first character;
+            return composition;
+        }
+        i = 0;
+        lastKey = "";
+        while (i < formula.size())
+        {
+            if (isupper(formula[i]))
+            {
+                if(lastKey.size() > 0)
+                {
+                    keys.push_back(lastKey);
+                    if (lastNumber.size() > 0)
+                    {
+                        if (this->StringToDouble(lastNumber, factor))
+                            numbers.push_back(factor);
+                        else
+                            return composition;
+                    }
+                    else
+                    {
+                        numbers.push_back(1.0);
+                    }
+                }
+                lastNumber = "";
+                parsingKey = true;
+                lastKey = formula.substr(i, 1);
+            }
+            else
+            {
+                if (islower(formula[i]))
+                {
+                    lastKey += formula.substr(i, 1);
+                }
+                else
+                {
+                    // parsing number
+                    parsingKey = false;
+                    lastNumber += formula.substr(i, 1);
+                }
+            }
+            i += 1;
+        }
+        if (i == formula.size())
+        {
+            if (parsingKey)
+            {
+                keys.push_back(lastKey);
+                numbers.push_back(1.0);
+            }
+            else
+            {
+                keys.push_back(lastKey);
+                if (this->StringToDouble(lastNumber, factor))
+                    numbers.push_back(factor);
+                else
+                    return composition;
+            }
+        }
+        if (keys.size() != numbers.size())
+        {
+            return composition;
+        }
+        for (i = 0; i < keys.size(); ++ i)
+        {
+            if (composition.find(keys[i]) == composition.end())
+            {
+                composition[keys[i]] = numbers[i];
+            }
+            else
+            {
+                composition[keys[i]] += numbers[i];
             }
         }
     }
-    i = 0;
-    while(i < formula.size())
-    {
-        if (formula[i] == '(')
-        {
-            // open parenthesis
-
-
-        }
-
-    }
-
     return composition;
+}
+
+bool Elements::StringToDouble(const std::string& str, double& number)
+{
+
+    std::istringstream i(str);
+
+    if (!(i >> number))
+    {
+        // Number conversion failed
+        return false;
+    }
+    return true;
+}
+
+std::string Elements::toString(const double& number)
+{
+    std::ostringstream ss;
+    ss << number;
+    std::string s(ss.str());
+    return s;
 }

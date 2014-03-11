@@ -181,6 +181,22 @@ public:
     */
     std::map<std::string, double> getCompositionFromFormula(const std::string & formula);
 
+    /*!
+    Try to parse a given string as a formula, returning the associated number of "atoms"
+    per single molecule. In case of failure, it returns an empty map.
+    */
+    std::map<std::string, double> parseFormula(const std::string & formula);
+
+    /*!
+    Utility to convert from string to double.
+    */
+    bool StringToDouble(const std::string & str, double& number);
+
+    /*!
+    Utility to convert from double to string.
+    */
+    std::string toString(const double& number);
+
 private:
     void initialize(std::string, std::string);
 
