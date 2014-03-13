@@ -175,6 +175,10 @@ void Elements::setMassAttenuationCoefficientsFile(std::string fileName)
 
     sf = SimpleSpecfile(fileName);
     nScans = sf.getNumberOfScans();
+    if (nScans < 1)
+    {
+        throw std::ios_base::failure("No scans found in file!");
+    }
 
     for (n = 0; n < nScans; n++)
     {
@@ -246,7 +250,7 @@ void Elements::setMassAttenuationCoefficientsFile(std::string fileName)
         // muCoherent.clear();
         // muCompton.clear();
         // muPair.clear();
-        this->setMassAttenuationCoefficients(this->elementList[i].getName(), \
+        this->setMassAttenuationCoefficients(this->elementList[n].getName(), \
                                              muEnergy, \
                                              muPhotoelectric, \
                                              muCoherent, \
