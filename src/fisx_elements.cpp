@@ -273,6 +273,7 @@ void Elements::setMassAttenuationCoefficients(std::string name,
     Element *element;
     std::vector<double> newEnergyGrid;
     std::vector<double>::size_type i, j, shellIndex;
+    std::vector<double> oldTotalPhotoelectric;
     std::string msg;
     std::string shell;
     double tmpDouble;
@@ -380,6 +381,13 @@ void Elements::setMassAttenuationCoefficients(std::string name,
     }
 
     // photoelectric
+    // we keep a copy of the old photoelectric
+    oldTotalPhotoelectric.resize(newEnergyGrid.size());
+    for (i = 0; i < newEnergyGrid.size(); i++)
+    {
+        oldTotalPhotoelectric[i] = massAttenuationCoefficients["photoelectric"][i];
+    }
+
     for (i = j; i < newEnergyGrid.size(); i++)
     {
         massAttenuationCoefficients["photoelectric"][i] = photoelectric[i - j];
@@ -408,7 +416,7 @@ void Elements::setMassAttenuationCoefficients(std::string name,
                 }
                 for (i = (j + idx + 1); i < newEnergyGrid.size(); i++)
                 {
-                    tmpDouble = massAttenuationCoefficients["photoelectric"][i];
+                    tmpDouble = oldTotalPhotoelectric[i];
                     if ( tmpDouble > 0)
                     {
                         tmpDouble = massAttenuationCoefficients[shell][i] / tmpDouble;
@@ -430,7 +438,7 @@ void Elements::setMassAttenuationCoefficients(std::string name,
             shell = shellList[shellIndex];
             for (i = j; i < newEnergyGrid.size(); i++)
             {
-                tmpDouble = massAttenuationCoefficients["photoelectric"][i];
+                tmpDouble = oldTotalPhotoelectric[i];
                 if ( tmpDouble > 0)
                 {
                     tmpDouble = massAttenuationCoefficients[shell][i] / tmpDouble;
@@ -444,7 +452,7 @@ void Elements::setMassAttenuationCoefficients(std::string name,
         }
     }
 
-    // finally we are ready to update the mass attnuation coefficients
+    // finally we are ready to update the mass attenuation coefficients
     (*element).setMassAttenuationCoefficients(massAttenuationCoefficients["energy"],\
                                        massAttenuationCoefficients["photoelectric"],   \
                                        massAttenuationCoefficients["coherent"],        \
