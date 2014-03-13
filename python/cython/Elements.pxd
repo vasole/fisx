@@ -11,6 +11,8 @@ from libcpp.map cimport map as std_map
 cdef extern from "fisx_elements.h":
     cdef cppclass Elements:
         Elements(std_string) except +
+        Elements(std_string, std_string) except +
+        Elements(std_string, std_string, std_string) except +
 
         void setMassAttenuationCoefficients(std_string,\
                                             std_vector[double], \
@@ -18,7 +20,9 @@ cdef extern from "fisx_elements.h":
                                             std_vector[double], \
                                             std_vector[double], \
                                             std_vector[double]) except +
-                                                
+
+        void setMassAttenuationCoefficientsFile(std_string) except +
+
         std_map[std_string, double] getMassAttenuationCoefficients(std_string, double) except +
 
         std_map[std_string, std_vector[double]] getMassAttenuationCoefficients(std_string) except +

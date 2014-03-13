@@ -11,8 +11,15 @@ from Elements cimport *
 cdef class PyElements:
     cdef Elements *thisptr
 
-    def __cinit__(self, std_string directoryName):
-        self.thisptr = new Elements(directoryName)
+    def __cinit__(self, std_string directoryName, 
+                        std_string bindingEnergiesFile="",
+                        std_string crossSectionsFile=""):
+        if len(bindingEnergiesFile):
+            self.thisptr = new Elements(directoryName, bindingEnergiesFile)
+        else:
+            self.thisptr = new Elements(directoryName)
+        if len(crossSectionsFile):
+            self.thisptr.setMassAttenuationCoefficientsFile(crossSectionsFile)
 
     def __dealloc__(self):
         del self.thisptr
@@ -30,6 +37,8 @@ cdef class PyElements:
                                                     coherent,
                                                     compton,
                                                     pair)
+    def setMassAttenuationCoefficientsFile(self, std_string crossSectionsFile):
+        self.thisptr.setMassAttenuationCoefficientsFile(crossSectionsFile)
     
     def _getElementSingleMassAttenuationCoefficients(self, std_string element,
                                                      double energy):
