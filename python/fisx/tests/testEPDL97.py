@@ -60,7 +60,9 @@ class testEPDL97(unittest.TestCase):
     def testEPDL97BindingVersusPyMcaEPDL97Binding(self):
         from PyMca import PyMcaEPDL97
         from PyMca import PyMcaDataDir
-        dirname = PyMcaDataDir.PYMCA_DATA_DIR
+        #dirname = PyMcaDataDir.PYMCA_DATA_DIR
+        from fisx import DataDir
+        dirname = DataDir.DATA_DIR
         epdl = EPDL97(dirname)
         for i in range(1, 99):
             pymca = PyMcaEPDL97.EPDL97_DICT[getSymbol(i)]['binding']
@@ -75,7 +77,9 @@ class testEPDL97(unittest.TestCase):
     def testEPDL97MuVersusPyMcaEPDL97Mu(self):
         from PyMca import PyMcaEPDL97
         from PyMca import PyMcaDataDir
-        dirname = PyMcaDataDir.PYMCA_DATA_DIR
+        #dirname = PyMcaDataDir.PYMCA_DATA_DIR
+        from fisx import DataDir
+        dirname = DataDir.DATA_DIR
         epdl = EPDL97(dirname)
         x = numpy.linspace(1.0, 80., 157)
         for j in range(1, 100):
@@ -101,7 +105,9 @@ class testEPDL97(unittest.TestCase):
     def testEPDL97PartialVersusPyMcaPartial(self):
         from PyMca import PyMcaEPDL97
         from PyMca import PyMcaDataDir
-        dirname = PyMcaDataDir.PYMCA_DATA_DIR
+        #dirname = PyMcaDataDir.PYMCA_DATA_DIR
+        from fisx import DataDir
+        dirname = DataDir.DATA_DIR
         epdl = EPDL97(dirname)
         pymca = PyMcaEPDL97.getElementCrossSections('Pb')
         idx = numpy.nonzero((pymca['energy'] > 1.0) & \
