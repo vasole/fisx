@@ -15,8 +15,7 @@ EPDL97::EPDL97()
 
 EPDL97::EPDL97(std::string directoryName)
 {
-    // No check on element name. Anything can be an element and
-    // can have any atomic number
+    // No check on directoryName.
     this->setDataDirectory(directoryName);
 }
 
@@ -107,21 +106,31 @@ void EPDL97::loadBindingEnergies(std::string fileName)
             }
             else
             {
-                if (tmpLabels[n].substr(3, 1) == "(")
-                {
-                    // three characters
-                    key = tmpLabels[n].substr(0, 3);
-                }
-                else
+                if (tmpLabels[n].size() < 3)
                 {
                     // two characters
                     key = tmpLabels[n].substr(0, 2);
+                }
+                else
+                {
+                    if (tmpLabels[n].substr(3, 1) == "(")
+                    {
+                        // three characters
+                        key = tmpLabels[n].substr(0, 3);
+                    }
+                    else
+                    {
+                        // two characters
+                        key = tmpLabels[n].substr(0, 2);
+                    }
                 }
             }
             this->bindingEnergy[i][key] = tmpValues[i][n];
         }
     }
     this->bindingEnergiesFile = fileName;
+    // TODO, for a complete initialization some attenuation coefficients dhould be there
+    this->initialized = true;
 }
 
 void EPDL97::loadCrossSections(std::string fileName)

@@ -77,9 +77,9 @@ void Element::setBindingEnergies(std::map<std::string, double> bindingEnergies)
                 // Shell constructor will take care of valid shells
                 // This uses default constructor ...
                 this->shellInstance[it->first] = Shell(it->first);
-                // This does not require default constructor, but MSVC still requires it
-                //this->shellInstance.insert\
-                //    (std::map<std::string, Shell>::value_type(it->first, Shell::Shell(it->first)));
+                /* This does not require default constructor, but MSVC still requires it
+                 this->shellInstance.insert\
+                    (std::map<std::string, Shell>::value_type(it->first, Shell::Shell(it->first))); */
             }
         }
     }
@@ -170,6 +170,8 @@ void Element::setMassAttenuationCoefficients(const std::vector<double> & energie
         {
             if (energies[i] < energies[i-1])
             {
+                std::cout << "ELEMENT " << this->name << std::endl;
+                std::cout << energies[i] << " < " << energies[i-1] << std::endl;
                 throw std::invalid_argument("Energies have to be supplied in ascending order");
             }
         }
@@ -412,6 +414,7 @@ std::map<std::string, std::pair<double, int> > \
 
     int    shellIndex;
 
+
     if(muPhotoelectric.size() < 1)
     {
         throw std::runtime_error("Empty photoelectric mass attenuation vector");
@@ -524,6 +527,8 @@ void Element::setPartialPhotoelectricMassAttenuationCoefficients(const std::stri
     {
         if (energy[i] < lastEnergy)
         {
+            std::cout << "ELEMENT " << this->name << std::endl;
+            std::cout << energy[i] << " < " << lastEnergy << std::endl;
             throw std::invalid_argument("Partial photoelectric energies should be in ascending order");
         }
         else

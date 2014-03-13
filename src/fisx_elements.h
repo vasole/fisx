@@ -137,7 +137,7 @@ public:
     void createMaterial(std::string name);
 
     /*!
-    Greate a new Material with the given name, density, thickness nad comment.
+    Greate a new Material with the given name, density, thickness and comment.
     */
     void createMaterial(const std::string & name, const double & density,
                         const double & thickness, const std::string  & comment);

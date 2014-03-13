@@ -193,7 +193,7 @@ void Elements::setMassAttenuationCoefficientsFile(std::string fileName)
                 muEnergy.resize(data.size());
                 for (j = 0; j < data.size(); j++)
                 {
-                    muEnergy[j] = data[i][j];
+                    muEnergy[j] = data[j][i];
                 }
             }
             if (key.find("PHOTO") != std::string::npos)
@@ -201,7 +201,7 @@ void Elements::setMassAttenuationCoefficientsFile(std::string fileName)
                 muPhotoelectric.resize(data.size());
                 for (j = 0; j < data.size(); j++)
                 {
-                    muPhotoelectric[j] = data[i][j];
+                    muPhotoelectric[j] = data[j][i];
                 }
             }
             if (key.find("PAIR") != std::string::npos)
@@ -209,7 +209,7 @@ void Elements::setMassAttenuationCoefficientsFile(std::string fileName)
                 muPair.resize(data.size());
                 for (j = 0; j < data.size(); j++)
                 {
-                    muPair[j] = data[i][j];
+                    muPair[j] = data[j][i];
                 }
             }
             if (key.find("COMPTON") != std::string::npos)
@@ -217,7 +217,7 @@ void Elements::setMassAttenuationCoefficientsFile(std::string fileName)
                 muCompton.resize(data.size());
                 for (j = 0; j < data.size(); j++)
                 {
-                    muCompton[j] = data[i][j];
+                    muCompton[j] = data[j][i];
                 }
             }
             if (key.find("RAYLEIGH") != std::string::npos)
@@ -225,7 +225,7 @@ void Elements::setMassAttenuationCoefficientsFile(std::string fileName)
                 muCoherent.resize(data.size());
                 for (j = 0; j < data.size(); j++)
                 {
-                    muCoherent[j] = data[i][j];
+                    muCoherent[j] = data[j][i];
                 }
             }
             if (key.find("COHERENT") != std::string::npos)
@@ -235,7 +235,7 @@ void Elements::setMassAttenuationCoefficientsFile(std::string fileName)
                     muCoherent.resize(data.size());
                     for (j = 0; j < data.size(); j++)
                     {
-                        muCoherent[j] = data[i][j];
+                        muCoherent[j] = data[j][i];
                     }
                 }
             }
@@ -291,7 +291,8 @@ void Elements::setMassAttenuationCoefficients(std::string name,
     element = &(this->elementList[this->elementDict[name]]);
     atomicNumber = this->elementList[this->elementDict[name]].getAtomicNumber();
     massAttenuationCoefficients = epdl97.getMassAttenuationCoefficients(atomicNumber);
-    (*element).setMassAttenuationCoefficients(massAttenuationCoefficients["energy"],\
+
+    (*element).setMassAttenuationCoefficients(massAttenuationCoefficients["energy"],          \
                                        massAttenuationCoefficients["photoelectric"],          \
                                        massAttenuationCoefficients["coherent"],               \
                                        massAttenuationCoefficients["compton"],                \
@@ -304,8 +305,6 @@ void Elements::setMassAttenuationCoefficients(std::string name,
                                                     massAttenuationCoefficients["energy"], \
                                                     massAttenuationCoefficients[shell]);
     }
-
-
 
     // now we calculate the mass attenuation coefficients via EPDL97 at the given energies
     // extended by the EPDL97 ones at the beginning
@@ -386,8 +385,8 @@ void Elements::setMassAttenuationCoefficients(std::string name,
     // partial cross sections
     // we extract the edges from supplied mass attenuation coefficients
     // the result contains the indices of the first instance of the energy
-    extractedEdgeEnergies = this->elementList[i].extractEdgeEnergiesFromMassAttenuationCoefficients(energy,
-                                                                                             photoelectric);
+    extractedEdgeEnergies = (*element).extractEdgeEnergiesFromMassAttenuationCoefficients(energy, \
+                                                                                          photoelectric);
 
     if (extractedEdgeEnergies.size() > 0)
     {
@@ -717,6 +716,13 @@ void Elements::addMaterial(Material & material)
     this->materialList.push_back(material);
 }
 
+std::map<std::string, double> Elements::getCompositionFromFormula(const std::string & formula)
+{
+    // TODO: Still to multiply by Atomic Weight!!!!
+    return this->parseFormula(formula);
+}
+
+
 std::map<std::string, double> Elements::parseFormula(const std::string & formula)
 {
     std::map<std::string, double> composition;
@@ -796,7 +802,7 @@ std::map<std::string, double> Elements::parseFormula(const std::string & formula
             // empty substring
             return composition;
         }
-        tmpComposition = this->getCompositionFromFormula(formula.substr(p1 + 1, length));
+        tmpComposition = this->parseFormula(formula.substr(p1 + 1, length));
         if (tmpComposition.size() < 1)
         {
             return tmpComposition;
@@ -843,7 +849,7 @@ std::map<std::string, double> Elements::parseFormula(const std::string & formula
         {
             newFormula += formula.substr(i, formula.size() - i);
         }
-        return this->getCompositionFromFormula(newFormula);
+        return this->parseFormula(newFormula);
     }
     else
     {
