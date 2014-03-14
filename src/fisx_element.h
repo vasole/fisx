@@ -49,7 +49,7 @@ public:
     Set the given element atomic number. WARNING: An element atomic mass not be changed unless we are making a
     copy from other element in order to change some properties.
     */
-    void setAtomicMass(double mass);
+    void setAtomicMass(const double & mass);
 
     /*!
     Retrieves the given element atomic mass.

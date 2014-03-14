@@ -965,6 +965,24 @@ const Shell & Element::getShellInstance(std::string name)
     return this->shellInstance[name];
 }
 
+
+void Element::setAtomicMass(const double & A)
+{
+    // For the time being only positive numbers accepted
+    if (A < 0)
+    {
+        throw std::invalid_argument("Atomic mass should be positive");
+    }
+    this->atomicMass = A;
+}
+
+const double & Element::getAtomicMass()
+{
+    // For the time being only positive numbers accepted
+    return this->atomicMass;
+}
+
+
 void Element::setAtomicNumber(const int & z)
 {
     // For the time being only positive numbers accepted
