@@ -40,7 +40,7 @@ cdef class PyElements:
     def setMassAttenuationCoefficientsFile(self, std_string crossSectionsFile):
         self.thisptr.setMassAttenuationCoefficientsFile(crossSectionsFile)
     
-    def _getElementSingleMassAttenuationCoefficients(self, std_string element,
+    def _getSingleMassAttenuationCoefficients(self, std_string element,
                                                      double energy):
         return self.thisptr.getMassAttenuationCoefficients(element, energy)
 
@@ -51,18 +51,28 @@ cdef class PyElements:
         if energy is None:
             return self._getElementDefaultMassAttenuationCoefficients(element)            
         elif hasattr(energy, "__len__"):
-            return self._getElementMultipleMassAttenuationCoefficients(element,
+            return self._getMultipleMassAttenuationCoefficients(element,
                                                                        energy)
         else:
-            return self._getElementMultipleMassAttenuationCoefficients(element,
+            return self._getMultipleMassAttenuationCoefficients(element,
                                                                        [energy])
 
-    def _getElementMultipleMassAttenuationCoefficients(self, std_string element,
+    def _getMultipleMassAttenuationCoefficients(self, std_string element,
                                                        std_vector[double] energy):
         return self.thisptr.getMassAttenuationCoefficients(element, energy)
                                        
 
-    def getMassAttenuationCoefficients(self, elementDict, energy):
+    def getMassAttenuationCoefficients(self, name, energy=None):
+        if hasattr(name, "keys"):
+            return self._getMassAttenuationCoefficients(name, energy)
+        elif energy is None:
+            return self._getElementDefaultMassAttenuationCoefficients(name)
+        elif hasattr(energy, "__len__"):
+            return self._getMultipleMassAttenuationCoefficients(name, energy)
+        else:
+            return self._getMultipleMassAttenuationCoefficients(name, [energy])
+
+    def _getMaterialMassAttenuationCoefficients(self, elementDict, energy):
         """
         elementDict is a dictionary of the form:
         elmentDict[key] = fraction where:
