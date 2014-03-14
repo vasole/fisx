@@ -70,6 +70,7 @@ cdef class PyElements:
         elif hasattr(energy, "__len__"):
             return self._getMultipleMassAttenuationCoefficients(name, energy)
         else:
+            # do not use the "single" version to have always the same signature
             return self._getMultipleMassAttenuationCoefficients(name, [energy])
 
     def _getMaterialMassAttenuationCoefficients(self, elementDict, energy):
