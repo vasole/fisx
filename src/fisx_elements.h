@@ -51,10 +51,12 @@ public:
     Returns true if the element with name elementName is already defined in the library.
     */
     bool isElementNameDefined(const std::string & elementName);
+
     /*!
     Returns a reference to the element with name elementName if defined in the library.
     */
     const Element & getElement(const std::string & elementName);
+
     /*!
     Get a copy of the element with name elementName.
     */

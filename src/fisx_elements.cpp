@@ -754,6 +754,7 @@ std::map<std::string, double> Elements::parseFormula(const std::string & formula
     bool spacesPresent;
     double factor;
 
+
     composition.clear();
 
     if (formula.size() < 1)
@@ -764,6 +765,7 @@ std::map<std::string, double> Elements::parseFormula(const std::string & formula
     }
 
     // look for parenthesis
+    spacesPresent = false;
     for(i=0; i < formula.size(); i++)
     {
         if (formula[i] =='(')
@@ -784,10 +786,13 @@ std::map<std::string, double> Elements::parseFormula(const std::string & formula
     // for just this case?
     if (openParenthesis.size() != closeParenthesis.size())
     {
+        //std::cout << "RECEIVED Formula NOT passed parenthesis check" << std::endl;
         return composition;
     }
+
     if (spacesPresent)
     {
+        //std::cout << "RECEIVED Formula NOT passed spaces check" << std::endl;
         return composition;
     }
 
@@ -808,7 +813,7 @@ std::map<std::string, double> Elements::parseFormula(const std::string & formula
             p1 = openParenthesis[0];
         }
         p2 = closeParenthesis[0];
-        length = p2 - p1;
+        length = p2 - p1 - 1;
         if(length < 1)
         {
             // empty substring
@@ -841,10 +846,12 @@ std::map<std::string, double> Elements::parseFormula(const std::string & formula
                 return composition;
             };
         }
+        /* better generate a new formula than to try to deal with everything here
         for(it = tmpComposition.begin(); it != tmpComposition.end(); ++it)
         {
             tmpComposition[it->first] *= factor;
         }
+        */
         if (p1 == 0)
         {
             newFormula = "";
