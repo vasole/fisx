@@ -98,15 +98,15 @@ public:
     std::map<std::string, std::vector<double> > getMassAttenuationCoefficients(std::string elementName);
 
     /*!
-    Given an element and a set of energies, give back the mass attenuation coefficients at the given
-    energies as a map where the keys are the different physical processes and the values are the vectors
-    of the calculated values via log-log interpolation in the internal table.
+    Given an element or formula and a set of energies, give back the mass attenuation coefficients
+    at the given energies as a map where the keys are the different physical processes and the values
+    are the vectors of the calculated values via log-log interpolation in the internal table.
     */
-    std::map<std::string, std::vector<double> > getMassAttenuationCoefficients(std::string elementName,
+    std::map<std::string, std::vector<double> > getMassAttenuationCoefficients(std::string formula,
                                                                          std::vector<double> energies);
 
     /*!
-    Given a map of elements and mass fractions element and a set of energies, give back the mass attenuation
+    Given a map of elements and mass fractions and a set of energies, give back the mass attenuation
     coefficients at the given energies as a map where the keys are the different physical processes and the
     values are the vectors of the calculated values via log-log interpolation in the internal table.
     */
@@ -117,11 +117,11 @@ public:
 
     /*!
     Convenience method.
-    Given an element and an energy, give back the mass attenuation coefficients at the given
-    energy as a map where the keys are the different physical processes and the values are calculated
-    values via log-log interpolation in the internal table.
+    Given an element or formula and an energy, give back the mass attenuation coefficients at the
+    given energy as a map where the keys are the different physical processes and the values are
+    calculated values via log-log interpolation in the internal table.
     */
-    std::map<std::string, double> getMassAttenuationCoefficients(std::string elementName, double energy);
+    std::map<std::string, double> getMassAttenuationCoefficients(std::string formula, double energy);
 
     /*!
     Convenience method.
