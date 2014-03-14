@@ -78,6 +78,7 @@ void Elements::initialize(std::string epdl97Directory, std::string bindingEnergi
         symbol = defaultElementsInfo[i].symbol;
         atomicNumber = defaultElementsInfo[i].z;
         this->elementList[i] = Element(symbol, atomicNumber);
+        this->elementList[i].setAtomicMass(defaultElementsInfo[i].atomicMass);
         this->elementList[i].setBindingEnergies(epdl97.getBindingEnergies(atomicNumber));
         massAttenuationCoefficients = epdl97.getMassAttenuationCoefficients(atomicNumber);
         this->elementList[i].setMassAttenuationCoefficients(massAttenuationCoefficients["energy"],\
@@ -485,13 +486,22 @@ std::map<std::string, std::vector<double> > Elements::getMassAttenuationCoeffici
 std::map<std::string, double> Elements::getMassAttenuationCoefficients(std::string name, double energy)
 {
     std::string msg;
+    std::map<std::string, double> composition;
 
     if (this->elementDict.find(name) == this->elementDict.end())
     {
-        msg = "Name " + name + " not among defined elements";
-        throw std::invalid_argument(msg);
+        composition = this->getCompositionFromFormula(name);
+        if (composition.size() < 1)
+        {
+            msg = "Name " + name + " not accepted as element or chemical formula";
+            throw std::invalid_argument(msg);
+        }
+        return this->getMassAttenuationCoefficients(composition, energy);
     }
-    return this->elementList[this->elementDict[name]].getMassAttenuationCoefficients(energy);
+    else
+    {
+        return this->elementList[this->elementDict[name]].getMassAttenuationCoefficients(energy);
+    }
 }
 
 std::map<std::string, std::vector<double> > Elements::getMassAttenuationCoefficients(std::string name, \
@@ -529,6 +539,7 @@ std::map<std::string, double> Elements::getMassAttenuationCoefficients(std::map<
         }
         total += massFraction;
     }
+    std::cout << "total mass fraction = " << total << std::endl;
 
     if (total <= 0.0)
     {
@@ -550,6 +561,8 @@ std::map<std::string, double> Elements::getMassAttenuationCoefficients(std::map<
         massFraction = c_it->second / total;
         element = c_it->first;
         tmpResult = this->elementList[this->elementDict[element]].getMassAttenuationCoefficients(energy);
+        std::cout << element << "photo = " << tmpResult["photoelectric"] << std::endl;
+
         result["coherent"] += tmpResult["coherent"] * massFraction;
         result["compton"] += tmpResult["compton"] * massFraction;
         result["pair"] += tmpResult["pair"] * massFraction;
@@ -730,8 +743,38 @@ void Elements::addMaterial(Material & material)
 
 std::map<std::string, double> Elements::getCompositionFromFormula(const std::string & formula)
 {
+    std::map<std::string, double> parsedFormula;
+    std::map<std::string, double>::iterator it;
+    std::string name, msg;
+    double total;
     // TODO: Still to multiply by Atomic Weight!!!!
-    return this->parseFormula(formula);
+
+    parsedFormula = this->parseFormula(formula);
+    if (parsedFormula.size() < 1)
+    {
+        // Formula not understood
+        return parsedFormula;
+    }
+    total = 0.0;
+    for (it = parsedFormula.begin(); it != parsedFormula.end(); ++it)
+    {
+        name = it->first;
+        if (this->elementDict.find(name) == this->elementDict.end())
+        {
+            msg = "Name " + name + " not among defined elements";
+            std::cout << msg << std::endl;
+            parsedFormula.clear();
+            return parsedFormula;
+        }
+        // multiply the number of atoms by the atomic weight
+        parsedFormula[name] *= this->elementList[this->elementDict[name]].getAtomicMass();
+        total += parsedFormula[name];
+    }
+    for (it = parsedFormula.begin(); it != parsedFormula.end(); ++it)
+    {
+        parsedFormula[it->first] /= total;
+    }
+    return parsedFormula;
 }
 
 
@@ -755,6 +798,7 @@ std::map<std::string, double> Elements::parseFormula(const std::string & formula
     double factor;
 
 
+    //std::cout << "Received formula = " << formula << std::endl;
     composition.clear();
 
     if (formula.size() < 1)
@@ -858,7 +902,7 @@ std::map<std::string, double> Elements::parseFormula(const std::string & formula
         }
         else
         {
-            newFormula = formula.substr(0, p1 - 1);
+            newFormula = formula.substr(0, p1);
         }
         for(it = tmpComposition.begin(); it != tmpComposition.end(); ++it)
         {
