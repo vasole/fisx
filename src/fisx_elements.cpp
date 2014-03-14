@@ -508,16 +508,23 @@ std::map<std::string, std::vector<double> > Elements::getMassAttenuationCoeffici
                                                                                      std::vector<double> energy)
 {
     std::string msg;
+    std::map<std::string, double> composition;
 
     if (this->elementDict.find(name) == this->elementDict.end())
     {
-        msg = "Name " + name + " not among defined elements";
-        throw std::invalid_argument(msg);
+        composition = this->getCompositionFromFormula(name);
+        if (composition.size() < 1)
+        {
+            msg = "Name " + name + " not accepted as element or chemical formula";
+            throw std::invalid_argument(msg);
+        }
+        return this->getMassAttenuationCoefficients(composition, energy);
     }
-    return this->elementList[this->elementDict[name]].getMassAttenuationCoefficients(energy);
+    else
+    {
+        return this->elementList[this->elementDict[name]].getMassAttenuationCoefficients(energy);
+    }
 }
-
-
 
 std::map<std::string, double> Elements::getMassAttenuationCoefficients(std::map<std::string, double> elementsDict,\
                                                                        double energy)
