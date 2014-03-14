@@ -527,19 +527,43 @@ std::map<std::string, std::vector<double> > Elements::getMassAttenuationCoeffici
 }
 
 std::map<std::string, double> Elements::getMassAttenuationCoefficients(\
-                                                std::map<std::string, double> inputElementsDict,\
-                                                double energy)
+                                                std::map<std::string, double> inputFormulaDict,\
+                                                double inputEnergy)
+{
+    std::vector<double> energy;
+    std::map<std::string, std::vector<double> >tmpResult;
+    std::map<std::string, double> result;
+
+    energy.resize(1);
+    energy[0] = inputEnergy;
+    tmpResult = this->getMassAttenuationCoefficients(inputFormulaDict, energy);
+
+    result["energy"] = tmpResult["energy"][0];
+    result["coherent"] = tmpResult["coherent"][0];
+    result["compton"] = tmpResult["compton"][0];
+    result["pair"] = tmpResult["pair"][0];
+    result["photoelectric"] = tmpResult["photoelectric"][0];
+    result["total"] = tmpResult["total"][0];
+
+    return result;
+}
+
+std::map<std::string, std::vector<double> > Elements::getMassAttenuationCoefficients(\
+                                                std::map<std::string, double> inputFormulaDict,\
+                                                                std::vector<double> energy)
 {
     std::string element, msg, name;
-    double      massFraction, total;
+    double total, massFraction;
     std::map<std::string, double>::const_iterator c_it;
-    std::map<std::string, double>::iterator it;
+    std::map<std::string, double> composition;
     std::map<std::string, double> tmpResult;
-    std::map<std::string, double> result, composition;
+    std::map<std::string, std::vector<double> > result;
+    std::map<std::string, std::vector<double> >::size_type n;
     std::map<std::string, double> elementsDict;
+    std::map<std::string, double>::iterator it;
 
     total = 0.0;
-    for (c_it = inputElementsDict.begin(); c_it != inputElementsDict.end(); ++c_it)
+    for (c_it = inputFormulaDict.begin(); c_it != inputFormulaDict.end(); ++c_it)
     {
         massFraction = c_it->second;
         if (massFraction < 0.0)
@@ -566,50 +590,12 @@ std::map<std::string, double> Elements::getMassAttenuationCoefficients(\
         }
         total += massFraction;
     }
-    std::cout << "total mass fraction = " << total << std::endl;
 
     if (total <= 0.0)
     {
         msg = "Sum of mass fractions is less or equal to 0";
         throw std::invalid_argument(msg);
     }
-
-
-    result["energy"] = energy;
-    result["coherent"] = 0.0;
-    result["compton"] = 0.0;
-    result["pair"] = 0.0;
-    result["photoelectric"] = 0.0;
-    result["total"] = 0.0;
-
-    for (c_it = elementsDict.begin(); c_it != elementsDict.end(); ++c_it)
-    {
-
-        massFraction = c_it->second / total;
-        element = c_it->first;
-        tmpResult = this->elementList[this->elementDict[element]].getMassAttenuationCoefficients(energy);
-        std::cout << element << " " << "photo = " << tmpResult["photoelectric"] << std::endl;
-
-        result["coherent"] += tmpResult["coherent"] * massFraction;
-        result["compton"] += tmpResult["compton"] * massFraction;
-        result["pair"] += tmpResult["pair"] * massFraction;
-        result["photoelectric"] += tmpResult["photoelectric"] * massFraction;
-    }
-
-    result["total"] = result["coherent"] + result["compton"] + result["pair"] + result["photoelectric"];
-
-    return result;
-}
-
-std::map<std::string, std::vector<double> > Elements::getMassAttenuationCoefficients(\
-                                                std::map<std::string, double> inputElementsDict,\
-                                                                std::vector<double> energy)
-{
-    std::string element, msg;
-    std::map<std::string, double>::const_iterator c_it;
-    std::map<std::string, double> tmpResult;
-    std::map<std::string, std::vector<double> > result;
-    std::map<std::string, std::vector<double> >::size_type n;
 
     result["energy"].resize(energy.size());
     result["coherent"].resize(energy.size());
@@ -620,17 +606,25 @@ std::map<std::string, std::vector<double> > Elements::getMassAttenuationCoeffici
 
     for (n = 0; n < result["energy"].size(); n++)
     {
-        tmpResult = this->getMassAttenuationCoefficients(inputElementsDict, energy[n]);
         result["energy"][n] = energy[n];
-        result["coherent"][n] = tmpResult["coherent"];
-        result["compton"][n] = tmpResult["compton"];
-        result["pair"][n] = tmpResult["pair"];
-        result["photoelectric"][n] = tmpResult["photoelectric"];
-    }
-    for (n = 0; n < energy.size(); n++)
-    {
-        result["total"][n] = result["coherent"][n] + result["compton"][n] + \
-                             result["pair"][n] + result["photoelectric"][n];
+        result["coherent"][n] = 0.0;
+        result["compton"][n] = 0.0;
+        result["pair"][n] = 0.0;
+        result["photoelectric"][n] = 0.0;
+        for (c_it = elementsDict.begin(); c_it != elementsDict.end(); ++c_it)
+        {
+
+            massFraction = c_it->second / total;
+            element = c_it->first;
+            tmpResult = this->elementList[this->elementDict[element]].getMassAttenuationCoefficients(energy[n]);
+            result["coherent"][n] += tmpResult["coherent"] * massFraction;
+            result["compton"][n] += tmpResult["compton"] * massFraction;
+            result["pair"][n] += tmpResult["pair"] * massFraction;
+            result["photoelectric"][n] += tmpResult["photoelectric"] * massFraction;
+        }
+
+        result["total"] [n] = (result["coherent"][n] + result["compton"][n]) + \
+                               result["pair"][n] + result["photoelectric"][n];
     }
     return result;
 }
