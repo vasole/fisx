@@ -69,14 +69,12 @@ void Material::setComposition(const std::map<std::string, double> & composition)
     std::map<std::string, double>::const_iterator c_it;
     std::vector<std::string> names;
     std::vector<double> amounts;
-    std::vector<double>::size_type i;
 
-    i = 0;
+
     for(c_it = composition.begin(); c_it != composition.end(); ++c_it)
     {
-        names[i] = c_it->first;
-        amounts[i] = c_it->second;
-        i++;
+        names.push_back(c_it->first);
+        amounts.push_back(c_it->second);
     }
     this->setComposition(names, amounts);
 }
