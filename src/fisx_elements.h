@@ -134,18 +134,15 @@ public:
 
     // Material handling
     /*!
-    Greate a new Material with the given name.
+    Create a new Material given name and initialize its density, thickness and comment.
+    The material is *not* added to the internal list of materials.
     */
-    void createMaterial(std::string name);
-
-    /*!
-    Greate a new Material with the given name, density, thickness and comment.
-    */
-    void createMaterial(const std::string & name, const double & density,
-                        const double & thickness, const std::string  & comment);
+    Material createMaterial(const std::string & name, const double & density = 1.0,
+                            const double & thickness = 1.0, const std::string  & comment = "");
 
     /*!
     Set the material composition of the material with name materialName.
+    The material must belong to the internal list defined materials.
     A composition is a map where the keys are elements/materials already defined in the library
     and the values are mass amounts.
     The library is supposed to normalize to make sure the mass fractions sum unity.
@@ -173,15 +170,28 @@ public:
     Material getMaterialCopy(const std::string & materialName);
 
     /*!
-    Add a Material instance to the set of defined materials.
+    Copy a material into the set of defined materials.
     */
-    void addMaterial(Material & materialInstance);
+    void addMaterial(Material materialInstance);
+
+    /*!
+    Create and add Material instance to the set of defined materials.
+    */
+    void addMaterial(const std::string & name, const double & density = 1.0,
+                        const double & thickness = 1.0, const std::string  & comment = "");
 
     /*!
     Try to interpret a given string as a formula, returning the associated mass fractions
     as a map of elements and mass fractions. In case of failure, it returns an empty map.
     */
     std::map<std::string, double> getCompositionFromFormula(const std::string & formula);
+
+    /*!
+    Try to interpret a given string as a chemical formula or a defined material, returning the
+    associated mass fractions as a map of elements and mass fractions.
+    In case of failure, it returns an empty map.
+    */
+    std::map<std::string, double> getComposition(const std::string & name);
 
     /*!
     Try to parse a given string as a formula, returning the associated number of "atoms"

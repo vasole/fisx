@@ -631,17 +631,29 @@ std::map<std::string, std::vector<double> > Elements::getMassAttenuationCoeffici
 
 
 // Materials handling
-void Elements::createMaterial(std::string name)
-{
-    this->createMaterial(name, 1.0, 1.0, "");
-}
-
-void Elements::createMaterial(const std::string & name, const double & density, \
+Material Elements::createMaterial(const std::string & name, const double & density, \
                               const double & thickness, const std::string & comment)
 {
     std::string msg;
     Material material;
     std::map<std::string, double> composition;
+
+    material.initialize(name, density, thickness, comment);
+    composition = this->getCompositionFromFormula(name);
+    if (composition.size() > 0)
+    {
+        material.setComposition(composition);
+    }
+    return material;
+}
+
+void Elements::addMaterial(const std::string & name, const double & density, \
+                              const double & thickness, const std::string & comment)
+{
+    std::string msg;
+    Material material;
+    std::map<std::string, double> composition;
+
 
     if (this->materialDict.find(name) != this->materialDict.end())
     {
@@ -649,7 +661,6 @@ void Elements::createMaterial(const std::string & name, const double & density, 
         throw std::invalid_argument(msg);
     }
     material.initialize(name, density, thickness, comment);
-
     this->materialList.resize(this->materialDict.size() + 1);
     this->materialList[this->materialDict.size()] = material;
     this->materialDict[name] = this->materialList.size() - 1;
@@ -710,7 +721,7 @@ Material Elements::getMaterialCopy(const std::string & materialName)
 }
 
 
-void Elements::addMaterial(Material & material)
+void Elements::addMaterial(Material material)
 {
     std::string msg;
     std::string materialName;
@@ -724,8 +735,76 @@ void Elements::addMaterial(Material & material)
     }
 
     this->materialDict[materialName] = this->materialList.size();
+    // TODO: Make sure the material can be interpreted in terms of the supplied composition
+    // because the composition can include other materials.
+    // If made that way, the internal list of materials will be "clean" of references from
+    // one material to another. Is it needed?
     this->materialList.push_back(material);
 }
+
+std::map<std::string, double> Elements::getComposition(const std::string & name)
+{
+    std::string msg;
+    std::map<std::string, double> result;
+    std::map<std::string, double> tmpResult;
+    std::map<std::string, double> composition;
+    std::map<std::string, double>::const_iterator c_it, c_it2;
+    double total;
+
+    // check if name is a valid element or formula
+    result = this->getCompositionFromFormula(name);
+    if (result.size() > 0)
+    {
+        return result;
+    }
+
+    // check if it is a material
+    if (this->materialDict.find(name) == this->materialDict.end())
+    {
+        // result at this point must be empty, we can send it back.
+        return result;
+    }
+
+    // make sure we give back the elemental material composition
+    tmpResult = this->materialList[this->materialDict[name]].getComposition();
+    if (tmpResult.size() < 1)
+    {
+        // throw an exception because we have an undefined material in the list of materials
+        msg = "Material " + name + " with empty or non-valid composition";
+        throw std::invalid_argument(msg);
+    }
+
+    // make sure (again ?) that material is normalized
+    total = 0;
+    for (c_it = tmpResult.begin(); c_it != tmpResult.end(); ++c_it)
+    {
+        total += c_it->second;
+    }
+    for (c_it = tmpResult.begin(); c_it != tmpResult.end(); ++c_it)
+    {
+        tmpResult[c_it->first] /= total;
+    }
+
+    // now, a material can be made of formulas, elements or other materials.
+    for (c_it = tmpResult.begin(); c_it != tmpResult.end(); ++c_it)
+    {
+        composition = this->getComposition(c_it->first);
+        if (composition.size() < 1)
+        {
+            return composition;
+        }
+        for (c_it2 = composition.begin(); c_it2 != composition.end(); ++c_it2)
+        {
+            if (result.find(c_it2->first) == result.end())
+            {
+                result[c_it2->first] = 0.0;
+            }
+            result[c_it2->first] += composition[c_it2->first] * tmpResult[c_it->first];
+        }
+    }
+    return result;
+}
+
 
 std::map<std::string, double> Elements::getCompositionFromFormula(const std::string & formula)
 {
@@ -747,8 +826,8 @@ std::map<std::string, double> Elements::getCompositionFromFormula(const std::str
         name = it->first;
         if (this->elementDict.find(name) == this->elementDict.end())
         {
-            msg = "Name " + name + " not among defined elements";
-            std::cout << msg << std::endl;
+            // msg = "Name " + name + " not among defined elements";
+            // std::cout << msg << std::endl;
             parsedFormula.clear();
             return parsedFormula;
         }
