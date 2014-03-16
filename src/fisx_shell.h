@@ -42,6 +42,7 @@ public:
     The class normalizes the provided intensities separating Auger and Coster-Kronig ratios.
     */
     void setNonradiativeTransitions(std::vector<std::string>, std::vector<double> values);
+    void setNonradiativeTransitions(std::map<std::string, double> values);
     void setNonradiativeTransitions(const char *strings[], const double *values, int nValues);
 
     /*!

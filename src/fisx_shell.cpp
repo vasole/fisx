@@ -127,6 +127,29 @@ void Shell::setNonradiativeTransitions(std::vector<std::string> labels, std::vec
     this->_updateNonradiativeRatios();
 }
 
+void Shell::setNonradiativeTransitions(std::map<std::string, double> inputMap)
+{
+    std::vector<std::string> transitions;
+    std::vector<double> values;
+    std::vector<double>::size_type iTransitions;
+    std::vector<double>::size_type iValues;
+    std::map<std::string, double>::const_iterator it;
+
+    transitions.resize(inputMap.size());
+    values.resize(inputMap.size());
+
+    iTransitions = 0;
+    iValues = 0;
+    for(it = inputMap.begin(); it != inputMap.end(); ++it)
+    {
+        transitions[iTransitions] = it->first;
+        values[iValues] = it->second;
+        iTransitions++;
+        iValues++;
+    }
+    this->setNonradiativeTransitions(transitions, values);
+}
+
 void Shell::setNonradiativeTransitions(const char *c_strings[], const double *values, int nValues)
 {
     int i;
@@ -206,18 +229,23 @@ void Shell::setRadiativeTransitions(std::vector<std::string> labels, std::vector
 
 void Shell::setRadiativeTransitions(std::map<std::string, double> inputMap)
 {
-    std::vector<std::string>::size_type istring;
     std::vector<std::string> transitions;
-    std::vector<double>::size_type idouble;
     std::vector<double> values;
+    std::vector<double>::size_type iTransitions;
+    std::vector<double>::size_type iValues;
     std::map<std::string, double>::const_iterator it;
 
-    idouble = 0;
-    istring = 0;
+    transitions.resize(inputMap.size());
+    values.resize(inputMap.size());
+
+    iTransitions = 0;
+    iValues = 0;
     for(it = inputMap.begin(); it != inputMap.end(); ++it)
     {
-        transitions[istring] = it->first;
-        values[idouble] = it->second;
+        transitions[iTransitions] = it->first;
+        values[iValues] = it->second;
+        iTransitions++;
+        iValues++;
     }
     this->setRadiativeTransitions(transitions, values);
 }
@@ -227,6 +255,10 @@ void Shell::setRadiativeTransitions(const char *c_strings[], const double *value
     std::vector<std::string> labels;
     std::vector<double> vValues;
     int i;
+
+    labels.resize(nValues);
+    vValues.resize(nValues);
+
     for(i=0; i < nValues; i++)
     {
         labels[i] = this->toUpperCaseString(std::string(c_strings[i]));
