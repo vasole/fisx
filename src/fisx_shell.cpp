@@ -16,7 +16,7 @@ Shell::Shell(std::string name)
     int idx = 0;
     int i, maxShellSubindex;
     int shellMainIndex = -1;
-    char c;
+    std::string msg;
     std::string fij;
     std::string digit[10]={"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
 
@@ -57,18 +57,18 @@ Shell::Shell(std::string name)
 
     if (name.size() == 2)
     {
-        c = name.at(1);
-        if (!isdigit(c))
+        if (!this->StringToInteger(name.substr(1, 1), idx))
         {
-            throw std::invalid_argument("Subshell index must a number");
+            msg = "Subshell index must a number but got <" + name.substr(1, 1) + ">";
+            throw std::invalid_argument(msg);
         }
-        idx = atoi(&c);
         if (idx < 1)
         {
             throw std::invalid_argument("Invalid subshell index");
         }
         if ((shellMainIndex == 1) && (idx > 3))
         {
+            std::cout << "INDEX = " << idx << " Obtained from " << name.substr(1, 1) << std::endl;
             throw std::invalid_argument("Incompatible L subshell index");
         }
         if ((shellMainIndex == 2) && (idx > 5))
@@ -555,6 +555,7 @@ std::map<std::string, double> Shell::getDirectVacancyTransferRatios(const std::s
 //          Only those constants supplied will be overwritten!!!
 void Shell::setShellConstants(std::map<std::string, double> shellConstants)
 {
+    std::string msg;
     std::map<std::string, double>::const_iterator c_it;
 
     for (c_it = shellConstants.begin(); c_it != shellConstants.end(); ++c_it)
@@ -565,7 +566,8 @@ void Shell::setShellConstants(std::map<std::string, double> shellConstants)
         }
         else
         {
-            throw std::invalid_argument("Invalid constant for this shell");
+            msg = "Invalid constant " + c_it->first + " for " + this->name +" shell";
+            throw std::invalid_argument(msg);
         }
     }
 }
@@ -574,4 +576,17 @@ const std::map<std::string, double> & Shell::getShellConstants()
 {
     return this->shellConstants;
 
+}
+
+bool Shell::StringToInteger(const std::string& str, int & number)
+{
+
+    std::istringstream i(str);
+
+    if (!(i >> number))
+    {
+        // Number conversion failed
+        return false;
+    }
+    return true;
 }

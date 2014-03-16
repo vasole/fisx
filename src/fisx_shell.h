@@ -43,8 +43,17 @@ public:
     */
     void setNonradiativeTransitions(std::vector<std::string>, std::vector<double> values);
     void setNonradiativeTransitions(const char *strings[], const double *values, int nValues);
+
+    /*!
+    Get Auger transition ratios
+    */
     const std::map<std::string, double> & getAugerRatios();
+
+    /*!
+    Get Coster-Kronig transition ratios
+    */
     const std::map<std::string, std::map<std::string, double> > & getCosterKronigRatios();
+
     const std::map<std::string, double> & getFluorescenceRatios();
     const std::map<std::string, double> & getRadiativeTransitions();
     const std::map<std::string, double> & getNonradiativeTransitions();
@@ -66,6 +75,7 @@ public:
     */
     void setShellConstants(std::map<std::string, double>);
     const std::map<std::string, double> & getShellConstants();
+    bool StringToInteger(const std::string& str, int & number);
 
 private:
     std::string  name;
