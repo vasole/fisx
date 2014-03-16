@@ -194,8 +194,8 @@ public:
     /*!
     Given one energy, give the initial distribution of vacancies (before cascade) due to
     photoelectric effect.
-    The output map keys correspond to the different partial photoelectric shells and the values
-    are just mu_photoelectric(shell, E)/mu_photoelectric(total, E)
+    The output map keys correspond to the different subshells and the values are just
+    mu_photoelectric(shell, E)/mu_photoelectric(total, E).
     */
     std::map<std::string, double> getInitialPhotoelectricVacancyDistribution(const double & energy);
 
@@ -204,13 +204,16 @@ public:
 
     const Shell & getShell(std::string);
 
-    /*! Provide an easier to wrap interface than calling getShell to access important shell functions
+    /*!
+    Provide an easier to wrap interface than calling getShell to access important shell functions
     */
     const std::map<std::string, double> & getFluorescenceRatios(std::string subshell);
     const std::map<std::string, double> & getAugerRatios(std::string subshell);
     const std::map<std::string, std::map<std::string, double> > & getCosterKronigRatios(std::string subshell);
 
-
+    /*!
+    Helper to locate interpolation indices.
+    */
     std::pair<long, long> getInterpolationIndices(const std::vector<double> &,  const double &);
 
 private:

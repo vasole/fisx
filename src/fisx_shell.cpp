@@ -562,6 +562,14 @@ std::map<std::string, double> Shell::getDirectVacancyTransferRatios(const std::s
     {
         tmpDouble += it->second;
     }
+    if (tmpDouble > 1.0)
+    {
+        for (it = this->shellConstants.begin(); it != this->shellConstants.end(); ++it)
+        {
+            std::cout << it->first << " = " << it->second << std::endl;
+        }
+        throw std::domain_error("Sum of CosterKronig and Fluorescence yields greater than 1.0");
+    }
     for (it = output.begin(); it != output.end(); ++it)
     {
         if (it->first == "auger")
