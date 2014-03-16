@@ -204,6 +204,13 @@ public:
 
     const Shell & getShell(std::string);
 
+    /*! Provide an easier to wrap interface than calling getShell to access important shell functions
+    */
+    const std::map<std::string, double> & getFluorescenceRatios(std::string subshell);
+    const std::map<std::string, double> & getAugerRatios(std::string subshell);
+    const std::map<std::string, std::map<std::string, double> > & getCosterKronigRatios(std::string subshell);
+
+
     std::pair<long, long> getInterpolationIndices(const std::vector<double> &,  const double &);
 
 private:

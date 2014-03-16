@@ -880,6 +880,27 @@ void Element::setShellConstants(std::string subshell, std::map<std::string, doub
     this->shellInstance[subshell].setShellConstants(constants);
 }
 
+const std::map<std::string, double> & Element::getFluorescenceRatios(std::string subshell)
+{
+    Shell shell;
+    shell = this->getShell(subshell);
+    return shell.getFluorescenceRatios();
+}
+
+const std::map<std::string, double> & Element::getAugerRatios(std::string subshell)
+{
+    Shell shell;
+    shell = this->getShell(subshell);
+    return shell.getAugerRatios();
+}
+
+const std::map<std::string, std::map<std::string, double> > & Element::getCosterKronigRatios(std::string subshell)
+{
+    Shell shell;
+    shell = this->getShell(subshell);
+    return shell.getCosterKronigRatios();
+}
+
 std::map<std::string, double> Element::getShellConstants(std::string subshell)
 {
     if (this->shellInstance.find(subshell) == this->shellInstance.end())

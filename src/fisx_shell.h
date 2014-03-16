@@ -55,7 +55,11 @@ public:
     */
     const std::map<std::string, std::map<std::string, double> > & getCosterKronigRatios();
 
+    /*!
+    Get X-ray fluorescence transition ratios
+    */
     const std::map<std::string, double> & getFluorescenceRatios();
+
     const std::map<std::string, double> & getRadiativeTransitions();
     const std::map<std::string, double> & getNonradiativeTransitions();
 
