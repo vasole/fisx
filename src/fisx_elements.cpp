@@ -114,28 +114,26 @@ void Elements::initialize(std::string epdl97Directory, std::string bindingEnergi
 
     // Load the shell constants
     filename = epdl97Directory + joinSymbol + K_SHELL_CONSTANTS_FILE;
-    this->setShellConstantsFile(filename, "K");
+    this->setShellConstantsFile("K", filename);
     filename = epdl97Directory + joinSymbol + L_SHELL_CONSTANTS_FILE;
-    this->setShellConstantsFile(filename, "L");
+    this->setShellConstantsFile("L", filename);
     filename = epdl97Directory + joinSymbol + M_SHELL_CONSTANTS_FILE;
-    this->setShellConstantsFile(filename, "M");
-    return;
-    filename = epdl97Directory + joinSymbol + K_SHELL_RADIATIVE_FILE;
-    this->setShellRadiativeTransitionsFile(filename, "K");
+    this->setShellConstantsFile("M", filename);
+
+    // Load the non-radiative transition ratios (alwys from epdl97)
     filename = epdl97Directory + joinSymbol + K_SHELL_NONRADIATIVE_FILE;
-    this->setShellNonradiativeTransitionsFile(filename, "K");
-
-    // Load the L shell
-    filename = epdl97Directory + joinSymbol + L_SHELL_RADIATIVE_FILE;
-    this->setShellRadiativeTransitionsFile(filename, "L");
+    this->setShellNonradiativeTransitionsFile("K", filename);
     filename = epdl97Directory + joinSymbol + L_SHELL_NONRADIATIVE_FILE;
-    this->setShellNonradiativeTransitionsFile(filename, "L");
-
-    // Load the M shell
-    filename = epdl97Directory + joinSymbol + M_SHELL_RADIATIVE_FILE;
-    this->setShellRadiativeTransitionsFile(filename, "M");
+    this->setShellNonradiativeTransitionsFile("L", filename);
     filename = epdl97Directory + joinSymbol + M_SHELL_NONRADIATIVE_FILE;
-    this->setShellNonradiativeTransitionsFile(filename, "M");
+    this->setShellNonradiativeTransitionsFile("M", filename);
+    // Load the radiative transition ratios
+    filename = epdl97Directory + joinSymbol + K_SHELL_RADIATIVE_FILE;
+    this->setShellRadiativeTransitionsFile("K", filename);
+    filename = epdl97Directory + joinSymbol + L_SHELL_RADIATIVE_FILE;
+    this->setShellRadiativeTransitionsFile("L", filename);
+    filename = epdl97Directory + joinSymbol + M_SHELL_RADIATIVE_FILE;
+    this->setShellRadiativeTransitionsFile("M", filename);
 }
 
 // Element handling
@@ -199,7 +197,7 @@ void Elements::addElement(Element & element)
     }
 }
 // Shell constants
-void Elements::setShellConstantsFile(std::string fileName, std::string mainShellName)
+void Elements::setShellConstantsFile(std::string mainShellName, std::string fileName)
 {
     SimpleSpecfile sf;
     int    nScans, i;
@@ -302,14 +300,192 @@ void Elements::setShellConstantsFile(std::string fileName, std::string mainShell
     }
 }
 
-void Elements::setShellRadiativeTransitionsFile(std::string fileName, std::string mainShellName)
+void Elements::setShellNonradiativeTransitionsFile(std::string mainShellName, std::string fileName)
 {
+    SimpleSpecfile sf;
+    int    nScans, i;
+    std::vector<std::string> tmpLabels;
+    std::vector<std::string>::size_type nLabels, j;
+    std::vector<std::string> subShells;
+    std::vector<std::vector<double> > tmpValues;
+    std::vector<std::vector<double> >::size_type n;
+    std::map<std::string, double > tmpDict;
+    std::map<std::string, double > bindingE;
+    std::string subshell;
+    std::string msg;
 
+    if ((mainShellName == "K") || (mainShellName == "L") || (mainShellName == "M"))
+    {
+        // We have received a valid main shell and not a subshell
+        ;
+    }
+    else
+    {
+        msg = "Invalid main shell <" + mainShellName +">";
+        throw std::invalid_argument(msg);
+    }
+
+    sf = SimpleSpecfile(fileName);
+    nScans = sf.getNumberOfScans();
+    if (mainShellName == "K")
+    {
+        if (nScans != 1)
+        {
+            msg = "Number of scans not equal one in K shell constants file " + \
+                   fileName;
+            throw std::ios_base::failure(msg);
+        }
+        subShells.push_back("K");
+    }
+    if (mainShellName == "L")
+    {
+        if (nScans != 3)
+        {
+            msg = "Number of scans not equal three in L shell constants file " + \
+                   fileName;
+            throw std::ios_base::failure(msg);
+        }
+        subShells.push_back("L1");
+        subShells.push_back("L2");
+        subShells.push_back("L3");
+    }
+    if (mainShellName == "M")
+    {
+        if (nScans != 5)
+        {
+            msg = "Number of scans not equal five in M shell constants file " + \
+                   fileName;
+            throw std::ios_base::failure(msg);
+        }
+        subShells.push_back("M1");
+        subShells.push_back("M2");
+        subShells.push_back("M3");
+        subShells.push_back("M4");
+        subShells.push_back("M5");
+    }
+
+    for (i = 0; i < nScans ; i++)
+    {
+        tmpLabels = sf.getScanLabels(i);
+        tmpValues = sf.getScanData(i);
+        nLabels = tmpLabels.size();
+        if (tmpValues[i].size() != nLabels)
+        {
+            msg = "Number of values does not match number of labels in " + fileName;
+            throw std::ios_base::failure(msg);
+        }
+        tmpDict.clear();
+        for (n = 0; n < tmpValues.size(); n++)
+        {
+            for (j = 0; j < nLabels; j++)
+            {
+                if (tmpLabels[j] != "Z")
+                {
+                    tmpDict[tmpLabels[j]] = tmpValues[n][j];
+                }
+
+            }
+            bindingE = this->elementList[n].getBindingEnergies();
+            if(bindingE[subShells[i]] > 0.0)
+            {
+                this->elementList[n].setNonradiativeTransitions(subShells[i], tmpDict);
+            }
+        }
+    }
 }
 
-void Elements::setShellNonradiativeTransitionsFile(std::string fileName, std::string mainShellName)
+void Elements::setShellRadiativeTransitionsFile(std::string mainShellName, std::string fileName)
 {
+    SimpleSpecfile sf;
+    int    nScans, i;
+    std::vector<std::string> tmpLabels;
+    std::vector<std::string>::size_type nLabels, j;
+    std::vector<std::string> subShells;
+    std::vector<std::vector<double> > tmpValues;
+    std::vector<std::vector<double> >::size_type n;
+    std::map<std::string, double > tmpDict;
+    std::map<std::string, double > bindingE;
+    std::string subshell;
+    std::string msg;
 
+    if ((mainShellName == "K") || (mainShellName == "L") || (mainShellName == "M"))
+    {
+        // We have received a valid main shell and not a subshell
+        ;
+    }
+    else
+    {
+        msg = "Invalid main shell <" + mainShellName +">";
+        throw std::invalid_argument(msg);
+    }
+
+    sf = SimpleSpecfile(fileName);
+    nScans = sf.getNumberOfScans();
+    if (mainShellName == "K")
+    {
+        if (nScans != 1)
+        {
+            msg = "Number of scans not equal one in K shell constants file " + \
+                   fileName;
+            throw std::ios_base::failure(msg);
+        }
+        subShells.push_back("K");
+    }
+    if (mainShellName == "L")
+    {
+        if (nScans != 3)
+        {
+            msg = "Number of scans not equal three in L shell constants file " + \
+                   fileName;
+            throw std::ios_base::failure(msg);
+        }
+        subShells.push_back("L1");
+        subShells.push_back("L2");
+        subShells.push_back("L3");
+    }
+    if (mainShellName == "M")
+    {
+        if (nScans != 5)
+        {
+            msg = "Number of scans not equal five in M shell constants file " + \
+                   fileName;
+            throw std::ios_base::failure(msg);
+        }
+        subShells.push_back("M1");
+        subShells.push_back("M2");
+        subShells.push_back("M3");
+        subShells.push_back("M4");
+        subShells.push_back("M5");
+    }
+
+    for (i = 0; i < nScans ; i++)
+    {
+        tmpLabels = sf.getScanLabels(i);
+        tmpValues = sf.getScanData(i);
+        nLabels = tmpLabels.size();
+        if (tmpValues[i].size() != nLabels)
+        {
+            msg = "Number of values does not match number of labels in " + fileName;
+            throw std::ios_base::failure(msg);
+        }
+        tmpDict.clear();
+        for (n = 0; n < tmpValues.size(); n++)
+        {
+            for (j = 0; j < nLabels; j++)
+            {
+                if (tmpLabels[j] != "Z")
+                {
+                    tmpDict[tmpLabels[j]] = tmpValues[n][j];
+                }
+
+            }
+            bindingE = this->elementList[n].getBindingEnergies();
+            if(bindingE[subShells[i]] > 0.0)
+            {
+                this->elementList[n].setRadiativeTransitions(subShells[i], tmpDict);
+            }
+        }
+    }
 }
 
 // Mass attenuation handling

@@ -77,19 +77,19 @@ public:
     /*!
     Load main shell (K, L or M) constants from file (fluorescence and Coster-Kronig yields)
     */
-    void setShellConstantsFile(std::string fileName, std::string shellName);
+    void setShellConstantsFile(std::string mainShellName, std::string fileName);
 
     /*!
     Load main shell (K, L or M) X-ray emission rates from file.
     The library normalizes internally.
     */
-    void setShellRadiativeTransitionsFile(std::string fileName, std::string mainShellName);
+    void setShellRadiativeTransitionsFile(std::string mainShellName, std::string fileName);
 
     /*!
     Load main shell (K, L or M) Coster-Kronig and Auger emission ratios from file.
     The library separates Coster-Kronig from Auger and normalizes internally.
     */
-    void setShellNonradiativeTransitionsFile(std::string fileName, std::string mainShellName);
+    void setShellNonradiativeTransitionsFile(std::string mainShellName, std::string fileName);
 
     // mass attenuation related functions
     /*!
