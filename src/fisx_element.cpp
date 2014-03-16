@@ -807,6 +807,23 @@ void Element::setRadiativeTransitions(std::string subshell, \
     this->shellInstance[subshell].setRadiativeTransitions(labels, values);
 }
 
+void Element::setRadiativeTransitions(std::string subshell, std::map<std::string, double> values)
+{
+    if (this->bindingEnergy.find(subshell) == this->bindingEnergy.end())
+    {
+        throw std::invalid_argument("Invalid shell");
+    }
+    if (this->bindingEnergy[subshell] <= 0.0)
+    {
+        throw std::invalid_argument("Requested shell has non positive binding energy");
+    }
+    if (this->shellInstance.find(subshell) == this->shellInstance.end())
+    {
+        throw std::invalid_argument("Requested shell is not a K, L or M subshell");
+    }
+    this->shellInstance[subshell].setRadiativeTransitions(values);
+}
+
 const std::map<std::string, double> & Element::getRadiativeTransitions(std::string subshell)
 {
     return this->shellInstance[subshell].getRadiativeTransitions();
@@ -829,6 +846,22 @@ void Element::setNonradiativeTransitions(std::string subshell, std::vector<std::
     this->shellInstance[subshell].setNonradiativeTransitions(labels, values);
 }
 
+void Element::setNonradiativeTransitions(std::string subshell, std::map<std::string, double> values)
+{
+    if (this->bindingEnergy.find(subshell) == this->bindingEnergy.end())
+    {
+        throw std::invalid_argument("Invalid shell");
+    }
+    if (this->bindingEnergy[subshell] <= 0.0)
+    {
+        throw std::invalid_argument("Requested shell has non positive binding energy");
+    }
+    if (this->shellInstance.find(subshell) == this->shellInstance.end())
+    {
+        throw std::invalid_argument("Requested shell is not a K, L or M subshell");
+    }
+    this->shellInstance[subshell].setNonradiativeTransitions(values);
+}
 
 const std::map<std::string, double> & Element::getNonradiativeTransitions(const std::string & subshell)
 {

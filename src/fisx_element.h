@@ -160,6 +160,8 @@ public:
                                                                     const double & energy);
 
     // Shell transitions description
+    void setRadiativeTransitions(std::string subshell, std::map<std::string, double> values);
+
     void setRadiativeTransitions(std::string subshell,\
                                  std::vector<std::string>,\
                                  std::vector<double> values);
@@ -168,6 +170,10 @@ public:
     void setNonradiativeTransitions(std::string subshell,
                                     std::vector<std::string>,
                                     std::vector<double> values);
+
+    void setNonradiativeTransitions(std::string subshell,
+                                    std::map<std::string, double> values);
+
     const std::map<std::string, double> & getNonradiativeTransitions(const std::string & subshell);
 
     // Shell constants (fluorescence yield, Coster-Kronig yields)
