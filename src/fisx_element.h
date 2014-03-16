@@ -78,7 +78,7 @@ public:
     void setBindingEnergies(std::map<std::string, double> bindingEnergies);
 
     /*!
-    Convenience method to tset the binding energies.
+    Convenience method to set the binding energies.
     */
     void setBindingEnergies(std::vector<std::string> labels, std::vector<double> energies);
 
@@ -196,7 +196,7 @@ public:
     std::map<std::string, std::map<std::string, double> >\
         getXRayLinesFromVacancyDistribution(std::map<std::string, double> distribution);
 
-    const Shell & getShellInstance(std::string);
+    const Shell & getShell(std::string);
 
     std::pair<long, long> getInterpolationIndices(const std::vector<double> &,  const double &);
 

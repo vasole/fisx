@@ -65,10 +65,11 @@ void Element::setBindingEnergies(std::map<std::string, double> bindingEnergies)
     {
         this->bindingEnergy[it->first] = it->second;
         tmpString = "";
-        if (tmpString.size())
+        if (it->first.size())
         {
             tmpString = it->first.substr(0, 1);
         }
+        //std::cout << this->name << " " << it->first << " " << it->second << "tmp = " << tmpString << std::endl;
         if ((tmpString == "K") || (tmpString == "L") || (tmpString == "M"))
         {
             if (this->shellInstance.find(it->first) == this->shellInstance.end())
@@ -788,17 +789,20 @@ std::map<std::string, double> Element::getInitialPhotoelectricVacancyDistributio
 void Element::setRadiativeTransitions(std::string subshell, \
                                       std::vector<std::string> labels, std::vector<double> values)
 {
+    std::string msg;
     if (this->bindingEnergy.find(subshell) == this->bindingEnergy.end())
     {
         throw std::invalid_argument("Invalid shell");
     }
     if (this->bindingEnergy[subshell] <= 0.0)
     {
-        throw std::invalid_argument("Requested shell has non positive binding energy");
+        msg = "Requested shell <" + subshell + "> has non positive binding energy";
+        throw std::invalid_argument(msg);
     }
     if (this->shellInstance.find(subshell) == this->shellInstance.end())
     {
-        throw std::invalid_argument("Requested shell is not a K, L or M subshell");
+        msg = "Requested shell <" + subshell + "> is not a K, L or M subshell";
+        throw std::invalid_argument(msg);
     }
     this->shellInstance[subshell].setRadiativeTransitions(labels, values);
 }
@@ -834,9 +838,11 @@ const std::map<std::string, double> & Element::getNonradiativeTransitions(const 
 
 void Element::setShellConstants(std::string subshell, std::map<std::string, double> constants)
 {
+    std::string msg;
     if (this->shellInstance.find(subshell) == this->shellInstance.end())
     {
-        throw std::invalid_argument("Requested shell is not a defined K, L or M subshell");
+        msg = "Requested shell <" + subshell + "> is not a defined K, L or M subshell";
+        throw std::invalid_argument(msg);
     }
     this->shellInstance[subshell].setShellConstants(constants);
 }
@@ -955,12 +961,12 @@ Element::getXRayLinesFromVacancyDistribution(std::map<std::string, double> distr
 }
 
 
-const Shell & Element::getShellInstance(std::string name)
+const Shell & Element::getShell(std::string name)
 {
     if (this->shellInstance.find(name) == this->shellInstance.end())
     {
         std::cout << "Undefined shell " << name << std::endl;
-        throw std::invalid_argument("Non defined shell");
+        throw std::invalid_argument("Non defined shell: " + name);
     }
     return this->shellInstance[name];
 }
