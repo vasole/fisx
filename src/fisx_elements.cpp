@@ -58,6 +58,8 @@ void Elements::initialize(std::string epdl97Directory, std::string bindingEnergi
     int    atomicNumber;
     std::vector<double> energyGrid;
     std::map<std::string, std::vector<double> > massAttenuationCoefficients;
+    std::string joinSymbol;
+    std::string filename;
 
     // initialize EPDL97
     this->epdl97.setDataDirectory(epdl97Directory);
@@ -95,6 +97,45 @@ void Elements::initialize(std::string epdl97Directory, std::string bindingEnergi
         }
         this->elementDict[symbol] = i;
     }
+
+#ifdef _WIN32
+    joinSymbol = "\\";
+#elif _WIN64
+    joinSymbol = "\\";
+#else
+    joinSymbol = "//";
+#endif
+
+    // check if epdl97Directory already ends with the joinSymbol
+    if (epdl97Directory.substr(epdl97Directory.size() - 1, 1) == joinSymbol)
+    {
+        joinSymbol = "";
+    }
+
+    // Load the shell constants
+    filename = epdl97Directory + joinSymbol + K_SHELL_CONSTANTS_FILE;
+    this->setShellConstantsFile(filename, "K");
+    filename = epdl97Directory + joinSymbol + L_SHELL_CONSTANTS_FILE;
+    this->setShellConstantsFile(filename, "L");
+    filename = epdl97Directory + joinSymbol + M_SHELL_CONSTANTS_FILE;
+    this->setShellConstantsFile(filename, "M");
+    return;
+    filename = epdl97Directory + joinSymbol + K_SHELL_RADIATIVE_FILE;
+    this->setShellRadiativeTransitionsFile(filename, "K");
+    filename = epdl97Directory + joinSymbol + K_SHELL_NONRADIATIVE_FILE;
+    this->setShellNonradiativeTransitionsFile(filename, "K");
+
+    // Load the L shell
+    filename = epdl97Directory + joinSymbol + L_SHELL_RADIATIVE_FILE;
+    this->setShellRadiativeTransitionsFile(filename, "L");
+    filename = epdl97Directory + joinSymbol + L_SHELL_NONRADIATIVE_FILE;
+    this->setShellNonradiativeTransitionsFile(filename, "L");
+
+    // Load the M shell
+    filename = epdl97Directory + joinSymbol + M_SHELL_RADIATIVE_FILE;
+    this->setShellRadiativeTransitionsFile(filename, "M");
+    filename = epdl97Directory + joinSymbol + M_SHELL_NONRADIATIVE_FILE;
+    this->setShellNonradiativeTransitionsFile(filename, "M");
 }
 
 // Element handling
@@ -157,7 +198,119 @@ void Elements::addElement(Element & element)
         this->elementList.push_back(element);
     }
 }
+// Shell constants
+void Elements::setShellConstantsFile(std::string fileName, std::string mainShellName)
+{
+    SimpleSpecfile sf;
+    int    nScans, i;
+    std::vector<std::string> tmpLabels;
+    std::vector<std::string>::size_type nLabels, j;
+    std::vector<std::string> subShells;
+    std::vector<std::vector<double> > tmpValues;
+    std::vector<std::vector<double> >::size_type n;
+    std::map<std::string, double > tmpDict;
+    std::string msg;
 
+    if ((mainShellName == "K") || (mainShellName == "L") || (mainShellName == "M"))
+    {
+        // We have received a valid main shell and not a subshell
+        ;
+    }
+    else
+    {
+        throw std::invalid_argument("Invalid main shell <" + mainShellName +">");
+    }
+
+    sf = SimpleSpecfile(fileName);
+    nScans = sf.getNumberOfScans();
+    if (mainShellName == "K")
+    {
+        if (nScans != 1)
+        {
+            msg = "Number of scans not equal one in K shell constants file " + \
+                   fileName;
+            throw std::ios_base::failure(msg);
+        }
+        subShells.push_back("K");
+    }
+    if (mainShellName == "L")
+    {
+        if (nScans != 3)
+        {
+            msg = "Number of scans not equal three in L shell constants file " + \
+                   fileName;
+            throw std::ios_base::failure(msg);
+        }
+        subShells.push_back("L1");
+        subShells.push_back("L2");
+        subShells.push_back("L3");
+    }
+    if (mainShellName == "M")
+    {
+        if (nScans != 5)
+        {
+            msg = "Number of scans not equal five in M shell constants file " + \
+                   fileName;
+            throw std::ios_base::failure(msg);
+        }
+        subShells.push_back("M1");
+        subShells.push_back("M2");
+        subShells.push_back("M3");
+        subShells.push_back("M4");
+        subShells.push_back("M5");
+    }
+
+    for (i = 0; i < nScans ; i++)
+    {
+        tmpLabels = sf.getScanLabels(i);
+        tmpValues = sf.getScanData(i);
+        nLabels = tmpLabels.size();
+        if (tmpValues[i].size() != nLabels)
+        {
+            msg = "Number of values does not match number of labels in " + fileName;
+            throw std::ios_base::failure(msg);
+        }
+        tmpDict.clear();
+        for (n = 0; n < tmpValues.size(); n++)
+        {
+            for (j = 0; j < nLabels; j++)
+            {
+                if (tmpLabels[j] != "Z")
+                {
+                    if(tmpLabels[j].size() > 4)
+                    {
+                        // only omegaX, fXY supported
+                        if (tmpLabels[j].substr(0, 5) == "omega")
+                        {
+                            tmpDict["omega"] = tmpValues[n][j];
+                        }
+                        else
+                        {
+                            //std::cout << "Label " << tmpLabels[j] << " ignored" << std::endl;
+                            ;
+                        }
+                    }
+                    else
+                    {
+                        tmpDict[tmpLabels[j]] = tmpValues[n][j];
+                    }
+                }
+
+            }
+            this->elementList[n].setShellConstants(subShells[i], tmpDict);
+        }
+    }
+}
+
+void Elements::setShellRadiativeTransitionsFile(std::string fileName, std::string mainShellName)
+{
+
+}
+
+void Elements::setShellNonradiativeTransitionsFile(std::string fileName, std::string mainShellName)
+{
+
+}
 
 // Mass attenuation handling
 void Elements::setMassAttenuationCoefficientsFile(std::string fileName)

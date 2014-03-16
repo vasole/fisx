@@ -73,6 +73,24 @@ public:
     */
     std::vector<std::string> getElementNames();
 
+    // shell related functions
+    /*!
+    Load main shell (K, L or M) constants from file (fluorescence and Coster-Kronig yields)
+    */
+    void setShellConstantsFile(std::string fileName, std::string shellName);
+
+    /*!
+    Load main shell (K, L or M) X-ray emission rates from file.
+    The library normalizes internally.
+    */
+    void setShellRadiativeTransitionsFile(std::string fileName, std::string mainShellName);
+
+    /*!
+    Load main shell (K, L or M) Coster-Kronig and Auger emission ratios from file.
+    The library separates Coster-Kronig from Auger and normalizes internally.
+    */
+    void setShellNonradiativeTransitionsFile(std::string fileName, std::string mainShellName);
+
     // mass attenuation related functions
     /*!
     Update the total mass attenuation coefficients of the default elements with those found
