@@ -1,3 +1,4 @@
+from ._fisx import PySimpleIni as SimpleIni
 from ._fisx import PySimpleSpecfile as SimpleSpecfile
 from ._fisx import PyEPDL97 as EPDL97
 from ._fisx import PyShell as Shell
