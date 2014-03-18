@@ -42,7 +42,7 @@ void SimpleIni::readFileName(std::string fileName)
     numberOfLines = -1;
     while (std::getline(fileInstance, line))
     {
-        std::cout << line << std::endl;
+        //std::cout << line << std::endl;
         ++numberOfLines;
 
         if (line.size() > 1)
