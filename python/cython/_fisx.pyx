@@ -298,6 +298,30 @@ from libcpp.string cimport string as std_string
 from libcpp.vector cimport vector as std_vector
 from libcpp.map cimport map as std_map
 
+from SimpleIni cimport *
+    
+cdef class PySimpleIni:
+    cdef SimpleIni *thisptr
+
+    def __cinit__(self, std_string name):
+        self.thisptr = new SimpleIni(name)
+
+    def __dealloc__(self):
+        del self.thisptr
+
+    def getKeys(self):
+        return self.thisptr.getKeys()
+
+    def readKey(self, std_string key):
+        return self.thisptr.readKey(key)
+#import numpy as np
+#cimport numpy as np
+cimport cython
+
+from libcpp.string cimport string as std_string
+from libcpp.vector cimport vector as std_vector
+from libcpp.map cimport map as std_map
+
 from SimpleSpecfile cimport *
     
 cdef class PySimpleSpecfile:
