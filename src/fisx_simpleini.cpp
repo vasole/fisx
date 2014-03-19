@@ -24,6 +24,7 @@ void SimpleIni::readFileName(std::string fileName)
     std::string mainKey;
     std::string key;
     std::string line;
+    std::string trimmedLine;
     std::string tmpString;
     std::string content;
     std::string::size_type i;
@@ -31,6 +32,7 @@ void SimpleIni::readFileName(std::string fileName)
     std::string::size_type p0, p1, length;
     int nQuotes;
     int nItems;
+    int equalPosition;
     long numberOfLines;
     std::streampos position;
     std::ifstream fileInstance(fileName.c_str(), std::ios::in | std::ios::binary);
@@ -42,27 +44,45 @@ void SimpleIni::readFileName(std::string fileName)
     numberOfLines = -1;
     while (std::getline(fileInstance, line))
     {
-        //std::cout << line << std::endl;
+        // std::cout << " INPUT <" << line << ">" << std::endl;
         ++numberOfLines;
 
-        if (line.size() > 1)
+        trimmedLine = "";
+        if((line.size() > 0))
         {
-            if (line[0] == '[')
+            // trim leading and trailing spaces
+            p1 = line.find_last_not_of(" \n\r\t");
+            if (p1 != line.npos)
             {
+                trimmedLine = line.substr(0, p1 + 1);
+                p0 = trimmedLine.find_first_not_of(" \n\r\t");
+                trimmedLine = trimmedLine.substr(p0);
+            }
+        }
+        if (trimmedLine.size() > 0)
+        {
+            if (trimmedLine[0] == '[')
+            {
+                if (p0 != 0)
+                {
+                    msg = "Main key not as first line character";
+                    std::cout << "WARNING: " << msg;
+                    std::cout << " line = <" << line << ">" << std::endl;
+                }
                 mainKey = "";
                 p0 = 0;
                 p1 = 0;
                 nItems = 1;
-                for (i = 1; i < line.size(); i++)
+                for (i = 1; i < trimmedLine.size(); i++)
                 {
-                    if (line[i] == '[')
+                    if (trimmedLine[i] == '[')
                     {
                         msg = "Invalid line: <" + line + ">";
                         throw std::invalid_argument(msg);
                     }
                     else
                     {
-                        if (line[i] == ']')
+                        if (trimmedLine[i] == ']')
                         {
                             nItems++;
                             p1 = i;
@@ -75,56 +95,74 @@ void SimpleIni::readFileName(std::string fileName)
                     msg = "Invalid line: <" + line + ">";
                     throw std::invalid_argument(msg);
                 }
-                mainKey = line.substr(p0 + 1, length);
+                mainKey = trimmedLine.substr(p0 + 1, length);
                 this->keys.push_back(mainKey);
                 this->keyPositions[mainKey] = numberOfLines;
                 continue;
             }
+
             tmpString = "";
             nQuotes = 0;
-            for(i=0; i < line.size(); i++)
+            equalPosition = 0;
+            for(i=0; i < trimmedLine.size(); i++)
             {
-                if (line[i] == '#')
-                {
-                    i = line.size();
-                }
-                if (line[i] == '"')
+                if (trimmedLine[i] == '"')
                 {
                     nQuotes++;
+                    tmpString += trimmedLine[i];
                     continue;
                 }
-                if (nQuotes == 0)
+                if (nQuotes && (nQuotes % 2))
                 {
-                    if ((line[i] != ' ') && (line[i] != '\r'))
-                    {
-                        tmpString += line[i];
-                    }
+                    // in between quotes
+                    tmpString += trimmedLine[i];
+                    continue;
                 }
                 else
                 {
-                    if(line[i] != '\r')
+                    if ((trimmedLine[i] == '#') || (trimmedLine[i] == ';'))
                     {
-                        tmpString += line[i];
+                        i = trimmedLine.size();
+                    }
+                    if (equalPosition == 0)
+                    {
+                        if (!isspace(trimmedLine[i]))
+                        {
+                            tmpString += trimmedLine[i];
+                        }
+                    }
+                    else
+                    {
+                        tmpString += trimmedLine[i];
+                    }
+                    if(trimmedLine[i] == '=')
+                    {
+                        if (equalPosition == 0)
+                        {
+                            equalPosition = tmpString.size() - 1;
+                        }
                     }
                 }
             }
-            if ((nQuotes != 0) && (nQuotes != 2))
+            if (nQuotes % 2)
             {
                 msg = "Unmatched double quotes in line: <" + line + ">";
                 throw std::invalid_argument(msg);
             }
+            // std::cout << " tmpString <" << tmpString << ">" << std::endl;
+
             if (tmpString.size() < 1)
             {
                 // empty line
                 key = "";
                 continue;
             }
-            if(tmpString.find('=') != tmpString.npos)
+            if(equalPosition > 0)
             {
                 // we have a key
                 key = "";
                 p0 = 0;
-                p1 = tmpString.find('=');
+                p1 = equalPosition;
                 length = p1 - p0;
                 if (length < 1)
                 {
