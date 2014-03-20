@@ -10,14 +10,10 @@ Material::Material()
     this->defaultThickness = 1.0;
 }
 
-Material::Material(const std::string & materialName)
+Material::Material(const std::string & materialName, const double & density,\
+                    const double & thickness, const std::string & comment)
 {
-    this->initialize(materialName, 1.0, 1.0, "");
-}
-
-Material::Material(const std::string & materialName, const double & density, const double & thickness)
-{
-    this->initialize(materialName, density, thickness, "");
+    this->initialize(materialName, density, thickness, comment);
 }
 
 

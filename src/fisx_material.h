@@ -15,18 +15,20 @@
 class Material
 {
 public:
-    Material();
     /*!
     Minimalist constructor.
     */
-    Material(const std::string &  materialName);
-    Material(const std::string & materialName, const double & density, const double & thickness);
-    Material(const std::string & materialName, const double & density, \
-             const double & thickness, const std::string & comment);
+    Material();
+
+    /*!
+    Expected constructor.
+    */
+    Material(const std::string & materialName, const double & density = 1.0, \
+             const double & thickness = 1.0, const std::string & comment = "");
 
     void setName(const std::string & name);
-    void initialize(const std::string & materialName, const double & density,\
-                    const double & thickness, const std::string & comment);
+    void initialize(const std::string & materialName, const double & density = 1.0,\
+                    const double & thickness = 1.0, const std::string & comment="");
 
     /*!
     Set the composition of the material.
@@ -46,8 +48,8 @@ public:
     std::map<std::string, double> getComposition();
     std::string getName();
     std::string getComment();
-    double getDefaultDensity();
-    double getDefaultThickness();
+    double getDefaultDensity(){return this->defaultDensity;};
+    double getDefaultThickness(){return this->defaultThickness;};
 
 private:
     std::string name;
