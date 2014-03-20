@@ -819,10 +819,11 @@ std::map<std::string, double> Elements::getMassAttenuationCoefficients(std::stri
 
     if (this->elementDict.find(name) == this->elementDict.end())
     {
-        composition = this->getCompositionFromFormula(name);
+        // composition = this->getCompositionFromFormula(name);
+        composition = this->getComposition(name);
         if (composition.size() < 1)
         {
-            msg = "Name " + name + " not accepted as element or chemical formula";
+            msg = "Name " + name + " not accepted as element, material or chemical formula";
             throw std::invalid_argument(msg);
         }
         return this->getMassAttenuationCoefficients(composition, energy);
@@ -841,10 +842,11 @@ std::map<std::string, std::vector<double> > Elements::getMassAttenuationCoeffici
 
     if (this->elementDict.find(name) == this->elementDict.end())
     {
-        composition = this->getCompositionFromFormula(name);
+        //composition = this->getCompositionFromFormula(name);
+        composition = this->getComposition(name);
         if (composition.size() < 1)
         {
-            msg = "Name " + name + " not accepted as element or chemical formula";
+            msg = "Name " + name + " not accepted as element, material or chemical formula";
             throw std::invalid_argument(msg);
         }
         return this->getMassAttenuationCoefficients(composition, energy);
@@ -902,7 +904,8 @@ std::map<std::string, std::vector<double> > Elements::getMassAttenuationCoeffici
         }
         // we may have received formulas ...
         name = c_it->first;
-        composition = this->getCompositionFromFormula(name);
+        //composition = this->getCompositionFromFormula(name);
+        composition = this->getComposition(name);
         if (composition.size() < 1)
         {
             msg = "Name " + c_it->first + " not understood";
@@ -1279,7 +1282,7 @@ std::map<std::string, double> Elements::parseFormula(const std::string & formula
                 }
                 i += 1;
             }
-            if (!this->StringToDouble(formula.substr(p2+1, i - (p2+1)), factor))
+            if (!this->stringToDouble(formula.substr(p2+1, i - (p2+1)), factor))
             {
                 return composition;
             };
@@ -1327,7 +1330,7 @@ std::map<std::string, double> Elements::parseFormula(const std::string & formula
                     keys.push_back(lastKey);
                     if (lastNumber.size() > 0)
                     {
-                        if (this->StringToDouble(lastNumber, factor))
+                        if (this->stringToDouble(lastNumber, factor))
                             numbers.push_back(factor);
                         else
                             return composition;
@@ -1366,7 +1369,7 @@ std::map<std::string, double> Elements::parseFormula(const std::string & formula
             else
             {
                 keys.push_back(lastKey);
-                if (this->StringToDouble(lastNumber, factor))
+                if (this->stringToDouble(lastNumber, factor))
                     numbers.push_back(factor);
                 else
                     return composition;
@@ -1391,7 +1394,7 @@ std::map<std::string, double> Elements::parseFormula(const std::string & formula
     return composition;
 }
 
-bool Elements::StringToDouble(const std::string& str, double& number)
+bool Elements::stringToDouble(const std::string& str, double& number)
 {
 
     std::istringstream i(str);

@@ -220,12 +220,12 @@ public:
     /*!
     Utility to convert from string to double.
     */
-    bool StringToDouble(const std::string & str, double& number);
+    static bool stringToDouble(const std::string & str, double& number);
 
     /*!
     Utility to convert from double to string.
     */
-    std::string toString(const double& number);
+    static std::string toString(const double& number);
 
 private:
     void initialize(std::string, std::string);
