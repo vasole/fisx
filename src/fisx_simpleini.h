@@ -13,7 +13,8 @@ public:
     void readFileName(std::string fileName);
     const std::vector<std:: string> & getKeys();
     const std::map<std::string, std::string> & readKey(const std::string & key,
-                                                       const std::string & defaultValue="");
+                                                       const std::string & defaultValue="",
+                                                       const bool & caseSensitive = true);
     template<typename T>
     static void parseStringAsSingleValue(const std::string & keyContent,\
                                   T & destination,

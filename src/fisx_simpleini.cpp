@@ -3,8 +3,7 @@
 #include <fstream>
 #include <stdexcept>
 #include <stdlib.h>
-#include <cctype>
-#define isNumber(x) ( isdigit(x) || x == '-' || x == '+' || x == '.' || x == 'E' || x == 'e')
+#include <locale>  // std::locale, std::tolower
 
 SimpleIni::SimpleIni()
 {
@@ -202,10 +201,44 @@ const std::vector<std::string> & SimpleIni::getKeys()
 }
 
 const std::map<std::string, std::string > & SimpleIni::readKey(const std::string & key,
-                                                               const std::string & defaultValue)
+                                                               const std::string & defaultValue,
+                                                               const bool & caseSensitive)
 {
+    std::string inputKey;
+    std::string tmpKey;
+    std::locale loc;
+    std::vector<std::string>::size_type i, j;
+
     if (this->keyContents.find(key) == this->keyContents.end())
     {
+        if (!caseSensitive)
+        {
+            inputKey = key;
+            for (i = 0; i < key.size(); i++)
+            {
+                inputKey[i] = std::toupper(inputKey[i], loc);
+            }
+            for (i = 0; i < this->keys.size(); i++)
+            {
+                tmpKey = this->keys[i];
+                if (tmpKey.size() == inputKey.size())
+                {
+                    j = 0;
+                    while (std::toupper(tmpKey[j], loc) == inputKey[j])
+                    {
+                        j++;
+                        if (j == inputKey.size())
+                        {
+                            break;
+                        }
+                    }
+                    if (j < inputKey.size())
+                    {
+                        return this->keyContents[keys[i]];
+                    }
+                }
+            }
+        }
         this->defaultContent.clear();
         this->defaultContent[key] = defaultValue;
         return this->defaultContent;
