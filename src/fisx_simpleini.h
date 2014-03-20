@@ -15,9 +15,17 @@ public:
     const std::map<std::string, std::string> & readKey(const std::string & key,
                                                        const std::string & defaultValue="");
     template<typename T>
-    void parseStringAsSingleValue(const std::string & keyContent,\
+    static void parseStringAsSingleValue(const std::string & keyContent,\
                                   T & destination,
-                                  const T & defaultValue);
+                                  const T & defaultValue)
+    {
+        std::stringstream stream(keyContent);
+        stream >> destination;
+        if (stream.fail())
+        {
+            destination = defaultValue;
+        }
+    };
 
     template<typename T>
     static void parseStringAsMultipleValues(const std::string & keyContent,
