@@ -11,10 +11,23 @@ public:
     SimpleIni();
     SimpleIni(std::string fileName);
     void readFileName(std::string fileName);
-    const std::vector<std:: string> & getKeys();
-    const std::map<std::string, std::string> & readKey(const std::string & key,
-                                                       const std::string & defaultValue="",
+    /*!
+    Get all the section names in the file.
+    */
+    const std::vector<std:: string> & getSections();
+
+    /*!
+    Read a particular section with the option to be case sensitive or not.
+    It returns a map<string, string> with the key and the key content.
+    Attention: subsections are not considered keys.
+    If the section is not present, it returns an empty map.
+    */
+    const std::map<std::string, std::string> & readSection(const std::string & section,
                                                        const bool & caseSensitive = true);
+
+    /*!
+    Static method to parse a string
+    */
     template<typename T>
     static void parseStringAsSingleValue(const std::string & keyContent,\
                                   T & destination,
@@ -30,16 +43,15 @@ public:
 
     template<typename T>
     static void parseStringAsMultipleValues(const std::string & keyContent,
-                                            std::vector<T> & destination, const T & defaultValue)
+                                            std::vector<T> & destination,
+                                            const T & defaultValue,
+                                            const char & separator = ',')
     {
         std::stringstream ss(keyContent);
         T result;
         std::string item;
-        char delimiter;
-
-        delimiter = ',';
         destination.clear();
-        while (std::getline(ss, item, delimiter))
+        while (std::getline(ss, item, separator))
         {
             if (SimpleIni::stringConverter(item, result))
                 destination.push_back(result);
@@ -62,9 +74,9 @@ public:
 
 private:
     std::string fileName;
-    std::map<std::string, std::map<std::string, std::string> > keyContents;
-    std::vector<std::string> keys;
-    std::map<std::string, long> keyPositions;
+    std::map<std::string, std::map<std::string, std::string> > sectionContents;
+    std::vector<std::string> sections;
+    std::map<std::string, long> sectionPositions;
     std::map<std::string, std::string>  defaultContent;
 };
 #endif

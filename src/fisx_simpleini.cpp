@@ -8,8 +8,8 @@
 SimpleIni::SimpleIni()
 {
     this->fileName = "";
-    this->keys.clear();
-    this->keyPositions.clear();
+    this->sections.clear();
+    this->sectionPositions.clear();
 }
 
 SimpleIni::SimpleIni(std::string fileName)
@@ -37,8 +37,8 @@ void SimpleIni::readFileName(std::string fileName)
     std::ifstream fileInstance(fileName.c_str(), std::ios::in | std::ios::binary);
     std::string msg;
 
-    this->keys.clear();
-    this->keyPositions.clear();
+    this->sections.clear();
+    this->sectionPositions.clear();
     position = 0;
     numberOfLines = -1;
     while (std::getline(fileInstance, line))
@@ -95,8 +95,8 @@ void SimpleIni::readFileName(std::string fileName)
                     throw std::invalid_argument(msg);
                 }
                 mainKey = trimmedLine.substr(p0 + 1, length);
-                this->keys.push_back(mainKey);
-                this->keyPositions[mainKey] = numberOfLines;
+                this->sections.push_back(mainKey);
+                this->sectionPositions[mainKey] = numberOfLines;
                 continue;
             }
 
@@ -170,14 +170,14 @@ void SimpleIni::readFileName(std::string fileName)
                 }
                 key = tmpString.substr(p0, length);
                 content = tmpString.substr(p1 + 1, tmpString.size() - p1 - 1);
-                this->keyContents[mainKey][key] = content;
+                this->sectionContents[mainKey][key] = content;
             }
             else
             {
                 // continuation line
                 if ((key.size() > 0) && (mainKey.size() > 0))
                 {
-                    this->keyContents[mainKey][key] += tmpString;
+                    this->sectionContents[mainKey][key] += tmpString;
                 }
                 else
                 {
@@ -195,21 +195,20 @@ void SimpleIni::readFileName(std::string fileName)
 }
 
 
-const std::vector<std::string> & SimpleIni::getKeys()
+const std::vector<std::string> & SimpleIni::getSections()
 {
-    return this->keys;
+    return this->sections;
 }
 
-const std::map<std::string, std::string > & SimpleIni::readKey(const std::string & key,
-                                                               const std::string & defaultValue,
-                                                               const bool & caseSensitive)
+const std::map<std::string, std::string > & SimpleIni::readSection(const std::string & key,
+                                                                   const bool & caseSensitive)
 {
     std::string inputKey;
     std::string tmpKey;
     std::locale loc;
     std::vector<std::string>::size_type i, j;
 
-    if (this->keyContents.find(key) == this->keyContents.end())
+    if (this->sectionContents.find(key) == this->sectionContents.end())
     {
         if (!caseSensitive)
         {
@@ -218,9 +217,9 @@ const std::map<std::string, std::string > & SimpleIni::readKey(const std::string
             {
                 inputKey[i] = std::toupper(inputKey[i], loc);
             }
-            for (i = 0; i < this->keys.size(); i++)
+            for (i = 0; i < this->sections.size(); i++)
             {
-                tmpKey = this->keys[i];
+                tmpKey = this->sections[i];
                 if (tmpKey.size() == inputKey.size())
                 {
                     j = 0;
@@ -234,14 +233,13 @@ const std::map<std::string, std::string > & SimpleIni::readKey(const std::string
                     }
                     if (j < inputKey.size())
                     {
-                        return this->keyContents[keys[i]];
+                        return this->sectionContents[tmpKey];
                     }
                 }
             }
         }
         this->defaultContent.clear();
-        this->defaultContent[key] = defaultValue;
         return this->defaultContent;
     }
-    return this->keyContents[key];
+    return this->sectionContents[key];
 }
