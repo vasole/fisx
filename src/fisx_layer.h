@@ -46,7 +46,6 @@ public:
     */
     std::vector<double> getTransmission(const std::vector<double> & energy, Elements & elements);
 
-
 private:
     std::string materialName;
     bool hasMaterial;

@@ -18,7 +18,16 @@ void Beam::setBeam(const std::vector<double> & energy, \
     double defaultDivergency;
 
     this->normalized = false;
-    this->rays.resize(energy.size());
+
+    if(energy.size() > 0)
+    {
+        this->rays.resize(energy.size());
+    }
+    else
+    {
+        this->rays.clear();
+        return;
+    }
 
     defaultWeight = 1.0;
     if (weight.size())
@@ -90,6 +99,10 @@ void Beam::setBeam(int nValues, double *energy, double *weight,
     this->normalized = false;
     this->rays.clear();
     this->rays.resize(nValues);
+    if (nValues <= 0)
+    {
+        return;
+    }
 
     tmpDouble = 1.0;
 
