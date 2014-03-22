@@ -4,6 +4,7 @@
 #include <vector>
 #include <map>
 #include <sstream>
+#include <locale>  // std::locale, std::tolower, std::toupper
 
 class SimpleIni
 {
@@ -17,6 +18,13 @@ public:
     const std::vector<std:: string> & getSections();
 
     /*!
+    Get all the file section names in the file with the provided parent
+    */
+    void getSubsections(const std::string & parent, \
+                        std::vector<std::string> & destination, \
+                        const bool & caseSensitive = true);
+
+    /*!
     Read a particular section with the option to be case sensitive or not.
     It returns a map<string, string> with the key and the key content.
     Attention: subsections are not considered keys.
@@ -24,6 +32,30 @@ public:
     */
     const std::map<std::string, std::string> & readSection(const std::string & section,
                                                        const bool & caseSensitive = true);
+
+    /*!
+    Static method to convert a string to upper case using supplied locale
+    */
+    static void toUpper(std::string & s, const std::locale & loc = std::locale())
+    {
+        std::string::size_type i;
+        for (i = 0; i < s.size(); i++)
+        {
+            s[i] = std::toupper(s[i], loc);
+        }
+    }
+
+    /*!
+    Static method to convert a string to lower case using supplied locale
+    */
+    static void toLower(std::string & s, const std::locale & loc = std::locale())
+    {
+        std::string::size_type i;
+        for (i = 0; i < s.size(); i++)
+        {
+            s[i] = std::tolower(s[i], loc);
+        }
+    }
 
     /*!
     Static method to parse a string

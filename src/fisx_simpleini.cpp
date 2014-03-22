@@ -3,7 +3,6 @@
 #include <fstream>
 #include <stdexcept>
 #include <stdlib.h>
-#include <locale>  // std::locale, std::tolower
 
 SimpleIni::SimpleIni()
 {
@@ -200,7 +199,60 @@ const std::vector<std::string> & SimpleIni::getSections()
     return this->sections;
 }
 
-const std::map<std::string, std::string > & SimpleIni::readSection(const std::string & key,
+void SimpleIni::getSubsections(const std::string & parent, \
+                               std::vector<std::string> & destination, \
+                               const bool & caseSensitive)
+{
+    std::string targetString;
+    std::string instanceString;
+    std::locale loc;
+    std::vector<std::string>::size_type i;
+    std::string::size_type j;
+
+    destination.clear();
+    if (parent.size() == 0)
+    {
+        destination.resize(this->sections.size());
+        for (i = 0; i < this->sections.size(); i++)
+        {
+            destination[i] = this->sections[i];
+        }
+        return;
+    }
+    if (caseSensitive)
+    {
+        targetString = parent + ".";
+        for (i = 0; i < this->sections.size(); i++)
+        {
+            if (this->sections[i].size() == targetString.size())
+            {
+                if (this->sections[i].substr(0, targetString.size()) == targetString)
+                {
+                    destination.push_back(this->sections[i]);
+                }
+            }
+        }
+    }
+    else
+    {
+        targetString = parent + ".";
+        this->toUpper(targetString, loc);
+        for (i = 0; i < this->sections.size(); i++)
+        {
+            instanceString = this->sections[i];
+            if (instanceString.size() == targetString.size())
+            {
+                this->toUpper(instanceString, loc);
+                if (instanceString == targetString)
+                {
+                    destination.push_back(this->sections[i]);
+                }
+            }
+        }
+    }
+}
+
+const std::map<std::string, std::string > & SimpleIni::readSection(const std::string & key, \
                                                                    const bool & caseSensitive)
 {
     std::string inputKey;
