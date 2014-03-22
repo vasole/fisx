@@ -1,7 +1,7 @@
 #ifndef FISX_XRFCONFIG_H
 #define FISX_XRFCONFIG_H
 // TODO #include "fisx_version.h"
-#include "fisx_layer.h"
+#include "fisx_detector.h"
 #include "fisx_beam.h"
 
 class XRFConfig
@@ -100,7 +100,8 @@ private:
     double  alphaIn;
     double  alphaOut;
     double  scatteringAngle;
-    Layer detector;
+    // for the time being the detector is just other layer
+    Detector detector;
     //collimators Not implemented;
 
 

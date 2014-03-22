@@ -20,6 +20,7 @@ void XRFConfig::readConfigurationFromFile(const std::string & fileName)
 {
     SimpleIni iniFile = SimpleIni(fileName);
     std::map<std::string, std::string> sectionContents;
+    std::string key;
     std::string content;
     std::locale loc;
     std::map<std::string, std::vector<double> > mapDoubles;
@@ -35,6 +36,8 @@ void XRFConfig::readConfigurationFromFile(const std::string & fileName)
     Layer layer;
     bool fisxFile;
     long counter;
+    bool multilayerSample;
+    double value;
 
     // find out if it is a fix or a PyMca configuration file
     sectionContents.clear();
@@ -198,6 +201,8 @@ void XRFConfig::readConfigurationFromFile(const std::string & fileName)
     this->beamFilters.clear();
     this->attenuators.clear();
     this->sample.clear();
+    this->detector = Detector();
+    multilayerSample = false;
     for (c_it = sectionContents.begin(); c_it != sectionContents.end(); ++c_it)
     {
         // std::cout << c_it->first << " " << c_it->second << std::endl;
@@ -230,6 +235,7 @@ void XRFConfig::readConfigurationFromFile(const std::string & fileName)
                     if (stringVector[1] == "MULTILAYER")
                     {
                         std::cout << "MULTILAYER NOT PARSED YET" << std::endl;
+                        multilayerSample = true;
                     }
                     else
                     {
@@ -244,7 +250,8 @@ void XRFConfig::readConfigurationFromFile(const std::string & fileName)
                     {
                         // DETECTOR
                         std::cout << "DETECTOR " << std::endl;
-                        ;
+                        this->detector = Detector(c_it->first, doubleVector[2], doubleVector[3], doubleVector[4]);
+                        this->detector.setMaterial(stringVector[1]);
                     }
                     else
                     {
@@ -256,6 +263,51 @@ void XRFConfig::readConfigurationFromFile(const std::string & fileName)
                     }
                 }
             }
+        }
+    }
+
+    // GET MULTILAYER SAMPLE IF NEEDED
+    if (multilayerSample)
+    {
+        sectionContents.clear();
+        sectionContents = iniFile.readSection("multilayer", false);
+        for (c_it = sectionContents.begin(); c_it != sectionContents.end(); ++c_it)
+        {
+            // std::cout << c_it->first << " " << c_it->second << std::endl;
+            content = c_it->second;
+            iniFile.parseStringAsMultipleValues(content, doubleVector, -1.0);
+            iniFile.parseStringAsMultipleValues(content, stringVector, std::string());
+            if (doubleVector.size() == 0.0)
+            {
+                std::cout << "WARNING: Empty line in multilayer section. Offending key is: "<< std::endl;
+                std::cout << "<" << c_it->first << ">" << std::endl;
+                continue;
+            }
+            if (doubleVector[0] > 0.0)
+            {
+                    //BeamFilter0 = 0, -, 0.0, 0.0, 1.0
+                    layer = Layer(c_it->first, doubleVector[2], doubleVector[3], doubleVector[4]);
+                    layer.setMaterial(stringVector[1]);
+                    this->sample.push_back(layer);
+            }
+        }
+    }
+
+    // CONCENTATIONS SETUP
+    sectionContents.clear();
+    sectionContents = iniFile.readSection("concentrations", false);
+    for (c_it = sectionContents.begin(); c_it != sectionContents.end(); ++c_it)
+    {
+        key = c_it->first;
+        iniFile.toUpper(key);
+        iniFile.parseStringAsSingleValue(c_it->second, value, -1.0);
+        if (key == "DISTANCE")
+        {
+            this->detector.setDistance(value);
+        }
+        if (key == "AREA")
+        {
+            this->detector.setActiveArea(value);
         }
     }
 }
