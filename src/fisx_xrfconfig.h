@@ -92,6 +92,7 @@ public:
 
 private:
     Beam beam;
+    std::vector<Material> materials;
     std::vector<Layer> beamFilters;
     std::vector<Layer> sample;
     std::vector<Layer> attenuators;
