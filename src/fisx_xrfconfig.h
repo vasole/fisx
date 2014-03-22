@@ -9,8 +9,8 @@ class XRFConfig
 public:
     XRFConfig();
 
-    void importConfigurationFromFile(const std::string & fileName);
-    void exportConfigurationToFile(const std::string & fileName);
+    void readConfigurationFromFile(const std::string & fileName);
+    void saveConfigurationToFile(const std::string & fileName);
 
     /*!
     Set the excitation beam
