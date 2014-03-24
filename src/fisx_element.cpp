@@ -238,7 +238,7 @@ std::map<std::string, double>Element::getMassAttenuationCoefficients(const doubl
     std::pair<long, long> indices;
     long i1, i2;
     double A, B, x0, x1, y0, y1;
-    std::string shellList[10] = {"K", "L1", "L2", "L3", "M1", "M2", "M3", "M4", "M5", "all other"};
+    //std::string shellList[10] = {"K", "L1", "L2", "L3", "M1", "M2", "M3", "M4", "M5", "all other"};
     std::map<std::string, std::vector<double> >::const_iterator c_it;
     std::string key;
     std::map<std::string, double> result;
@@ -407,7 +407,6 @@ std::map<std::string, std::pair<double, int> > \
     std::vector<double>::size_type i;
     std::string shellList[16] = {"K", "L1", "L2", "L3", "M1", "M2", "M3", "M4", "M5",\
                                 "N1", "N2", "N3", "N4", "N5", "N6", "N7"};
-    int lastShell;
     std::string key;
     double energy;
     std::map<double, std::vector<double>::size_type> candidates;
@@ -434,7 +433,6 @@ std::map<std::string, std::pair<double, int> > \
         throw std::runtime_error("Binding energies not initialized");
     }
 
-    lastShell = 0;
     for(i = 0; i < (muPhotoelectric.size() - 1); i++)
     {
         energy = muEnergy[i];
@@ -923,7 +921,7 @@ Element::getXRayLinesFromVacancyDistribution(std::map<std::string, double> distr
     double rate, energy0, energy1;
     std::string tmpString;
     std::map<std::string, double> finalDistribution;
-    bool cascade = true;
+    //bool cascade = true;
     std::map<std::string, double> transferRatios;
     std::map<std::string, double> fluorescenceRatios;
     std::map<std::string, std::map<std::string, double> >result;
