@@ -26,9 +26,9 @@ public:
     /*!
     Set the beam filters to be applied to the beam
     */
-    void setBeamFilters(const std::vector<std::string> & names,\
-                        const std::vector<double> & densities,\
-                        const std::vector<double> & thicknesses,\
+    void setBeamFilters(const std::vector<std::string> & names, \
+                        const std::vector<double> & densities, \
+                        const std::vector<double> & thicknesses, \
                         const std::vector<std::string> & comments);
     void setBeamFilters(const std::vector<Layer> & filters);
 
@@ -44,9 +44,9 @@ public:
     The first ( = top) layer will be taken as reference layer. This can be changed calling setRefenceLayer
     */
     void setSample(const std::vector<Layer> & layers, const int & referenceLayer = 0);
-    void setSample(const std::vector<std::string> & names,\
-                   const std::vector<double> & densities,\
-                   const std::vector<double> & thicknesses,\
+    void setSample(const std::vector<std::string> & names, \
+                   const std::vector<double> & densities, \
+                   const std::vector<double> & thicknesses, \
                    const std::vector<std::string> & comments,
                    const int & referenceLayer = 0);
 
@@ -61,9 +61,9 @@ public:
     Set the list of attenuators. Attenuators are layers between sample and detector.
     */
     void setAttenuators(const std::vector<Layer> & attenuators);
-    void setAttenuators(const std::vector<std::string> & names,\
-                        const std::vector<double> & densities,\
-                        const std::vector<double> & thicknesses,\
+    void setAttenuators(const std::vector<std::string> & names, \
+                        const std::vector<double> & densities, \
+                        const std::vector<double> & thicknesses, \
                         const std::vector<std::string> & comments);
 
     /*!
@@ -77,7 +77,7 @@ public:
     Set the detector. For the time being it is very simple.
     It has active area, material, density, thickness and distance.
     */
-    //void setDetector();
+    void setDetector(const Detector & detector);
 
     /*!
     Methods coordinating all the calculation

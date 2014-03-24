@@ -319,3 +319,33 @@ void XRFConfig::setBeam(const std::vector<double> & energy, \
 {
     this->beam.setBeam(energy, weight, characteristic, divergency);
 }
+
+void XRFConfig::setBeam(const Beam & beam)
+{
+    this->beam = beam;
+}
+
+void XRFConfig::setBeamFilters(const std::vector<Layer> & filters)
+{
+    this->beamFilters = filters;
+}
+
+void XRFConfig::setSample(const std::vector<Layer> & layers, const int & referenceLayer)
+{
+    if (referenceLayer >= (int) layers.size())
+    {
+        throw std::invalid_argument("Reference layer must be smaller than number of layers");
+    }
+    this->sample = layers;
+    this->referenceLayer = referenceLayer;
+}
+
+void XRFConfig::setAttenuators(const std::vector<Layer> & attenuators)
+{
+    this->attenuators = attenuators;
+}
+
+void XRFConfig::setDetector(const Detector & detector)
+{
+    this->detector = detector;
+}
