@@ -54,8 +54,8 @@ public:
 
 
 private:
-    double diameter =  0.0;
-    double distance = 10.0;
+    double diameter ;
+    double distance ;
     // TODO: Calibration, fano, noise, and so on.
 };
 

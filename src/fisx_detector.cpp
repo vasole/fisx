@@ -5,7 +5,8 @@
 Detector::Detector(const std::string & name, const double & density, const double & thickness, \
                   const double & funnyFactor): Layer(name, density, thickness, funnyFactor)
 {
-    ;
+    this->diameter =  0.0;
+    this->distance = 10.0;
 }
 
 double Detector::getActiveArea()
