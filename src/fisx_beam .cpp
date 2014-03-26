@@ -198,30 +198,31 @@ void Beam::normalizeBeam()
     std::sort(this->rays.begin(), this->rays.end());
 }
 
-std::vector<double> Beam::getBeamAsDoubleVector()
+std::vector<std::vector<double> > Beam::getBeamAsDoubleVectors()
 {
     std::vector<double>::size_type nItems;
     std::vector<Ray>::const_iterator c_it;
-    std::vector<double> returnValue;
+    std::vector<std::vector<double> >returnValue;
     Ray ray;
 
     if (!this->normalized)
     {
         this->normalizeBeam();
     }
-    nItems = 4 * this->rays.size();
-    returnValue.resize(nItems);
+    nItems = rays.size();
+    returnValue.resize(4);
+    returnValue[0].resize(nItems);
+    returnValue[1].resize(nItems);
+    returnValue[2].resize(nItems);
+    returnValue[3].resize(nItems);
     nItems = 0;
-    for(c_it = this->rays.begin(); c_it != this->rays.end(); ++c_it)
+    for(c_it = rays.begin(); c_it != rays.end(); ++c_it)
     {
         ray = *c_it;
-        returnValue[nItems] = ray.energy;
-        nItems++;
-        returnValue[nItems] = ray.weight;
-        nItems++;
-        returnValue[nItems] = ray.characteristic;
-        nItems++;
-        returnValue[nItems] = ray.divergency;
+        returnValue[0][nItems] = ray.energy;
+        returnValue[1][nItems] = ray.weight;
+        returnValue[2][nItems] = ray.characteristic;
+        returnValue[3][nItems] = ray.divergency;
         nItems++;
     }
     return returnValue;

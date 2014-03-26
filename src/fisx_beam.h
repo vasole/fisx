@@ -45,7 +45,9 @@ public:
     Minimalist constructor.
     */
 
-    /*! Beam description given as vectors
+    /*!
+    Beam description given as vectors.
+    The beam is always internally ordered.
     */
     void setBeam(const std::vector<double> & energy, \
                  const std::vector<double> & weight = std::vector<double>(),\
@@ -67,12 +69,16 @@ public:
     */
     const std::vector<Ray> & getBeam();
 
-
-
-    /*! Returns a vector of doubles of length 4 * the number of rays describing the beam as:
-    [energy0, weight0, characteristic0, divergency0, energy1, weight1, ...]
+    /*!
+    Currently it returns a vector of "elements" in which each element is a vector of
+    doubles with length equal to the number of energies.
+    The first four elements are warranteed to exist and they are:
+    [energy0, energy1, energy2, ...]
+    [weight0, weight1, weight2, ...]
+    [characteristic0, characteristic1, charactersitic2, ...]
+    [divergency0, divergency1, divergency2, ...]
     */
-    std::vector<double> getBeamAsDoubleVector();
+    std::vector<std::vector<double> > getBeamAsDoubleVectors();
 
 private:
     bool normalized;
