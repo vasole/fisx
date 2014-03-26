@@ -50,12 +50,12 @@ public:
     /*!
     Returns true if the element with name elementName is already defined in the library.
     */
-    bool isElementNameDefined(const std::string & elementName);
+    bool isElementNameDefined(const std::string & elementName) const;
 
     /*!
     Returns a reference to the element with name elementName if defined in the library.
     */
-    const Element & getElement(const std::string & elementName);
+    const Element & getElement(const std::string & elementName) const;
 
     /*!
     Get a copy of the element with name elementName.
@@ -113,7 +113,8 @@ public:
     /*!
     Retrieve the internal table of photon mass attenuation coefficients of the requested element.
     */
-    std::map<std::string, std::vector<double> > getMassAttenuationCoefficients(std::string elementName);
+    std::map<std::string, std::vector<double> > getMassAttenuationCoefficients( \
+                                                        const std::string & elementName) const;
 
     /*!
     Given an element or formula and a set of energies, give back the mass attenuation coefficients
@@ -121,7 +122,7 @@ public:
     are the vectors of the calculated values via log-log interpolation in the internal table.
     */
     std::map<std::string, std::vector<double> > getMassAttenuationCoefficients(std::string formula,
-                                                                         std::vector<double> energies);
+                                                            std::vector<double> energies) const;
 
     /*!
     Given a map of elements and mass fractions and a set of energies, give back the mass attenuation
@@ -130,7 +131,7 @@ public:
     */
     std::map<std::string, std::vector<double> > getMassAttenuationCoefficients(\
                                                 std::map<std::string, double> elementMassFractions,\
-                                                std::vector<double> energies);
+                                                std::vector<double> energies) const;
 
 
     /*!
@@ -139,7 +140,7 @@ public:
     given energy as a map where the keys are the different physical processes and the values are
     calculated values via log-log interpolation in the internal table.
     */
-    std::map<std::string, double> getMassAttenuationCoefficients(std::string formula, double energy);
+    std::map<std::string, double> getMassAttenuationCoefficients(std::string formula, double energy) const;
 
     /*!
     Convenience method.
@@ -148,7 +149,7 @@ public:
     values are the calculated values via log-log interpolation in the internal table.    */
     std::map<std::string, double> getMassAttenuationCoefficients(\
                                                 std::map<std::string, double> elementMassFractions,\
-                                                double energies);
+                                                double energies) const;
 
     // Material handling
     /*!
@@ -202,20 +203,20 @@ public:
     Try to interpret a given string as a formula, returning the associated mass fractions
     as a map of elements and mass fractions. In case of failure, it returns an empty map.
     */
-    std::map<std::string, double> getCompositionFromFormula(const std::string & formula);
+    std::map<std::string, double> getCompositionFromFormula(const std::string & formula) const;
 
     /*!
     Try to interpret a given string as a chemical formula or a defined material, returning the
     associated mass fractions as a map of elements and mass fractions.
     In case of failure, it returns an empty map.
     */
-    std::map<std::string, double> getComposition(const std::string & name);
+    std::map<std::string, double> getComposition(const std::string & name) const;
 
     /*!
     Try to parse a given string as a formula, returning the associated number of "atoms"
     per single molecule. In case of failure, it returns an empty map.
     */
-    std::map<std::string, double> parseFormula(const std::string & formula);
+    std::map<std::string, double> parseFormula(const std::string & formula) const;
 
     /*!
     Utility to convert from string to double.

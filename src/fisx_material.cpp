@@ -105,7 +105,7 @@ void Material::setComposition(const std::vector<std::string> & names, const std:
 
 }
 
-std::map<std::string, double> Material::getComposition()
+std::map<std::string, double> Material::getComposition() const
 {
     return this->composition;
 }

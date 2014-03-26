@@ -137,7 +137,7 @@ void Elements::initialize(std::string epdl97Directory, std::string bindingEnergi
 }
 
 // Element handling
-bool Elements::isElementNameDefined(const std::string & elementName)
+bool Elements::isElementNameDefined(const std::string & elementName) const
 {
     if (elementName.size() == 0)
     {
@@ -164,10 +164,16 @@ std::vector<std::string> Elements::getElementNames()
     return result;
 }
 
-const Element & Elements::getElement(const std::string & elementName)
+const Element & Elements::getElement(const std::string & elementName) const
 {
+    std::map<std::string, int>::const_iterator it;
+    int i;
     if (this->isElementNameDefined(elementName))
-        return this->elementList[this->elementDict[elementName]];
+    {
+        it = this->elementDict.find(elementName);
+        i = it->second;
+        return this->elementList[i];
+    }
     else
         throw std::invalid_argument("Invalid element: " + elementName);
 }
@@ -799,20 +805,24 @@ void Elements::setMassAttenuationCoefficients(std::string name,
 }
 
 
-std::map<std::string, std::vector<double> > Elements::getMassAttenuationCoefficients(std::string name)
+std::map<std::string, std::vector<double> > Elements::getMassAttenuationCoefficients( \
+                                                                const std::string & name) const
 {
     std::string msg;
-    if (this->elementDict.find(name) == this->elementDict.end())
+    std::map<std::string, int>::const_iterator it;
+
+    it = this->elementDict.find(name);
+    if (it == this->elementDict.end())
     {
         msg = "Name " + name + " not among defined elements";
         throw std::invalid_argument(msg);
     }
-    return this->elementList[this->elementDict[name]].getMassAttenuationCoefficients();
+    return this->elementList[it->second].getMassAttenuationCoefficients();
 
 }
 
 
-std::map<std::string, double> Elements::getMassAttenuationCoefficients(std::string name, double energy)
+std::map<std::string, double> Elements::getMassAttenuationCoefficients(std::string name, double energy) const
 {
     std::string msg;
     std::map<std::string, double> composition;
@@ -830,17 +840,21 @@ std::map<std::string, double> Elements::getMassAttenuationCoefficients(std::stri
     }
     else
     {
-        return this->elementList[this->elementDict[name]].getMassAttenuationCoefficients(energy);
+        //elementList.getElement
+        const Element & elementReference = this->getElement(name);
+        return elementReference.getMassAttenuationCoefficients(energy);
     }
 }
 
 std::map<std::string, std::vector<double> > Elements::getMassAttenuationCoefficients(std::string name, \
-                                                                                     std::vector<double> energy)
+                                                                        std::vector<double> energy) const
 {
     std::string msg;
     std::map<std::string, double> composition;
+    std::map<std::string, int>::const_iterator c_it;
 
-    if (this->elementDict.find(name) == this->elementDict.end())
+    c_it = this->elementDict.find(name);
+    if (c_it == this->elementDict.end())
     {
         //composition = this->getCompositionFromFormula(name);
         composition = this->getComposition(name);
@@ -853,13 +867,13 @@ std::map<std::string, std::vector<double> > Elements::getMassAttenuationCoeffici
     }
     else
     {
-        return this->elementList[this->elementDict[name]].getMassAttenuationCoefficients(energy);
+        return this->elementList[c_it->second].getMassAttenuationCoefficients(energy);
     }
 }
 
 std::map<std::string, double> Elements::getMassAttenuationCoefficients(\
                                                 std::map<std::string, double> inputFormulaDict,\
-                                                double inputEnergy)
+                                                double inputEnergy) const
 {
     std::vector<double> energy;
     std::map<std::string, std::vector<double> >tmpResult;
@@ -881,7 +895,7 @@ std::map<std::string, double> Elements::getMassAttenuationCoefficients(\
 
 std::map<std::string, std::vector<double> > Elements::getMassAttenuationCoefficients(\
                                                 std::map<std::string, double> inputFormulaDict,\
-                                                                std::vector<double> energy)
+                                                                std::vector<double> energy) const
 {
     std::string element, msg, name;
     double total, massFraction;
@@ -948,7 +962,7 @@ std::map<std::string, std::vector<double> > Elements::getMassAttenuationCoeffici
 
             massFraction = c_it->second / total;
             element = c_it->first;
-            tmpResult = this->elementList[this->elementDict[element]].getMassAttenuationCoefficients(energy[n]);
+            tmpResult = this->elementList[c_it->second].getMassAttenuationCoefficients(energy[n]);
             result["coherent"][n] += tmpResult["coherent"] * massFraction;
             result["compton"][n] += tmpResult["compton"] * massFraction;
             result["pair"][n] += tmpResult["pair"] * massFraction;
@@ -1074,13 +1088,14 @@ void Elements::addMaterial(Material material)
     this->materialList.push_back(material);
 }
 
-std::map<std::string, double> Elements::getComposition(const std::string & name)
+std::map<std::string, double> Elements::getComposition(const std::string & name) const
 {
     std::string msg;
     std::map<std::string, double> result;
     std::map<std::string, double> tmpResult;
     std::map<std::string, double> composition;
     std::map<std::string, double>::const_iterator c_it, c_it2;
+    std::map<std::string , int>::const_iterator matIterator;
     double total;
 
     // check if name is a valid element or formula
@@ -1091,14 +1106,15 @@ std::map<std::string, double> Elements::getComposition(const std::string & name)
     }
 
     // check if it is a material
-    if (this->materialDict.find(name) == this->materialDict.end())
+    matIterator = this->materialDict.find(name);
+    if (matIterator == this->materialDict.end())
     {
         // result at this point must be empty, we can send it back.
         return result;
     }
 
     // make sure we give back the elemental material composition
-    tmpResult = this->materialList[this->materialDict[name]].getComposition();
+    tmpResult = this->materialList[matIterator->second].getComposition();
     if (tmpResult.size() < 1)
     {
         // throw an exception because we have an undefined material in the list of materials
@@ -1138,12 +1154,13 @@ std::map<std::string, double> Elements::getComposition(const std::string & name)
 }
 
 
-std::map<std::string, double> Elements::getCompositionFromFormula(const std::string & formula)
+std::map<std::string, double> Elements::getCompositionFromFormula(const std::string & formula) const
 {
     std::map<std::string, double> parsedFormula;
     std::map<std::string, double>::iterator it;
     std::string name, msg;
     double total;
+    std::map<std::string , int>::const_iterator matIterator;
     // TODO: Still to multiply by Atomic Weight!!!!
 
     parsedFormula = this->parseFormula(formula);
@@ -1156,7 +1173,8 @@ std::map<std::string, double> Elements::getCompositionFromFormula(const std::str
     for (it = parsedFormula.begin(); it != parsedFormula.end(); ++it)
     {
         name = it->first;
-        if (this->elementDict.find(name) == this->elementDict.end())
+        matIterator = this->elementDict.find(name);
+        if (matIterator == this->elementDict.end())
         {
             // msg = "Name " + name + " not among defined elements";
             // std::cout << msg << std::endl;
@@ -1164,7 +1182,7 @@ std::map<std::string, double> Elements::getCompositionFromFormula(const std::str
             return parsedFormula;
         }
         // multiply the number of atoms by the atomic weight
-        parsedFormula[name] *= this->elementList[this->elementDict[name]].getAtomicMass();
+        parsedFormula[name] *= this->elementList[matIterator->second].getAtomicMass();
         total += parsedFormula[name];
     }
     for (it = parsedFormula.begin(); it != parsedFormula.end(); ++it)
@@ -1175,7 +1193,7 @@ std::map<std::string, double> Elements::getCompositionFromFormula(const std::str
 }
 
 
-std::map<std::string, double> Elements::parseFormula(const std::string & formula)
+std::map<std::string, double> Elements::parseFormula(const std::string & formula) const
 {
     std::map<std::string, double> composition;
     std::map<std::string, double> tmpComposition;
