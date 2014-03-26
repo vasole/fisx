@@ -43,7 +43,7 @@ public:
     /*!
     Retrieves the given element atomic number.
     */
-    const int & getAtomicNumber();
+    const int & getAtomicNumber() const;
 
     /*!
     Set the given element atomic number. WARNING: An element atomic mass not be changed unless we are making a
@@ -54,7 +54,7 @@ public:
     /*!
     Retrieves the given element atomic mass.
     */
-    const double & getAtomicMass();
+    const double & getAtomicMass() const;
 
     // density (initialized by default to 1.0)
     /*!
@@ -126,18 +126,19 @@ public:
     /*!
     Retrieves the internal table of energies and associated mass attenuation coefficients
     */
-    std::map<std::string, std::vector<double> > getMassAttenuationCoefficients();
+    const std::map<std::string, std::vector<double> > & getMassAttenuationCoefficients() const;
+
     /*!
     Calculates via log-log interpolation in the internal table the mass attenuation coefficients
     at the given set of energies.
     */
     std::map<std::string, std::vector<double> > getMassAttenuationCoefficients(\
-                                                const std::vector<double> & energy);
+                                                const std::vector<double> & energy) const;
     /*!
     Convenience method. Calculates via log-log interpolation in the internal table the mass
     attenuation coefficients at the given energy.
     */
-    std::map<std::string, double> getMassAttenuationCoefficients(const double & energy);
+    std::map<std::string, double> getMassAttenuationCoefficients(const double & energy) const;
 
     std::map<std::string, std::pair<double, int> > extractEdgeEnergiesFromMassAttenuationCoefficients();
     std::map<std::string, std::pair<double, int> > extractEdgeEnergiesFromMassAttenuationCoefficients(\
@@ -157,7 +158,7 @@ public:
     Retrieves the internal table of partial photoelectric cross sections (in cm2/g)  at the given energy.
     */
     std::map<std::string, double> getPartialPhotoelectricMassAttenuationCoefficients(\
-                                                                    const double & energy);
+                                                                    const double & energy) const;
 
     // Shell transitions description
     void setRadiativeTransitions(std::string subshell, std::map<std::string, double> values);
@@ -214,7 +215,7 @@ public:
     /*!
     Helper to locate interpolation indices.
     */
-    std::pair<long, long> getInterpolationIndices(const std::vector<double> &,  const double &);
+    std::pair<long, long> getInterpolationIndices(const std::vector<double> &,  const double &) const;
 
 private:
     std::string name;

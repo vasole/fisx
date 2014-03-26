@@ -227,13 +227,13 @@ void Element::setTotalMassAttenuationCoefficient(const std::vector<double> & ene
     throw std::runtime_error("setTotalMassAttenuationCoefficient not implemented yet");
 }
 
-std::map< std::string, std::vector<double> > Element::getMassAttenuationCoefficients()
+const std::map< std::string, std::vector<double> > & Element::getMassAttenuationCoefficients() const
 {
     //TODO check initialization
-    return std::map<std::string, std::vector<double> > (this->mu);
+    return this->mu;
 }
 
-std::map<std::string, double>Element::getMassAttenuationCoefficients(const double & energy)
+std::map<std::string, double> Element::getMassAttenuationCoefficients(const double & energy) const
 {
     std::pair<long, long> indices;
     long i1, i2;
@@ -303,7 +303,7 @@ std::map<std::string, double>Element::getMassAttenuationCoefficients(const doubl
             key = c_it->first;
             if ((key == "coherent") || (key == "compton") || (key == "pair"))
             {
-                result[key] = this->mu[key][i1];
+                result[key] = c_it->second[i1];
             }
         }
     }
@@ -321,8 +321,8 @@ std::map<std::string, double>Element::getMassAttenuationCoefficients(const doubl
             if ((key == "coherent") || (key == "compton") || (key == "pair"))
             {
                 // we are left with coherent, compton and pair
-                y0 = this->mu[key][i1];
-                y1 = this->mu[key][i2];
+                y0 = c_it->second[i1];
+                y1 = c_it->second[i2];
                 //std::cout << "y0, y1 " << y0 << " " << y1 <<std::endl;
                 if ((y0 > 0.0) && (y1 > 0.0))
                 {
@@ -354,7 +354,7 @@ std::map<std::string, double>Element::getMassAttenuationCoefficients(const doubl
 }
 
 std::map<std::string, std::vector<double> > Element::getMassAttenuationCoefficients(\
-                                                const std::vector<double> & energy)
+                                                const std::vector<double> & energy) const
 {
     std::vector<double>::size_type length, i;
     std::map<std::string, double> tmpResult;
@@ -547,7 +547,7 @@ void Element::setPartialPhotoelectricMassAttenuationCoefficients(const std::stri
 }
 
 std::map<std::string, double> \
-    Element::getPartialPhotoelectricMassAttenuationCoefficients(const double & energy)
+    Element::getPartialPhotoelectricMassAttenuationCoefficients(const double & energy) const
 {
     std::string shellList[10] = {"K", "L1", "L2", "L3", "M1", "M2", "M3", "M4", "M5", "all other"};
     std::string shell;
@@ -556,6 +556,8 @@ std::map<std::string, double> \
     std::pair<long, long> indices;
     long i1, i2, i1w, i2w;
     double A, B, x0, x1, y0, y1, x0w, x1w;
+    std::map<std::string, double >::const_iterator c_itSingle;
+    std::map<std::string, std::vector<double> >::const_iterator c_it;
 
     if (this->muPartialPhotoelectricEnergy.size() == 0)
     {
@@ -572,29 +574,31 @@ std::map<std::string, double> \
         result[shell] = 0.0;
         if (shell != "all other")
         {
-            if ((this->bindingEnergy[shell] == 0.0) || (energy < this->bindingEnergy[shell]))
+            c_itSingle = this->bindingEnergy.find(shell);
+            if ((c_itSingle->second == 0.0) || (energy < c_itSingle->second))
             {
                 continue;
             }
         }
-        indices = this->getInterpolationIndices(this->muPartialPhotoelectricEnergy[shell], energy);
+        c_it = this->muPartialPhotoelectricEnergy.find(shell);
+        indices = this->getInterpolationIndices(c_it->second, energy);
         i1 = indices.first;
         i2 = indices.second;
-        x0 = this->muPartialPhotoelectricEnergy[shell][i1];
-        x1 = this->muPartialPhotoelectricEnergy[shell][i2];
+        x0 = c_it->second[i1];
+        x1 = c_it->second[i2];
         // std::cout << "partials i1, i2 " << i1 << " " << i2 <<std::endl;
         // std::cout << "partials x0, x1 " << x0 << " " << x1 <<std::endl;
         if (energy == x1)
         {
-            if ((i2 + 1) < ((int) this->muPartialPhotoelectricEnergy[shell].size()))
+            if ((i2 + 1) < ((int) c_it->second.size()))
             {
-                if (this->muPartialPhotoelectricEnergy[shell][i2+1] == x1)
+                if (c_it->second[i2+1] == x1)
                 {
                     // repeated energy
                     i1 = i2;
                     i2++;
-                    x0 = this->muPartialPhotoelectricEnergy[shell][i1];
-                    x1 = this->muPartialPhotoelectricEnergy[shell][i2];
+                    x0 = c_it->second[i1];
+                    x1 = c_it->second[i2];
                     //std::cout << "RETOUCHED PARTIAL i1, i2 " << i1 << " " << i2 <<std::endl;
                     //std::cout << "RETOUCHED PARTIAL x0, x1 " << x0 << " " << x1 <<std::endl;
                 }
@@ -607,18 +611,18 @@ std::map<std::string, double> \
             // std::cout << "case a " <<std::endl;
             if (shell == "all other")
             {
-                result[shell] = this->muPartialPhotoelectricValue[shell][i2];
+                result[shell] = c_it->second[i2];
             }
             else
             {
-                y0 = this->muPartialPhotoelectricValue[shell][i1];
+                y0 = c_it->second[i1];
                 if ( y0 > 0.0)
                 {
                     result[shell] = y0;
                 }
                 else
                 {
-                    y1 = this->muPartialPhotoelectricValue[shell][i2];
+                    y1 = c_it->second[i2];
                     if (((x1 - x0) < 5.E-10) && (y1 > 0.0))
                     {
                         result[shell] = y1;
@@ -628,15 +632,15 @@ std::map<std::string, double> \
                         // according to the binding energies, the shell is excited, but the
                         // respective mass attenuation is zero. We have to extrapolate
                         i1w = i1;
-                        while(this->muPartialPhotoelectricValue[shell][i1w] <= 0.0)
+                        while(c_it->second[i1w] <= 0.0)
                         {
                             i1w += 1;
                         }
                         i2w = i1w + 1;
-                        y0 = this->muPartialPhotoelectricValue[shell][i1w];
-                        y1 = this->muPartialPhotoelectricValue[shell][i2w];
-                        x0w = this->muPartialPhotoelectricEnergy[shell][i1w];
-                        x1w = this->muPartialPhotoelectricEnergy[shell][i2w];
+                        y0 = c_it->second[i1w];
+                        y1 = c_it->second[i2w];
+                        x0w = c_it->second[i1w];
+                        x1w = c_it->second[i2w];
                         B = 1.0 / log( x1w / x0w);
                         A = log(x1w/energy) * B;
                         B *= log( energy / x0w);
@@ -651,8 +655,8 @@ std::map<std::string, double> \
             B = 1.0 / log( x1 / x0);
             A = log(x1/energy) * B;
             B *= log( energy / x0);
-            y0 = this->muPartialPhotoelectricValue[shell][i1];
-            y1 = this->muPartialPhotoelectricValue[shell][i2];
+            y0 = c_it->second[i1];
+            y1 = c_it->second[i2];
 
             if (shell == "all other")
             {
@@ -686,15 +690,15 @@ std::map<std::string, double> \
                     // according to the binding energies, the shell is excited, but the
                     // respective mass attenuation is zero. We have to extrapolate
                     i1w = i1;
-                    while(this->muPartialPhotoelectricValue[shell][i1w] <= 0.0)
+                    while(c_it->second[i1w] <= 0.0)
                     {
                         i1w += 1;
                     }
                     i2w = i1w + 1;
-                    y0 = this->muPartialPhotoelectricValue[shell][i1w];
-                    y1 = this->muPartialPhotoelectricValue[shell][i2w];
-                    x0w = this->muPartialPhotoelectricEnergy[shell][i1w];
-                    x1w = this->muPartialPhotoelectricEnergy[shell][i2w];
+                    y0 = c_it->second[i1w];
+                    y1 = c_it->second[i2w];
+                    x0w = c_it->second[i1w];
+                    x1w = c_it->second[i2w];
                     B = 1.0 / log( x1w / x0w);
                     A = log(x1w/energy) * B;
                     B *= log( energy / x0w);
@@ -1034,7 +1038,7 @@ void Element::setAtomicMass(const double & A)
     this->atomicMass = A;
 }
 
-const double & Element::getAtomicMass()
+const double & Element::getAtomicMass() const
 {
     // For the time being only positive numbers accepted
     return this->atomicMass;
@@ -1051,13 +1055,13 @@ void Element::setAtomicNumber(const int & z)
     this->atomicNumber = z;
 }
 
-const int & Element::getAtomicNumber()
+const int & Element::getAtomicNumber() const
 {
     // For the time being only positive numbers accepted
     return this->atomicNumber;
 }
 
-std::pair<long, long> Element::getInterpolationIndices(const std::vector<double> & vec, const double & x)
+std::pair<long, long> Element::getInterpolationIndices(const std::vector<double> & vec, const double & x) const
 {
     static long lastI0 = 0L;
     std::vector<double>::size_type length, iMin, iMax, distance;
