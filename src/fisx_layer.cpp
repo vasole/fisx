@@ -33,6 +33,11 @@ void Layer::setMaterial(const Material & material)
     this->hasMaterial = true;
 }
 
+bool Layer::hasMaterialComposition()
+{
+    return this->hasMaterial;
+}
+
 double Layer::getTransmission(const double & energy, Elements & elements)
 {
     // The material might not have been defined in the  current Elements instance.

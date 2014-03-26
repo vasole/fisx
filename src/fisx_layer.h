@@ -46,6 +46,14 @@ public:
     */
     std::vector<double> getTransmission(const std::vector<double> & energy, Elements & elements);
 
+    /*!
+    Return true if material composition was specified.
+    Returns false if only the name or formula of the material was given.
+    */
+    bool hasMaterialComposition();
+
+    const std::string & getMaterialName(){return this->materialName;};
+
 private:
     std::string materialName;
     bool hasMaterial;
