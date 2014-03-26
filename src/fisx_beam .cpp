@@ -198,17 +198,17 @@ void Beam::normalizeBeam()
     std::sort(this->rays.begin(), this->rays.end());
 }
 
-std::vector<std::vector<double> > Beam::getBeamAsDoubleVectors()
+std::vector<std::vector<double> > Beam::getBeamAsDoubleVectors() const
 {
     std::vector<double>::size_type nItems;
     std::vector<Ray>::const_iterator c_it;
     std::vector<std::vector<double> >returnValue;
     Ray ray;
 
-    if (!this->normalized)
-    {
-        this->normalizeBeam();
-    }
+    //if (!this->normalized)
+    //{
+    //    this->normalizeBeam();
+    //}
     nItems = rays.size();
     returnValue.resize(4);
     returnValue[0].resize(nItems);
@@ -231,7 +231,7 @@ std::vector<std::vector<double> > Beam::getBeamAsDoubleVectors()
 
 const std::vector<Ray> & Beam::getBeam()
 {
-    if (!this->normalized)
-        this->normalizeBeam();
+    //if (!this->normalized)
+    //    this->normalizeBeam();
     return this->rays;
 }

@@ -78,7 +78,7 @@ public:
     [characteristic0, characteristic1, charactersitic2, ...]
     [divergency0, divergency1, divergency2, ...]
     */
-    std::vector<std::vector<double> > getBeamAsDoubleVectors();
+    std::vector<std::vector<double> > getBeamAsDoubleVectors() const;
 
 private:
     bool normalized;
