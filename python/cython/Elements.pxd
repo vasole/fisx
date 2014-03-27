@@ -36,3 +36,9 @@ cdef extern from "fisx_elements.h":
         std_map[std_string, std_vector[double]]\
                             getMassAttenuationCoefficients(std_map[std_string, double],\
                                                            std_vector[double]) except +
+
+        std_vector[std_map[std_string, std_map[std_string, double]]] getExcitationFactors( \
+                            std_string element,
+                            std_vector[double] energy,
+                            std_vector[double] weights) except +
+

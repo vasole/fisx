@@ -18,7 +18,7 @@ cdef class PySimpleIni:
         del self.thisptr
 
     def getKeys(self):
-        return self.thisptr.getKeys()
+        return self.thisptr.getSections()
 
     def readKey(self, std_string key):
-        return self.thisptr.readKey(key)
+        return self.thisptr.readSection(key)

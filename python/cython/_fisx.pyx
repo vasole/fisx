@@ -158,7 +158,7 @@ cdef class PyElements:
 
     def getMassAttenuationCoefficients(self, name, energy=None):
         if hasattr(name, "keys"):
-            return self._getMassAttenuationCoefficients(name, energy)
+            return self._getMaterialMassAttenuationCoefficients(name, energy)
         elif energy is None:
             return self._getElementDefaultMassAttenuationCoefficients(name)
         elif hasattr(energy, "__len__"):
@@ -166,6 +166,19 @@ cdef class PyElements:
         else:
             # do not use the "single" version to have always the same signature
             return self._getMultipleMassAttenuationCoefficients(name, [energy])
+
+    def getExcitationFactors(self, name, energy, weight=None):
+        if hasattr(energy, "__len__"):
+            if weight is None:
+                weight = [1.0] * len(energy)
+        else:
+            energy = [energy]
+            if weight is None:
+                weight = [1.0]
+            else:
+                weight = [weight]
+        return self._getExcitationFactors(name, energy, weight)
+
 
     def _getMaterialMassAttenuationCoefficients(self, elementDict, energy):
         """
@@ -185,7 +198,15 @@ cdef class PyElements:
 
     def _getMassAttenuationCoefficients(self, std_map[std_string, double] elementDict,
                                               std_vector[double] energy):
+        print("DICT METHOD CALLED")
         return self.thisptr.getMassAttenuationCoefficients(elementDict, energy)
+
+    def _getExcitationFactors(self, std_string element,
+                                   std_vector[double] energies,
+                                   std_vector[double] weights):
+        return self.thisptr.getExcitationFactors(element, energies, weights)
+
+
 #import numpy as np
 #cimport numpy as np
 cimport cython
@@ -310,10 +331,10 @@ cdef class PySimpleIni:
         del self.thisptr
 
     def getKeys(self):
-        return self.thisptr.getKeys()
+        return self.thisptr.getSections()
 
     def readKey(self, std_string key):
-        return self.thisptr.readKey(key)
+        return self.thisptr.readSection(key)
 #import numpy as np
 #cimport numpy as np
 cimport cython

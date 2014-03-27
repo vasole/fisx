@@ -11,5 +11,5 @@ cdef extern from "fisx_simpleini.h":
         SimpleIni() except +
         SimpleIni(std_string) except +
         void setFileName(std_string) except +
-        std_vector[std_string] getKeys() except +
-        std_map[std_string, std_string] readKey(std_string) except +
+        std_vector[std_string] getSections() except +
+        std_map[std_string, std_string] readSection(std_string) except +
