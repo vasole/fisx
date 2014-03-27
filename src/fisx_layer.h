@@ -28,7 +28,7 @@ public:
     /*!
     Eventually get a handle to underlying material
     */
-    const Material & getMaterial() {return this->material;};
+    const Material & getMaterial() const {return this->material;};
 
     /*!
     Get the layer transmission at the given energy using the elements library
@@ -36,7 +36,7 @@ public:
     If the material is not defined or cannot be handled, it will throw the
     relevant error.
     */
-    double getTransmission(const double & energy, Elements & elements) const;
+    double getTransmission(const double & energy, const Elements & elements) const;
 
     /*!
     Get the layer transmissions at the given energies using the elements library
@@ -44,7 +44,7 @@ public:
     If the material is not defined or cannot be handled, it will throw the
     relevant error.
     */
-    std::vector<double> getTransmission(const std::vector<double> & energy, Elements & elements) const;
+    std::vector<double> getTransmission(const std::vector<double> & energy, const Elements & elements) const;
 
     /*!
     Return true if material composition was specified.
@@ -52,7 +52,7 @@ public:
     */
     bool hasMaterialComposition() const;
 
-    const std::string & getMaterialName(){return this->materialName;};
+    const std::string & getMaterialName()const {return this->materialName;};
 
 private:
     std::string materialName;

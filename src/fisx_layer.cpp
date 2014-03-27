@@ -38,7 +38,7 @@ bool Layer::hasMaterialComposition() const
     return this->hasMaterial;
 }
 
-double Layer::getTransmission(const double & energy, Elements & elements) const
+double Layer::getTransmission(const double & energy, const Elements & elements) const
 {
     // The material might not have been defined in the  current Elements instance.
     // However, its composition might be fine.
@@ -63,7 +63,7 @@ double Layer::getTransmission(const double & energy, Elements & elements) const
     return exp(-(tmpDouble * muTotal));
 }
 
-std::vector<double> Layer::getTransmission(const std::vector<double> & energy, Elements & elements) const
+std::vector<double> Layer::getTransmission(const std::vector<double> & energy, const Elements & elements) const
 {
     std::vector<double>::size_type i;
     std::vector<double> tmpDoubleVector;
