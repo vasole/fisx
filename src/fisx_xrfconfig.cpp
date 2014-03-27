@@ -325,6 +325,12 @@ void XRFConfig::setBeam(const Beam & beam)
     this->beam = beam;
 }
 
+const Beam & XRFConfig::getBeam()
+{
+    return this->beam;
+}
+
+
 void XRFConfig::setBeamFilters(const std::vector<Layer> & filters)
 {
     this->beamFilters = filters;

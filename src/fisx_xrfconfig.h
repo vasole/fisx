@@ -89,6 +89,13 @@ public:
     void expectedScattering();
     void peakRatios();
     */
+    /*!
+    Returns a constant reference to the internal beam.
+    */
+   const Beam & getBeam();
+   const std::vector<Layer> & getBeamFilters() const {return this->beamFilters;};
+   const std::vector<Layer> & getSample() const {return this->sample;};
+   const std::vector<Layer> & getAttenuators() const {return this->attenuators;};
 
 private:
     Beam beam;
