@@ -257,7 +257,7 @@ std::map<std::string, double> Element::getMassAttenuationCoefficients(const doub
         if (c_it->second.size() > 0)
         {
             // partial initialized at least for one shell
-            // std::cout << " Getting partial photoelectric mass attenuation coefficients " << std::endl;
+            //std::cout << " Getting partial photoelectric mass attenuation coefficients " << std::endl;
             result = this->getPartialPhotoelectricMassAttenuationCoefficients(energy);
             break;
         }
@@ -558,6 +558,7 @@ std::map<std::string, double> \
     double A, B, x0, x1, y0, y1, x0w, x1w;
     std::map<std::string, double >::const_iterator c_itSingle;
     std::map<std::string, std::vector<double> >::const_iterator c_it;
+    std::map<std::string, std::vector<double> >::const_iterator y_it;
 
     if (this->muPartialPhotoelectricEnergy.size() == 0)
     {
@@ -581,6 +582,7 @@ std::map<std::string, double> \
             }
         }
         c_it = this->muPartialPhotoelectricEnergy.find(shell);
+        y_it = this->muPartialPhotoelectricValue.find(shell);
         indices = this->getInterpolationIndices(c_it->second, energy);
         i1 = indices.first;
         i2 = indices.second;
@@ -611,18 +613,18 @@ std::map<std::string, double> \
             // std::cout << "case a " <<std::endl;
             if (shell == "all other")
             {
-                result[shell] = c_it->second[i2];
+                result[shell] = y_it->second[i2];
             }
             else
             {
-                y0 = c_it->second[i1];
+                y0 = y_it->second[i1];
                 if ( y0 > 0.0)
                 {
                     result[shell] = y0;
                 }
                 else
                 {
-                    y1 = c_it->second[i2];
+                    y1 = y_it->second[i2];
                     if (((x1 - x0) < 5.E-10) && (y1 > 0.0))
                     {
                         result[shell] = y1;
@@ -637,8 +639,8 @@ std::map<std::string, double> \
                             i1w += 1;
                         }
                         i2w = i1w + 1;
-                        y0 = c_it->second[i1w];
-                        y1 = c_it->second[i2w];
+                        y0 = y_it->second[i1w];
+                        y1 = y_it->second[i2w];
                         x0w = c_it->second[i1w];
                         x1w = c_it->second[i2w];
                         B = 1.0 / log( x1w / x0w);
@@ -655,8 +657,8 @@ std::map<std::string, double> \
             B = 1.0 / log( x1 / x0);
             A = log(x1/energy) * B;
             B *= log( energy / x0);
-            y0 = c_it->second[i1];
-            y1 = c_it->second[i2];
+            y0 = y_it->second[i1];
+            y1 = y_it->second[i2];
 
             if (shell == "all other")
             {
@@ -695,8 +697,8 @@ std::map<std::string, double> \
                         i1w += 1;
                     }
                     i2w = i1w + 1;
-                    y0 = c_it->second[i1w];
-                    y1 = c_it->second[i2w];
+                    y0 = y_it->second[i1w];
+                    y1 = y_it->second[i2w];
                     x0w = c_it->second[i1w];
                     x1w = c_it->second[i2w];
                     B = 1.0 / log( x1w / x0w);
@@ -730,7 +732,7 @@ std::vector<std::string> Element::getExcitedShells(const double & energy)
 }
 
  std::map<std::string, std::vector<double> >Element::getInitialPhotoelectricVacancyDistribution(\
-                                                const std::vector<double> & energies)
+                                                const std::vector<double> & energies) const
 {
     std::map<std::string, std::vector<double> > tmpMap;
     std::map<std::string, std::vector<double> > result;
@@ -761,7 +763,7 @@ std::vector<std::string> Element::getExcitedShells(const double & energy)
 }
 
 std::map<std::string, double> Element::getInitialPhotoelectricVacancyDistribution(\
-                                                                const double & energy)
+                                                                const double & energy) const
 {
     std::map<std::string, double> tmpMap;
     std::map<std::string, double> result;
@@ -915,8 +917,66 @@ std::map<std::string, double> Element::getShellConstants(std::string subshell)
 std::map<std::string, std::map<std::string, double> > getXRayLines(std::string family);
 
 
+std::map<std::string, double> \
+Element::getCascadeModifiedVacancyDistribution(const std::map<std::string, double> & distribution) const
+{
+    std::map<std::string, double> finalDistribution;
+    std::map<std::string, double>::const_iterator c_it;
+    std::string keys[9] = {"K", "L1", "L2", "L3", "M1", "M2", "M3", "M4", "M5"};
+    std::vector<std::string>::size_type i;
+    std::vector<std::string>::size_type j;
+    double rate;
+    std::string tmpString;
+    //bool cascade = true;
+    std::map<std::string, double> transferRatios;
+    std::map<std::string, double> fluorescenceRatios;
+    std::map<std::string, std::map<std::string, double> >result;
+    std::map<std::string, Shell>::const_iterator shell_it;
+    std::map<std::string, double>::const_iterator bind_it;
+
+    // get a complete initial distribution of vacancies
+    for (i = 0; i < this->shellInstance.size(); i++)
+    {
+        c_it = distribution.find(keys[i]);
+        if (c_it != distribution.end())
+        {
+            rate = c_it->second;
+        }
+        else
+        {
+            rate = 0.0;
+        }
+        finalDistribution[keys[i]] = rate;
+    }
+
+    // update the distribution due to the cascade
+    for (i = 0; i < finalDistribution.size(); i++)
+    {
+        if(finalDistribution[keys[i]] > 0.0)
+        {
+            // we have initial vacancies in shell i
+            // propagate to all the higher shells j
+            shell_it = this->shellInstance.find(keys[i]);
+            for (j = i + 1; j < finalDistribution.size(); j++)
+            {
+                rate = 0.0;
+                transferRatios.clear();
+                transferRatios = shell_it->second.getDirectVacancyTransferRatios(keys[j]);
+                for (c_it = transferRatios.begin(); c_it != transferRatios.end(); ++c_it)
+                {
+                    rate += c_it->second;
+                }
+                finalDistribution[keys[j]] += (rate * finalDistribution[keys[i]]);
+            }
+        }
+    }
+    return finalDistribution;
+}
+
 std::map<std::string, std::map<std::string, double> >\
-Element::getXRayLinesFromVacancyDistribution(std::map<std::string, double> distribution)
+Element::getXRayLinesFromVacancyDistribution(const std::map<std::string, double> & distribution, \
+                                             const int & cascade, \
+                                             const bool & useFluorescenceYield) const
 {
     std::map<std::string, double>::const_iterator c_it;
     std::string keys[9] = {"K", "L1", "L2", "L3", "M1", "M2", "M3", "M4", "M5"};
@@ -929,40 +989,29 @@ Element::getXRayLinesFromVacancyDistribution(std::map<std::string, double> distr
     std::map<std::string, double> transferRatios;
     std::map<std::string, double> fluorescenceRatios;
     std::map<std::string, std::map<std::string, double> >result;
+    std::map<std::string, Shell>::const_iterator shell_it;
+    std::map<std::string, double>::const_iterator bind_it;
 
-    // get a complete initial distribution of vacancies
-    for (i = 0; i < this->shellInstance.size(); i++)
+
+    if (cascade != 0)
     {
-        if (distribution.find(keys[i]) != distribution.end())
-        {
-            rate = distribution[keys[i]];
-        }
-        else
-        {
-            rate = 0.0;
-        }
-        finalDistribution[keys[i]] = rate;
+        finalDistribution = this->getCascadeModifiedVacancyDistribution(distribution);
     }
-
-
-    // update the distribution due to the cascade
-    for (i = 0; i < finalDistribution.size(); i++)
+    else
     {
-        if(finalDistribution[keys[i]] > 0.0)
+        // get a complete initial distribution of vacancies
+        for (i = 0; i < this->shellInstance.size(); i++)
         {
-            // we have initial vacancies in shell i
-            // propagate to all the higher shells j
-            for (j = i + 1; j < finalDistribution.size(); j++)
+            c_it = distribution.find(keys[i]);
+            if (c_it != distribution.end())
+            {
+                rate = c_it->second;
+            }
+            else
             {
                 rate = 0.0;
-                transferRatios.clear();
-                transferRatios = this->shellInstance[keys[i]].getDirectVacancyTransferRatios(keys[j]);
-                for (c_it = transferRatios.begin(); c_it != transferRatios.end(); ++c_it)
-                {
-                    rate += c_it->second;
-                }
-                finalDistribution[keys[j]] += (rate * finalDistribution[keys[i]]);
             }
+            finalDistribution[keys[i]] = rate;
         }
     }
 
@@ -972,28 +1021,33 @@ Element::getXRayLinesFromVacancyDistribution(std::map<std::string, double> distr
     for (i = 0; i < finalDistribution.size(); i++)
     {
         // get all the fluorescence transitions to that shell
-        fluorescenceRatios = this->shellInstance[keys[i]].getFluorescenceRatios();
+        shell_it = this->shellInstance.find(keys[i]);
+        fluorescenceRatios = shell_it->second.getFluorescenceRatios();
         for (c_it = fluorescenceRatios.begin(); c_it != fluorescenceRatios.end(); c_it++)
         {
             rate = c_it->second * finalDistribution[keys[i]];
+            if (useFluorescenceYield)
+            {
+                rate *= shell_it->second.getFluorescenceYield();
+            }
             if (rate > 0.0)
             {
                 result[c_it->first]["rate"] = rate;
-                energy0 = this->bindingEnergy[keys[i]];
-                if(this->bindingEnergy.find(keys[i])==\
-                    this->bindingEnergy.end())
+                bind_it = this->bindingEnergy.find(keys[i]);
+                if(bind_it == this->bindingEnergy.end())
                 {
                     std::cout << "Fluorescence transition " << c_it->first << std::endl;
                     throw std::domain_error("Transition to an undefined shell!");
                 }
+                energy0 = bind_it->second;
                 if (energy0 <= 0)
                 {
                     std::cout << "Fluorescence transition " << c_it->first << std::endl;
                     throw std::domain_error("Transition to a shell with 0 binding energy!");
                 }
                 tmpString = c_it->first.substr(c_it->first.size() - 2, 2);
-                if (this->bindingEnergy.find(tmpString) ==\
-                    this->bindingEnergy.end())
+                bind_it = this->bindingEnergy.find(tmpString);
+                if (bind_it == this->bindingEnergy.end())
                 {
                     std::cout << "Fluorescence transition from undefined shell ";
                     std::cout << tmpString << std::endl;
@@ -1001,7 +1055,7 @@ Element::getXRayLinesFromVacancyDistribution(std::map<std::string, double> distr
                 }
                 else
                 {
-                    energy1 = this->bindingEnergy[tmpString];
+                    energy1 = bind_it->second;
                 }
                 if(energy1 <= 0.0)
                 {
@@ -1060,6 +1114,50 @@ const int & Element::getAtomicNumber() const
     // For the time being only positive numbers accepted
     return this->atomicNumber;
 }
+
+
+std::vector<std::map<std::string, std::map<std::string, double> > >Element::getPhotoelectricExcitationFactors( \
+                            const std::vector<double> & energy,
+                            const std::vector<double> & weights) const
+{
+    double weight;
+    std::map<std::string, double>vacancyDistribution;
+    std::vector<double>::size_type i;
+    std::vector<std::map<std::string, std::map<std::string, double> > > result;
+    std::map<std::string, std::map<std::string, double> >::iterator it;
+
+    if (weights.size() == 1)
+        weight = weights[0];
+    else
+        weight = 1.0 / energy.size();
+    for(i = 0; i < energy.size(); i++)
+    {
+        if (weights.size() > 1)
+            weight = weights[i];
+        vacancyDistribution = this->getInitialPhotoelectricVacancyDistribution(energy[i]);
+        result.push_back(this->getXRayLinesFromVacancyDistribution(vacancyDistribution, 1, true));
+        for(it = result[i].begin(); it != result[i].end(); ++it)
+        {
+            it->second["factor"] = it->second["rate"] * weight;
+            it->second["rate"] = it->second["factor"] *\
+                            this->getMassAttenuationCoefficients(energy[i])["photoelectric"];
+        }
+    }
+    return result;
+}
+
+std::map<std::string, std::map<std::string, double> > Element::getPhotoelectricExcitationFactors( \
+                                                    const double & energy,
+                                                    const double & weight) const
+{
+    std::vector<double> energies;
+    std::vector<double> weights;
+
+    energies.push_back(energy);
+    weights.push_back(weight);
+    return this->getPhotoelectricExcitationFactors(energies, weights)[0];
+}
+
 
 std::pair<long, long> Element::getInterpolationIndices(const std::vector<double> & vec, const double & x) const
 {

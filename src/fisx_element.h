@@ -189,8 +189,8 @@ public:
     The output map keys correspond to the different partial photoelectric shells and the values
     are just vectors of mu_photoelectric(shell, E)/mu_photoelectric(total, E)
     */
-    std::map<std::string, std::vector<double> >getInitialPhotoelectricVacancyDistribution(\
-                                                const std::vector<double> & energies);
+    std::map<std::string, std::vector <double> >getInitialPhotoelectricVacancyDistribution(\
+                                                const std::vector<double> & energies) const;
 
     /*!
     Given one energy, give the initial distribution of vacancies (before cascade) due to
@@ -198,10 +198,36 @@ public:
     The output map keys correspond to the different subshells and the values are just
     mu_photoelectric(shell, E)/mu_photoelectric(total, E).
     */
-    std::map<std::string, double> getInitialPhotoelectricVacancyDistribution(const double & energy);
+    std::map<std::string, double> getInitialPhotoelectricVacancyDistribution(const double & energy) const;
+
+    std::map<std::string, double> getCascadeModifiedVacancyDistribution(const std::map<std::string, \
+                                                                        double> & distribution) const;
 
     std::map<std::string, std::map<std::string, double> >\
-        getXRayLinesFromVacancyDistribution(std::map<std::string, double> distribution);
+        getXRayLinesFromVacancyDistribution(const std::map<std::string, double> & distribution, \
+                                            const int & cascade = 1,
+                                            const bool & useFluorescenceYield = true) const;
+
+    /*!
+    Given a set of energies and (optional) weights returns the emitted X-ray already
+    corrected for cascade and fluorescence yield following photoelectric
+    interaction.
+    */
+    std::vector<std::map<std::string, std::map<std::string, double> > > \
+                            getPhotoelectricExcitationFactors( \
+                                const std::vector<double> & energy,
+                                const std::vector<double> & weights = std::vector<double>()) const;
+
+    /*!
+    Given an energy and its (optional) weight, returns the emitted X-ray already
+    corrected for cascade and fluorescence yield. If the weight is one, that
+    corresponds to the different emitted x-rays per incident photon following photoelectric
+    interaction.
+    */
+    std::map<std::string, std::map<std::string, double> > getPhotoelectricExcitationFactors( \
+                                                    const double & energy,
+                                                    const double & weight = 1.0) const;
+
 
     const Shell & getShell(std::string);
 
