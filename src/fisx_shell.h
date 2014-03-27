@@ -58,7 +58,7 @@ public:
     /*!
     Get X-ray fluorescence transition ratios
     */
-    const std::map<std::string, double> & getFluorescenceRatios();
+    const std::map<std::string, double> & getFluorescenceRatios() const;
 
     const std::map<std::string, double> & getRadiativeTransitions();
     const std::map<std::string, double> & getNonradiativeTransitions();
@@ -68,7 +68,7 @@ public:
     Since the different types of transitions are normalized, it multiplies by the
     fluorescence, Auger or Coster-Kronig yields to get the probabilities.
     */
-    std::map<std::string, double> getDirectVacancyTransferRatios(const std::string& destination);
+    std::map<std::string, double> getDirectVacancyTransferRatios(const std::string& destination) const;
 
     /*!
     Set the shell constants.
@@ -81,6 +81,8 @@ public:
     void setShellConstants(std::map<std::string, double>);
     const std::map<std::string, double> & getShellConstants();
     bool StringToInteger(const std::string& str, int & number);
+
+    double getFluorescenceYield() const;
 
 private:
     std::string  name;

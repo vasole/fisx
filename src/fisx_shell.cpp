@@ -286,7 +286,7 @@ const std::map<std::string, std::map<std::string, double> > & Shell::getCosterKr
 {
     return this->costerKronigRatios;
 }
-const std::map<std::string, double> & Shell::getFluorescenceRatios()
+const std::map<std::string, double> & Shell::getFluorescenceRatios() const
 {
     return this->fluorescenceRatios;
 }
@@ -326,6 +326,13 @@ void Shell::_updateFluorescenceRatios()
             }
         }
     }
+}
+
+double Shell::getFluorescenceYield() const
+{
+    std::map<std::string, double>::const_iterator c_it;
+    c_it = this->shellConstants.find("omega");
+    return c_it->second;
 }
 
 void Shell::_updateNonradiativeRatios()
@@ -477,7 +484,7 @@ void Shell::_updateNonradiativeRatios()
     this->augerRatios[totalLabel] = totalAuger;
 }
 
-std::map<std::string, double> Shell::getDirectVacancyTransferRatios(const std::string &destination)
+std::map<std::string, double> Shell::getDirectVacancyTransferRatios(const std::string &destination) const
 // Return the probabilities of direct transfer of a vacancy to a higher shell following
 // an X-ray emission, an Auger transition and Coster-Kronig transitions (if any).
 // It multiplies by the fluorescence, auger or Coster-Kronig yields to get the probabilities.
@@ -488,9 +495,12 @@ std::map<std::string, double> Shell::getDirectVacancyTransferRatios(const std::s
     std::string transition;
     double tmpDouble;
 
-    if (this->shellConstants["omega"] == 0.0)
+    it = this->shellConstants.find("omega");
+    if (it->second == 0.0)
     {
-        std::cout << "WARNING: Probably using unitialized shell constants!!!! " << std::endl;
+        // TODO: Put a less exigent test, omega can be zero for a lot of shells ...
+        // std::cout << "WARNING: Probably using unitialized shell constants!!!! " << std::endl;
+        ;
     }
 
     // destination needs two characters as in L2, M3, ...
@@ -504,9 +514,10 @@ std::map<std::string, double> Shell::getDirectVacancyTransferRatios(const std::s
 
     // build fluorescence transition key
     transition = this->name + destination;
-    if (this->fluorescenceRatios.find(transition) != this->fluorescenceRatios.end())
+    it = this->fluorescenceRatios.find(transition);
+    if (it != this->fluorescenceRatios.end())
     {
-        output["fluorescence"] = this->fluorescenceRatios[transition];
+        output["fluorescence"] = it->second;
     }
 
     // Auger pattern Origin-DestinationAny
@@ -570,6 +581,8 @@ std::map<std::string, double> Shell::getDirectVacancyTransferRatios(const std::s
         }
         throw std::domain_error("Sum of CosterKronig and Fluorescence yields greater than 1.0");
     }
+
+    std::map<std::string, double>::const_iterator const_it;
     for (it = output.begin(); it != output.end(); ++it)
     {
         if (it->first == "auger")
@@ -580,12 +593,13 @@ std::map<std::string, double> Shell::getDirectVacancyTransferRatios(const std::s
         {
             if (it->first == "fluorescence")
             {
-                output[it->first] *= this->shellConstants["omega"];
+                const_it = this->shellConstants.find("omega");
             }
             else
             {
-                output[it->first] *= this->shellConstants[it->first];
+                const_it = this->shellConstants.find(it->first);
             }
+            output[it->first] *= const_it->second;
         }
     }
     return output;
