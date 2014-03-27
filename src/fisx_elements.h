@@ -218,6 +218,27 @@ public:
     */
     std::map<std::string, double> parseFormula(const std::string & formula) const;
 
+
+    /*!
+    Given a set of energies and (optional) weights, for the specfified element, this method returns
+    the emitted X-ray already corrected for cascade and fluorescence yield.
+    It is the equivalent of the excitation factor in D.K.G. de Boer's paper.
+    */
+    std::vector<std::map<std::string, std::map<std::string, double> > > getExcitationFactors( \
+                            const std::string & element,
+                            const std::vector<double> & energy,
+                            const std::vector<double> & weights = std::vector<double>()) const;
+
+    /*!
+    Given an energy and its (optional) weight, for the specfified element, this method returns
+    the emitted X-ray already corrected for cascade and fluorescence yield.
+    It is the equivalent of the excitation factor in D.K.G. de Boer's paper.
+    */
+    std::map<std::string, std::map<std::string, double> > getExcitationFactors( \
+                            const std::string & element,
+                            const double & energy, \
+                            const double & weights = 1.0) const;
+
     /*!
     Utility to convert from string to double.
     */

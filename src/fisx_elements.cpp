@@ -1192,6 +1192,30 @@ std::map<std::string, double> Elements::getCompositionFromFormula(const std::str
     return parsedFormula;
 }
 
+std::vector<std::map<std::string, std::map<std::string, double> > >Elements::getExcitationFactors( \
+                            const std::string & element,
+                            const std::vector<double> & energies,
+                            const std::vector<double> & weights) const
+{
+    const Element & elementObject = this->getElement(element);
+    std::map<std::string, std::map<std::string, double> > result;
+
+    // for the time being no other way to produce vacancies than photoelectric effect
+    return elementObject.getPhotoelectricExcitationFactors(energies, weights);
+}
+
+std::map<std::string, std::map<std::string, double> > Elements::getExcitationFactors( \
+                            const std::string & element,
+                            const double & energy,
+                            const double & weight) const
+{
+    std::vector<double> energies;
+    std::vector<double> weights;
+
+    energies.push_back(energy);
+    weights.push_back(weight);
+    return this->getExcitationFactors(element, energies, weights)[0];
+}
 
 std::map<std::string, double> Elements::parseFormula(const std::string & formula) const
 {
