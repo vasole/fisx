@@ -79,7 +79,7 @@ public:
               Only those constants supplied will be overwritten!!!
     */
     void setShellConstants(std::map<std::string, double>);
-    const std::map<std::string, double> & getShellConstants();
+    const std::map<std::string, double> & getShellConstants() const;
     bool StringToInteger(const std::string& str, int & number);
 
     double getFluorescenceYield() const;

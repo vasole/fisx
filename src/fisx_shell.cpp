@@ -626,7 +626,7 @@ void Shell::setShellConstants(std::map<std::string, double> shellConstants)
     }
 }
 
-const std::map<std::string, double> & Shell::getShellConstants()
+const std::map<std::string, double> & Shell::getShellConstants() const
 {
     return this->shellConstants;
 
