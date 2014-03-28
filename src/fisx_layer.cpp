@@ -1,6 +1,6 @@
+#include "fisx_layer.h"
 #include <math.h>
 #include <stdexcept>
-#include "fisx_layer.h"
 
 Layer::Layer(const std::string & name, const double & density, \
              const double & thickness, const double & funnyFactor)
@@ -38,10 +38,24 @@ bool Layer::hasMaterialComposition() const
     return this->hasMaterial;
 }
 
-double Layer::getTransmission(const double & energy, const Elements & elements) const
+std::map<std::string, double> Layer::getMassAttenuationCoefficients(const double & energy, \
+                                                const Elements & elements) const
+{
+    if (this->hasMaterial)
+    {
+        return elements.getMassAttenuationCoefficients(this->material.getComposition(), energy);
+    }
+    else
+    {
+        return elements.getMassAttenuationCoefficients(this->materialName, energy);
+    }
+}
+
+double Layer::getTransmission(const double & energy, const Elements & elements, const double & angle) const
 {
     // The material might not have been defined in the  current Elements instance.
     // However, its composition might be fine.
+    const double PI = acos(-1.0);
     double muTotal;
     double tmpDouble;
     if (this->hasMaterial)
@@ -52,7 +66,18 @@ double Layer::getTransmission(const double & energy, const Elements & elements) 
     {
         muTotal = elements.getMassAttenuationCoefficients(this->materialName, energy)["total"];
     }
-    tmpDouble = this->density * this->thickness;
+    if (angle == 90.0)
+    {
+        tmpDouble = this->density * this->thickness;
+    }
+    else
+    {
+        if (angle < 0)
+            tmpDouble = sin(-angle * PI / 180.);
+        else
+            tmpDouble = sin(-angle * PI / 180.);
+        tmpDouble /= this->density * this->thickness;
+    }
     if(tmpDouble <= 0.0)
     {
         std::string msg;
@@ -60,16 +85,30 @@ double Layer::getTransmission(const double & energy, const Elements & elements) 
         throw std::runtime_error( msg );
     }
 
-    return exp(-(tmpDouble * muTotal));
+    return (1.0 - this->funnyFactor) + (this->funnyFactor * exp(-(tmpDouble * muTotal)));
 }
 
-std::vector<double> Layer::getTransmission(const std::vector<double> & energy, const Elements & elements) const
+std::vector<double> Layer::getTransmission(const std::vector<double> & energy, const Elements & elements, \
+                                           const double & angle) const
 {
+    const double PI = acos(-1.0);
     std::vector<double>::size_type i;
     std::vector<double> tmpDoubleVector;
     double tmpDouble;
 
-    tmpDouble = this->density * this->thickness;
+    if (angle == 90.0)
+    {
+        tmpDouble = this->density * this->thickness;
+    }
+    else
+    {
+        if (angle < 0)
+            tmpDouble = sin(-angle * PI / 180.);
+        else
+            tmpDouble = sin(-angle * PI / 180.);
+        tmpDouble /= this->density * this->thickness;
+    }
+
     if(tmpDouble <= 0.0)
     {
         std::string msg;
@@ -87,7 +126,8 @@ std::vector<double> Layer::getTransmission(const std::vector<double> & energy, c
     }
     for (i = 0; i < tmpDoubleVector.size(); i++)
     {
-        tmpDoubleVector[i] = exp(-tmpDouble * tmpDoubleVector[i]);
+        tmpDoubleVector[i] = (1.0 - this->funnyFactor) + \
+                              (this->funnyFactor * exp(-(tmpDouble * tmpDoubleVector[i])));
     }
     return tmpDoubleVector;
 }

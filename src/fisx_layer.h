@@ -36,7 +36,16 @@ public:
     If the material is not defined or cannot be handled, it will throw the
     relevant error.
     */
-    double getTransmission(const double & energy, const Elements & elements) const;
+    double getTransmission(const double & energy, const Elements & elements, const double & angle = 90.0) const;
+
+
+    /*!
+    Get the layer mass attenuation coefficients transmission at the given energy using the elements library
+    supplied. If the material is not defined or cannot be handled, it will throw the
+    relevant error.
+    */
+    std::map<std::string, double> getMassAttenuationCoefficients(const double & energy,
+                                                                 const Elements & elements) const;
 
     /*!
     Get the layer transmissions at the given energies using the elements library
@@ -44,7 +53,8 @@ public:
     If the material is not defined or cannot be handled, it will throw the
     relevant error.
     */
-    std::vector<double> getTransmission(const std::vector<double> & energy, const Elements & elements) const;
+    std::vector<double> getTransmission(const std::vector<double> & energy,
+                                const Elements & elements, const double & angle = 90.0) const;
 
     /*!
     Return true if material composition was specified.
