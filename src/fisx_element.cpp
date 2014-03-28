@@ -884,10 +884,9 @@ void Element::setShellConstants(std::string subshell, std::map<std::string, doub
     this->shellInstance[subshell].setShellConstants(constants);
 }
 
-const std::map<std::string, double> & Element::getFluorescenceRatios(std::string subshell)
+const std::map<std::string, double> & Element::getFluorescenceRatios(const std::string & subshell) const
 {
-    Shell shell;
-    shell = this->getShell(subshell);
+    const Shell & shell = this->getShell(subshell);
     return shell.getFluorescenceRatios();
 }
 
@@ -905,17 +904,22 @@ const std::map<std::string, std::map<std::string, double> > & Element::getCoster
     return shell.getCosterKronigRatios();
 }
 
-std::map<std::string, double> Element::getShellConstants(std::string subshell)
+std::map<std::string, double> Element::getShellConstants(const std::string & subshell) const
 {
-    if (this->shellInstance.find(subshell) == this->shellInstance.end())
+
+    std::map<std::string, Shell>::const_iterator it;
+    it = this->shellInstance.find(subshell);
+    if (it == this->shellInstance.end())
     {
         throw std::invalid_argument("Requested shell is not a defined K, L or M subshell");
     }
-    return this->shellInstance[subshell].getShellConstants();
+    return it->second.getShellConstants();
 }
 
-std::map<std::string, std::map<std::string, double> > getXRayLines(std::string family);
-
+const std::map<std::string, double> & Element::getXRayLines(const std::string & family) const
+{
+    return this->getFluorescenceRatios(family);
+}
 
 std::map<std::string, double> \
 Element::getCascadeModifiedVacancyDistribution(const std::map<std::string, double> & distribution) const
@@ -1071,14 +1075,17 @@ Element::getXRayLinesFromVacancyDistribution(const std::map<std::string, double>
 }
 
 
-const Shell & Element::getShell(std::string name)
+const Shell & Element::getShell(const std::string & name) const
 {
-    if (this->shellInstance.find(name) == this->shellInstance.end())
+    std::map<std::string, Shell>::const_iterator it;
+
+    it = this->shellInstance.find(name);
+    if (it == this->shellInstance.end())
     {
         std::cout << "Undefined shell " << name << std::endl;
         throw std::invalid_argument("Non defined shell: " + name);
     }
-    return this->shellInstance[name];
+    return it->second;
 }
 
 

@@ -179,9 +179,9 @@ public:
 
     // Shell constants (fluorescence yield, Coster-Kronig yields)
     void setShellConstants(std::string subshell, std::map<std::string, double> constants);
-    std::map<std::string, double> getShellConstants(std::string subshell);
+    std::map<std::string, double> getShellConstants(const std::string & subshell) const;
 
-    std::map<std::string, std::map<std::string, double> > getXRayLines(std::string family);
+    const std::map<std::string, double> & getXRayLines(const std::string & family = "") const;
 
     /*!
     Given a set of energies, give the initial distribution of vacancies (before cascade) due to
@@ -229,12 +229,12 @@ public:
                                                     const double & weight = 1.0) const;
 
 
-    const Shell & getShell(std::string);
+    const Shell & getShell(const std::string &) const;
 
     /*!
     Provide an easier to wrap interface than calling getShell to access important shell functions
     */
-    const std::map<std::string, double> & getFluorescenceRatios(std::string subshell);
+    const std::map<std::string, double> & getFluorescenceRatios(const std::string & subshell) const;
     const std::map<std::string, double> & getAugerRatios(std::string subshell);
     const std::map<std::string, std::map<std::string, double> > & getCosterKronigRatios(std::string subshell);
 
