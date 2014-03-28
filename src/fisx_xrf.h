@@ -59,7 +59,6 @@ public:
     void setGeometry(const double & alphaIn, const double & alphaOut,\
                       const double & scatteringAngle = 90.);
 
-
     /*!
     Set the reference layer. The detector distance is measured from the reference layer surface.
     If not specified, the lauer closest to the detector
@@ -70,7 +69,7 @@ public:
     /*!
     Set the elements library to be used.
     */
-    void setElementsReference(const Elements & elements);
+    //void setElementsReference(const Elements & elements);
 
     /*!
     Collimators are not implemented yet. The collimators are attenuators that take into account their distance to
@@ -90,6 +89,20 @@ public:
     void setConfiguration(const XRFConfig & configuration);
 
     /*!
+    Get the expected fluorescence emission coming from primary excitation per unit photon.
+    It needs to be multiplied by the mass fraction and the total number of photons to get
+    the actual primary fluorescence.
+
+    The output is a map:
+
+    Element -> Family -> Line -> energy: double, ratio: double
+
+    */
+    std::map< std::string, std::map< std::string, std::map<std::string, std::map<std::string, double> > > >\
+                getExpectedPrimaryEmission(const std::vector<std::string> & elementList,
+                                           const Elements & elements);
+
+    /*!
     Methods coordinating all the calculation
     void detectedEmission()
     void expectedEmission():
@@ -97,13 +110,14 @@ public:
     void expectedScattering();
     void peakRatios();
     */
+    std::map<std::string, std::map<std::string, double> > getFluorescence(const std::string element, \
+                const Elements & elementsLibrary, const int & samplelayerIndex = 0, \
+                const std::string & lineFamily = "", const int & secondary = 0);
 
 private:
     /*!
     Reference to elements library to be used for calculations
     */
-    const Elements *elements;
-
     /*!
     The internal configuration
     */
