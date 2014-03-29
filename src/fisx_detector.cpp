@@ -9,7 +9,7 @@ Detector::Detector(const std::string & name, const double & density, const doubl
     this->distance = 10.0;
 }
 
-double Detector::getActiveArea()
+double Detector::getActiveArea() const
 {
     double pi;
     pi = acos(-1.0);
@@ -45,12 +45,12 @@ void Detector::setDistance(const double & distance)
     this->distance = distance;
 }
 
-const double & Detector::getDiameter()
+const double & Detector::getDiameter() const
 {
     return this->diameter;
 }
 
-const double & Detector::getDistance()
+const double & Detector::getDistance() const
 {
     return this->distance;
 }

@@ -35,12 +35,12 @@ public:
     /*!
     Returns the active area in cm2
     */
-    double getActiveArea();
+    double getActiveArea() const;
 
     /*!
     Returns the diameter in cm2
     */
-    const double & getDiameter();
+    const double & getDiameter() const;
 
     /*!
     Sets the distance to reference layer in cm2
@@ -50,7 +50,7 @@ public:
     /*!
     Returns the distance to reference layer in cm2
     */
-    const double & getDistance();
+    const double & getDistance() const;
 
 
 private:
