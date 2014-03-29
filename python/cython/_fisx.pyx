@@ -262,6 +262,31 @@ cdef class PyEPDL97:
 
     def _getMultiplePhotoelectricWeights(self, int z, std_vector[double] energy):
         return self.thisptr.getPhotoelectricWeights(z, energy)
+import numpy
+#cimport numpy as np
+cimport cython
+
+from cython.operator cimport dereference as deref
+from libcpp.string cimport string as std_string
+from libcpp.vector cimport vector as std_vector
+from libcpp.map cimport map as std_map
+
+from Elements cimport *
+from Layer cimport *
+
+cdef class PyLayer:
+    cdef Layer *thisptr
+
+    def __cinit__(self, std_string materialName, double density=1.0, double thickness=1.0, double funny=1.0):
+        self.thisptr = new Layer(materialName, density, thickness, funny)
+
+    def __dealloc__(self):
+        del self.thisptr
+
+    def getTransmission(self, energies, PyElements elementsLib, double angle=90.):
+        if not hasattr(energies, "__len__"):
+            energies = numpy.array([energies], numpy.float)
+        return self.thisptr.getTransmission(energies, deref(elementsLib.thisptr), angle)
 #import numpy as np
 #cimport numpy as np
 cimport cython
@@ -373,6 +398,7 @@ from libcpp.vector cimport vector as std_vector
 from libcpp.map cimport map as std_map
 
 from XRF cimport *
+from Layer cimport *
     
 cdef class PyXRF:
     cdef XRF *thisptr
@@ -405,3 +431,49 @@ cdef class PyXRF:
     def _setBeam(self, std_vector[double] energies, std_vector[double] weights, \
                        std_vector[int] characteristic, std_vector[double] divergency):
         self.thisptr.setBeam(energies, weights, characteristic, divergency)
+
+    def setBeamFilters(self, layerList):
+        """
+        Due to wrapping constraints, the filter list must have the form:
+        [[Material name or formula0, density0, thickness0, funny factor0],
+         [Material name or formula1, density1, thickness1, funny factor1],
+         ...
+         [Material name or formulan, densityn, thicknessn, funny factorn]]
+
+        Unless you know what you are doing, the funny factors must be 1.0
+        """
+        cdef std_vector[Layer] container
+        for name, density, thickness, funny in layerList:
+            container.push_back(Layer(name, density, thickness, funny))
+        self.thisptr.setBeamFilters(container)
+
+    def setSample(self, layerList, referenceLayer=0):
+        """
+        Due to wrapping constraints, the filter list must have the form:
+        [[Material name or formula0, density0, thickness0, funny factor0],
+         [Material name or formula1, density1, thickness1, funny factor1],
+         ...
+         [Material name or formulan, densityn, thicknessn, funny factorn]]
+
+        Unless you know what you are doing, the funny factors must be 1.0
+        """
+        cdef std_vector[Layer] container
+        for name, density, thickness, funny in layerList:
+            container.push_back(Layer(name, density, thickness, funny))
+        self.thisptr.setSample(container, referenceLayer)
+
+
+    def setAttenuators(self, layerList):
+        """
+        Due to wrapping constraints, the filter list must have the form:
+        [[Material name or formula0, density0, thickness0, funny factor0],
+         [Material name or formula1, density1, thickness1, funny factor1],
+         ...
+         [Material name or formulan, densityn, thicknessn, funny factorn]]
+
+        Unless you know what you are doing, the funny factors must be 1.0
+        """
+        cdef std_vector[Layer] container
+        for name, density, thickness, funny in layerList:
+            container.push_back(Layer(name, density, thickness, funny))
+        self.thisptr.setAttenuators(container)
