@@ -111,7 +111,7 @@ public:
     void peakRatios();
     */
     std::map<std::string, std::map<std::string, double> > getFluorescence(const std::string element, \
-                const Elements & elementsLibrary, const int & samplelayerIndex = 0, \
+                const Elements & elementsLibrary, const int & sampleLayerIndex = 0, \
                 const std::string & lineFamily = "", const int & secondary = 0);
 
 private:

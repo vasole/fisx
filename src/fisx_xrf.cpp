@@ -220,6 +220,7 @@ std::map<std::string, std::map<std::string, double> > XRF::getFluorescence(const
     const Element & element = elementsLibrary.getElement(elementName);
     std::string msg;
     std::map<std::string, std::map<std::string, double> >  result;
+    std::map<std::string, std::map<std::string, double> > actualResult;
     const double PI = acos(-1.0);
     const double & alphaIn = this->configuration.getAlphaIn();
     const double & alphaOut = this->configuration.getAlphaOut();
@@ -230,6 +231,7 @@ std::map<std::string, std::map<std::string, double> > XRF::getFluorescence(const
     const int & referenceLayerIndex = this->configuration.getReferenceLayer();
     double sinAlphaIn = sin(alphaIn*(PI/180.));
     double sinAlphaOut = sin(alphaOut*(PI/180.));
+    double tmpDouble;
 
     if (actualRays.size() == 0)
     {
@@ -348,7 +350,6 @@ std::map<std::string, std::map<std::string, double> > XRF::getFluorescence(const
     }
 
     std::map<std::string, std::map<std::string, double> > tmpResult;
-    std::map<std::string, std::map<std::string, double> > actualResult;
     std::map<std::string, std::map<std::string, double> >::const_iterator c_it;
     std::map<std::string, double>::const_iterator mapIt;
     std::map<std::string, double> muTotalFluo;
@@ -372,10 +373,12 @@ std::map<std::string, std::map<std::string, double> > XRF::getFluorescence(const
                                                                 mapIt->second, \
                                                                 elementsLibrary)["total"] / sinAlphaOut;
             }
-            // calculate the transmission in the way back for each energy (it will be the same for each energy)
+            // calculate the transmission of the fluorescence photon in the way back.
+            // it will be the same for each incident energy.
             // in the sample upper layers
-            // in the attenuators (DO NOT FORGET the funny factor) Because of that it would be better that
-            // the layer takes care of the calculation
+            // in the attenuators
+            // the geometric factor
+            // the detector efficiency
             for (c_it = tmpResult.begin(); c_it != tmpResult.end(); ++c_it)
             {
                 mapIt = c_it->second.find("energy");
@@ -410,6 +413,22 @@ std::map<std::string, std::map<std::string, double> > XRF::getFluorescence(const
                                                                             elementsLibrary, 90.0));
                 }
             }
+            actualResult = tmpResult;
+            for (c_it = tmpResult.begin(); c_it != tmpResult.end(); ++c_it)
+            {
+                actualResult[c_it->first]["rate"] = 0.0;
+            }
+        }
+        //The self attenuation term!
+        tmpDouble = (muTotal[iRay] + muTotalFluo[c_it->first]);
+        tmpDouble = (1.0 - exp(- tmpDouble * sample[sampleLayerIndex].density)) / tmpDouble;
+        for (c_it = tmpResult.begin(); c_it != tmpResult.end(); ++c_it)
+        {
+            actualResult[c_it->first];
+            mapIt = c_it->second.find("rate");
+            actualResult[c_it->first]["rate"] += mapIt->second * tmpDouble * \
+                                                detectionEfficiency[c_it->first];
         }
     }
+    return actualResult;
 }
