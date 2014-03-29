@@ -100,6 +100,7 @@ public:
    const double & getAlphaIn() const {return this->alphaIn;};
    const double & getAlphaOut() const {return this->alphaOut;};
    const double & getScatteringAngle() const {return this->scatteringAngle;};
+   const int & getReferenceLayer() const {return this->referenceLayer;};
 
 private:
     Beam beam;
