@@ -427,12 +427,11 @@ std::map<std::string, std::map<std::string, double> > XRF::getFluorescence(const
                 actualResult[c_it->first]["rate"] = 0.0;
             }
         }
-        //The self attenuation term!
-        tmpDouble = (muTotal[iRay] + muTotalFluo[c_it->first]);
-        tmpDouble = (1.0 - exp(- tmpDouble * sample[sampleLayerIndex].density)) / tmpDouble;
         for (c_it = tmpResult.begin(); c_it != tmpResult.end(); ++c_it)
         {
-            actualResult[c_it->first];
+            //The self attenuation term
+            tmpDouble = (muTotal[iRay] + muTotalFluo[c_it->first]);
+            tmpDouble = (1.0 - exp(- tmpDouble * sample[sampleLayerIndex].density)) / (tmpDouble * sinAlphaIn);
             mapIt = c_it->second.find("rate");
             actualResult[c_it->first]["rate"] += mapIt->second * tmpDouble * \
                                                 detectionEfficiency[c_it->first];

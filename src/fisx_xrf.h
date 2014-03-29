@@ -27,7 +27,7 @@ public:
     void setBeam(const Beam & beam);
 
     /*!
-    Easier to wrap funtion to set the excitation beam
+    Easy to wrap funtion to set the excitation beam
     */
     void setBeam(const std::vector<double> & energies, \
                  const std::vector<double> & weight, \
