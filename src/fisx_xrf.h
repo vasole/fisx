@@ -27,6 +27,14 @@ public:
     void setBeam(const Beam & beam);
 
     /*!
+    Easier to wrap funtion to set the excitation beam
+    */
+    void setBeam(const std::vector<double> & energies, \
+                 const std::vector<double> & weight, \
+                 const std::vector<int> & characteristic = std::vector<int>(), \
+                 const std::vector<double> & divergency = std::vector<double>());
+
+    /*!
     Set the beam filters to be applied
     */
     void setBeamFilters(const std::vector<Layer> & filters);
@@ -64,7 +72,7 @@ public:
     If not specified, the lauer closest to the detector
     */
     void setReferenceLayer(const int & index);
-    void setRefenceLayer(std::string name);
+    void setRefenceLayer(const std::string & name);
 
     /*!
     Set the elements library to be used.

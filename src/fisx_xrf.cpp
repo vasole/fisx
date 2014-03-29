@@ -34,6 +34,14 @@ void XRF::setBeam(const Beam & beam)
     this->configuration.setBeam(beam);
 }
 
+void XRF::setBeam(const std::vector<double> & energies, \
+                 const std::vector<double> & weight, \
+                 const std::vector<int> & characteristic, \
+                 const std::vector<double> & divergency)
+{
+    this->configuration.setBeam(energies, weight, characteristic, divergency);
+}
+
 void XRF::setBeamFilters(const std::vector<Layer> &layers)
 {
     this->recentBeam = true;
