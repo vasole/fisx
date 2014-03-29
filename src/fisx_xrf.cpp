@@ -226,6 +226,7 @@ std::map<std::string, std::map<std::string, double> > XRF::getFluorescence(const
     const double & detectorDistance = detector.getDistance();
     const double & detectorDiameter = detector.getDiameter();
     double distance;
+    double geometricEfficiency;
     const int & referenceLayerIndex = this->configuration.getReferenceLayer();
     double sinAlphaIn = sin(alphaIn*(PI/180.));
     double sinAlphaOut = sin(alphaOut*(PI/180.));
@@ -298,7 +299,7 @@ std::map<std::string, std::map<std::string, double> > XRF::getFluorescence(const
     weights = actualRays[1];
     std::fill(muTotal.begin(), muTotal.end(), 0.0);
     distance = 0.0;
-    for (std::vector<Layer>::size_type iLayer = 0; iLayer < sampleLayerIndex; iLayer++)
+    for (iLayer = 0; iLayer < sampleLayerIndex; iLayer++)
     {
         layerPtr = &sample[iLayer];
         if (iLayer < referenceLayerIndex)
@@ -312,6 +313,18 @@ std::map<std::string, std::map<std::string, double> > XRF::getFluorescence(const
         {
             weights[iRay] *= doubleVector[iRay];
         }
+    }
+
+    // we can already calculate the geometric efficiency
+    if (detectorDiameter > 0.0)
+    {
+        distance += detectorDistance;
+        // calculate geometric efficiency 0.5 * (1 - cos theta)
+        geometricEfficiency = 0.5 * (1.0 - (detectorDiameter / sqrt(pow(distance, 2) + pow(detectorDiameter, 2))));
+    }
+    else
+    {
+        geometricEfficiency = 1.0 ;
     }
 
     // we have reached the layer we are interesed on
@@ -340,9 +353,7 @@ std::map<std::string, std::map<std::string, double> > XRF::getFluorescence(const
     std::map<std::string, double>::const_iterator mapIt;
     std::map<std::string, double> muTotalFluo;
     std::map<std::string, double> detectionEfficiency;
-    double energy;
-    double rate;
-    double distance;
+
     iRay = energies.size();
     while (iRay > 0)
         --iRay;
@@ -388,17 +399,16 @@ std::map<std::string, std::map<std::string, double> > XRF::getFluorescence(const
                                                             elementsLibrary, 90.);
                 }
 
-                // detection efficienty
-                if (detector.getDiameter() > 0.0)
+                // detection efficienty decomposed in geometric and intrinsic
+                if (detectorDiameter > 0.0)
                 {
-                    distance += detector.getDistance();
-                    // calculate solid angle
+                    // apply geometric efficiency 0.5 * (1 - cos theta)
+                    detectionEfficiency[c_it->first] *= geometricEfficiency;
 
                     // calculate intrinsic efficiency
                     detectionEfficiency[c_it->first] *= (1.0 - detector.getTransmission( mapIt->second, \
                                                                             elementsLibrary, 90.0));
                 }
-
             }
         }
     }
