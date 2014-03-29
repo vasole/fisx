@@ -906,6 +906,7 @@ std::map<std::string, std::vector<double> > Elements::getMassAttenuationCoeffici
     std::map<std::string, std::vector<double> >::size_type n;
     std::map<std::string, double> elementsDict;
     std::map<std::string, double>::iterator it;
+    std::map<std::string , int>::const_iterator mapIterator;
 
     total = 0.0;
     for (c_it = inputFormulaDict.begin(); c_it != inputFormulaDict.end(); ++c_it)
@@ -962,7 +963,8 @@ std::map<std::string, std::vector<double> > Elements::getMassAttenuationCoeffici
 
             massFraction = c_it->second / total;
             element = c_it->first;
-            tmpResult = this->elementList[c_it->second].getMassAttenuationCoefficients(energy[n]);
+            mapIterator = this->elementDict.find(element);
+            tmpResult = this->elementList[mapIterator->second].getMassAttenuationCoefficients(energy[n]);
             result["coherent"][n] += tmpResult["coherent"] * massFraction;
             result["compton"][n] += tmpResult["compton"] * massFraction;
             result["pair"][n] += tmpResult["pair"] * massFraction;
