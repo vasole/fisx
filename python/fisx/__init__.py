@@ -5,4 +5,5 @@ from ._fisx import PyShell as Shell
 from ._fisx import PyElement as Element
 from ._fisx import PyElements as Elements
 from ._fisx import PyLayer as Layer
+from ._fisx import PyDetector as Detector
 from ._fisx import PyXRF as XRF
