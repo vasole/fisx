@@ -15,8 +15,7 @@ public:
     /*!
     Set the excitation beam
     */
-    void setBeam(const double & energy, const double & weight = 1.0, \
-                 const int & characteristic = 1, const double & divergency = 0.0);
+    void setBeam(const double & energy, const double & divergency);
     void setBeam(const std::vector<double> & energies, \
                  const std::vector<double> & weight, \
                  const std::vector<int> & characteristic = std::vector<int>(), \
