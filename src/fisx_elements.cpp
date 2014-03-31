@@ -1473,8 +1473,8 @@ const std::string & Elements::getShellRadiativeTransitionsFile( \
 {
     std::map<std::string, std::string>::const_iterator c_it;
 
-    c_it = this->shellConstantsFile.find(mainShellName);
-    if (c_it == this->shellConstantsFile.end())
+    c_it = this->shellRadiativeTransitionsFile.find(mainShellName);
+    if (c_it == this->shellRadiativeTransitionsFile.end())
     {
         throw std::invalid_argument("Invalid main shell. It should be K, L or M");
     }
@@ -1486,8 +1486,8 @@ const std::string & Elements::getShellNonradiativeTransitionsFile( \
 {
     std::map<std::string, std::string>::const_iterator c_it;
 
-    c_it = this->shellConstantsFile.find(mainShellName);
-    if (c_it == this->shellConstantsFile.end())
+    c_it = this->shellNonradiativeTransitionsFile.find(mainShellName);
+    if (c_it == this->shellNonradiativeTransitionsFile.end())
     {
         throw std::invalid_argument("Invalid main shell. It should be K, L or M");
     }
