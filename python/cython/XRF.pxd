@@ -15,6 +15,7 @@ cdef extern from "fisx_xrf.h":
         XRF(std_string) except +
         void readConfigurationFromFile(std_string) except +
         void setBeam(std_vector[double], std_vector[double], std_vector[int], std_vector[double]) except +
+        void setBeam(double, double) except +
         void setBeamFilters(std_vector[Layer]) except +
         void setSample(std_vector[Layer], int) except +
         void setAttenuators(std_vector[Layer]) except +
