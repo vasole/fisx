@@ -24,6 +24,28 @@ cdef class PyElements:
     def __dealloc__(self):
         del self.thisptr
 
+    def setShellConstantsFile(self, std_string mainShellName, std_string fileName):
+        """
+        Load main shell (K, L or M) constants from file (fluorescence and Coster-Kronig yields)
+        """
+        self.thisptr.setShellConstantsFile(mainShellName, fileName)
+
+    def getShellConstantsFile(self, std_string mainShellName):
+        return self.thisptr.getShellConstantsFile(mainShellName)
+
+    def setShellRadiativeTransitionsFile(self, std_string mainShellName, std_string fileName):
+        """
+        Load main shell (K, L or M) X-ray emission rates from file.
+        The library normalizes internally.
+        """
+        self.thisptr.setShellRadiativeTransitionsFile(mainShellName, fileName)
+
+    def getShellRadiativeTransitionsFile(self, std_string mainShellName):
+        return self.thisptr.getShellRadiativeTransitionsFile(mainShellName)
+
+    def getShellNonradiativeTransitionsFile(self, std_string mainShellName):
+        return self.thisptr.getShellNonradiativeTransitionsFile(mainShellName)
+
     def setMassAttenuationCoefficients(self,
                                        std_string element,
                                        std_vector[double] energies,

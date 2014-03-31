@@ -14,6 +14,18 @@ cdef extern from "fisx_elements.h":
         Elements(std_string, std_string) except +
         Elements(std_string, std_string, std_string) except +
 
+        void setShellConstantsFile(std_string, std_string) except +
+
+        void setShellRadiativeTransitionsFile(std_string, std_string) except +
+
+        void setShellNonradiativeTransitionsFile(std_string, std_string) except +
+
+        std_string getShellConstantsFile(std_string) except +
+
+        std_string getShellRadiativeTransitionsFile(std_string) except +
+
+        std_string getShellNonradiativeTransitionsFile(std_string) except +
+
         void setMassAttenuationCoefficients(std_string,\
                                             std_vector[double], \
                                             std_vector[double], \
@@ -41,4 +53,6 @@ cdef extern from "fisx_elements.h":
                             std_string element,
                             std_vector[double] energy,
                             std_vector[double] weights) except +
+
+
 
