@@ -61,6 +61,17 @@ void Elements::initialize(std::string epdl97Directory, std::string bindingEnergi
     std::string joinSymbol;
     std::string filename;
 
+    // Indicate we are going to configure everything
+    this->shellConstantsFile["K"] = "";
+    this->shellConstantsFile["L"] = "";
+    this->shellConstantsFile["M"] = "";
+    this->shellRadiativeTransitionsFile["K"] = "";
+    this->shellRadiativeTransitionsFile["L"] = "";
+    this->shellRadiativeTransitionsFile["M"] = "";
+    this->shellNonradiativeTransitionsFile["K"] = "";
+    this->shellNonradiativeTransitionsFile["L"] = "";
+    this->shellNonradiativeTransitionsFile["M"] = "";
+
     // initialize EPDL97
     this->epdl97.setDataDirectory(epdl97Directory);
 
@@ -203,7 +214,8 @@ void Elements::addElement(Element & element)
     }
 }
 // Shell constants
-void Elements::setShellConstantsFile(std::string mainShellName, std::string fileName)
+void Elements::setShellConstantsFile(const std::string & mainShellName, \
+                                     const std::string & fileName)
 {
     SimpleSpecfile sf;
     int    nScans, i;
@@ -304,9 +316,11 @@ void Elements::setShellConstantsFile(std::string mainShellName, std::string file
             this->elementList[n].setShellConstants(subShells[i], tmpDict);
         }
     }
+    this->shellConstantsFile[mainShellName] = fileName;
 }
 
-void Elements::setShellNonradiativeTransitionsFile(std::string mainShellName, std::string fileName)
+void Elements::setShellNonradiativeTransitionsFile(const std::string & mainShellName, \
+                                                   const std::string & fileName)
 {
     SimpleSpecfile sf;
     int    nScans, i;
@@ -398,9 +412,11 @@ void Elements::setShellNonradiativeTransitionsFile(std::string mainShellName, st
             }
         }
     }
+    this->shellNonradiativeTransitionsFile[mainShellName] = fileName;
 }
 
-void Elements::setShellRadiativeTransitionsFile(std::string mainShellName, std::string fileName)
+void Elements::setShellRadiativeTransitionsFile(const std::string & mainShellName, \
+                                                const std::string & fileName)
 {
     SimpleSpecfile sf;
     int    nScans, i;
@@ -492,10 +508,11 @@ void Elements::setShellRadiativeTransitionsFile(std::string mainShellName, std::
             }
         }
     }
+    this->shellRadiativeTransitionsFile[mainShellName] = fileName;
 }
 
 // Mass attenuation handling
-void Elements::setMassAttenuationCoefficientsFile(std::string fileName)
+void Elements::setMassAttenuationCoefficientsFile(const std::string & fileName)
 {
     int n, nScans;
     SimpleSpecfile sf;
@@ -595,12 +612,12 @@ void Elements::setMassAttenuationCoefficientsFile(std::string fileName)
     }
 }
 
-void Elements::setMassAttenuationCoefficients(std::string name,
-                                              std::vector<double> energy,
-                                              std::vector<double> photoelectric,
-                                              std::vector<double> coherent,
-                                              std::vector<double> compton,
-                                              std::vector<double> pair)
+void Elements::setMassAttenuationCoefficients(const std::string & name,
+                                              const std::vector<double> & energy,
+                                              const std::vector<double> & photoelectric,
+                                              const std::vector<double> & coherent,
+                                              const std::vector<double> & compton,
+                                              const std::vector<double> & pair)
 {
     std::map<std::string, std::vector<double> > massAttenuationCoefficients;
     std::map<std::string, std::vector<double> >::iterator it;
@@ -846,8 +863,9 @@ std::map<std::string, double> Elements::getMassAttenuationCoefficients(std::stri
     }
 }
 
-std::map<std::string, std::vector<double> > Elements::getMassAttenuationCoefficients(std::string name, \
-                                                                        std::vector<double> energy) const
+std::map<std::string, std::vector<double> > Elements::getMassAttenuationCoefficients( \
+                                                        const std::string & name, \
+                                                        const std::vector<double> & energy) const
 {
     std::string msg;
     std::map<std::string, double> composition;
@@ -1437,6 +1455,45 @@ std::map<std::string, double> Elements::parseFormula(const std::string & formula
     }
     return composition;
 }
+
+const std::string & Elements::getShellConstantsFile(const std::string & mainShellName) const
+{
+    std::map<std::string, std::string>::const_iterator c_it;
+
+    c_it = this->shellConstantsFile.find(mainShellName);
+    if (c_it == this->shellConstantsFile.end())
+    {
+        throw std::invalid_argument("Invalid main shell. It should be K, L or M");
+    }
+    return c_it->second;
+}
+
+const std::string & Elements::getShellRadiativeTransitionsFile( \
+                                                const std::string & mainShellName) const
+{
+    std::map<std::string, std::string>::const_iterator c_it;
+
+    c_it = this->shellConstantsFile.find(mainShellName);
+    if (c_it == this->shellConstantsFile.end())
+    {
+        throw std::invalid_argument("Invalid main shell. It should be K, L or M");
+    }
+    return c_it->second;
+}
+
+const std::string & Elements::getShellNonradiativeTransitionsFile( \
+                                                const std::string & mainShellName) const
+{
+    std::map<std::string, std::string>::const_iterator c_it;
+
+    c_it = this->shellConstantsFile.find(mainShellName);
+    if (c_it == this->shellConstantsFile.end())
+    {
+        throw std::invalid_argument("Invalid main shell. It should be K, L or M");
+    }
+    return c_it->second;
+}
+
 
 bool Elements::stringToDouble(const std::string& str, double& number)
 {

@@ -77,38 +77,59 @@ public:
     /*!
     Load main shell (K, L or M) constants from file (fluorescence and Coster-Kronig yields)
     */
-    void setShellConstantsFile(std::string mainShellName, std::string fileName);
+    void setShellConstantsFile(const std::string & mainShellName, const std::string & fileName);
 
     /*!
     Load main shell (K, L or M) X-ray emission rates from file.
     The library normalizes internally.
     */
-    void setShellRadiativeTransitionsFile(std::string mainShellName, std::string fileName);
+    void setShellRadiativeTransitionsFile(const std::string & mainShellName, \
+                                          const std::string & fileName);
 
     /*!
     Load main shell (K, L or M) Coster-Kronig and Auger emission ratios from file.
     The library separates Coster-Kronig from Auger and normalizes internally.
     */
-    void setShellNonradiativeTransitionsFile(std::string mainShellName, std::string fileName);
+    void setShellNonradiativeTransitionsFile(const std::string & mainShellName, \
+                                             const std::string & fileName);
+
+
+
+    /*!
+    Get file used to load main shell (K, L or M) constants (fluorescence and Coster-Kronig yields)
+    */
+    const std::string &  getShellConstantsFile(const std::string & mainShellName) const;
+
+    /*!
+    Get file used to load main shell (K, L or M) X-ray emission rates from file.
+    The library normalizes internally.
+    */
+    const std::string &  getShellRadiativeTransitionsFile(const std::string & mainShellName) const;
+
+    /*!
+    Get file used to load main shell (K, L or M) Coster-Kronig and Auger emission ratios from file.
+    The library separates Coster-Kronig from Auger and normalizes internally.
+    */
+    const std::string & getShellNonradiativeTransitionsFile(const std::string & mainShellName) const;
 
     // mass attenuation related functions
     /*!
     Update the total mass attenuation coefficients of the default elements with those found
     in the given file.
     */
-    void setMassAttenuationCoefficientsFile(std::string fileName);
+    void setMassAttenuationCoefficientsFile(const std::string & fileName);
 
     /*!
     Update the total mass attenuation coefficients of the supplied element.
     The partial mass attenuation photoelectric coefficients are updated by the library in order
     to be consistent with the supplied mass attenuation coefficients
     */
-    void setMassAttenuationCoefficients(std::string elementName, \
-                                        std::vector<double> energy, \
-                                        std::vector<double> photoelectric, \
-                                        std::vector<double> coherent, \
-                                        std::vector<double> compton,\
-                                        std::vector<double> pair);
+    void setMassAttenuationCoefficients(const std::string & elementName, \
+                                        const std::vector<double> & energy, \
+                                        const std::vector<double> & photoelectric, \
+                                        const std::vector<double> & coherent, \
+                                        const std::vector<double> & compton,\
+                                        const std::vector<double> & pair);
 
     /*!
     Retrieve the internal table of photon mass attenuation coefficients of the requested element.
@@ -121,8 +142,9 @@ public:
     at the given energies as a map where the keys are the different physical processes and the values
     are the vectors of the calculated values via log-log interpolation in the internal table.
     */
-    std::map<std::string, std::vector<double> > getMassAttenuationCoefficients(std::string formula,
-                                                            std::vector<double> energies) const;
+    std::map<std::string, std::vector<double> > getMassAttenuationCoefficients( \
+                                                    const std::string & formula,
+                                                    const std::vector<double> & energies) const;
 
     /*!
     Given a map of elements and mass fractions and a set of energies, give back the mass attenuation
@@ -239,6 +261,8 @@ public:
                             const double & energy, \
                             const double & weights = 1.0) const;
 
+
+
     /*!
     Utility to convert from string to double.
     */
@@ -268,5 +292,9 @@ private:
     // The map Material name, index
     std::map<std::string , int> materialDict;
 
+    // The files used for configuring the library
+    std::map<std::string, std::string> shellConstantsFile;
+    std::map<std::string, std::string> shellRadiativeTransitionsFile;
+    std::map<std::string, std::string> shellNonradiativeTransitionsFile;
 };
 #endif
