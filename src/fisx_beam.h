@@ -54,15 +54,19 @@ public:
                  const std::vector<int> & characteristic = std::vector<int>(),\
                  const std::vector<double> & divergency = std::vector<double>());
 
+
+
     /*!
     Easy to wrap interface functions
     Except for the energy, you can use NULL pointers to use default values.
     */
-    void setBeam(int nValues, double *energy, double *weight = NULL,
-                 int *characteristic = NULL, double *divergency = NULL);
+    void setBeam(const int & nValues, const double *energy, const double *weight = NULL,
+                 const int *characteristic = NULL, const double *divergency = NULL);
 
-    void setBeam(int nValues, double *energy, double *weight = NULL,
-                 double *characteristic = NULL, double *divergency = NULL);
+    void setBeam(const int & nValues, const double *energy, const double *weight = NULL,
+                 const double *characteristic = NULL, const double *divergency = NULL);
+
+    void setBeam(const double & energy, const double divergency = 0.0);
 
     /*!
     Returns a constant reference to the internal beam.

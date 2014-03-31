@@ -1,5 +1,6 @@
 #include "fisx_beam.h"
 #include <algorithm>
+#include <iostream>
 
 Beam::Beam()
 {
@@ -88,10 +89,21 @@ void Beam::setBeam(const std::vector<double> & energy, \
     this->normalizeBeam();
 }
 
+void Beam::setBeam(const double & energy, const double divergency)
+{
+    this->normalized = false;
+    this->rays.clear();
+    this->rays.resize(1);
+    this->rays[0].energy = energy;
+    this->rays[0].weight = 1.0;
+    this->rays[0].characteristic = 1;
+    this->rays[0].divergency = divergency;
+    // it is already normalized
+    this->normalizeBeam();
+}
 
-
-void Beam::setBeam(int nValues, double *energy, double *weight,
-                   int *characteristic, double *divergency)
+void Beam::setBeam(const int & nValues, const double *energy, const double *weight,
+                 const int *characteristic, const double *divergency)
 {
     int i;
     double tmpDouble;
@@ -99,10 +111,6 @@ void Beam::setBeam(int nValues, double *energy, double *weight,
     this->normalized = false;
     this->rays.clear();
     this->rays.resize(nValues);
-    if (nValues <= 0)
-    {
-        return;
-    }
 
     tmpDouble = 1.0;
 
@@ -134,44 +142,19 @@ void Beam::setBeam(int nValues, double *energy, double *weight,
     this->normalizeBeam();
 }
 
-void Beam::setBeam(int nValues, double *energy, double *weight,
-                   double *characteristic, double *divergency)
+void Beam::setBeam(const int & nValues, const double *energy, const double *weight,
+                   const double *characteristic, const double *divergency)
 {
-    int i;
-    double tmpDouble;
+    std::vector<int>::size_type i;
+    std::vector<int> flags;
 
-    this->normalized = false;
-    this->rays.clear();
-    this->rays.resize(nValues);
-
-    tmpDouble = 1.0;
-
-    for (i=0; i < nValues; ++i)
+    flags.resize(nValues);
+    for (i = 0; i < nValues; i++)
     {
-        this->rays[i].energy = energy[i];
-        if (weight != NULL)
-        {
-            tmpDouble = weight[i];
-        }
-        this->rays[i].weight = tmpDouble;
-        if (characteristic == NULL)
-        {
-            this->rays[i].characteristic = 1;
-        }
-        else
-        {
-            this->rays[i].characteristic = (int) characteristic[i];
-        }
-        if (divergency == NULL)
-        {
-            this->rays[i].divergency = 0.0;
-        }
-        else
-        {
-            this->rays[i].divergency = divergency[i];
-        }
+        flags[i] = (int) characteristic[i];
     }
-    this->normalizeBeam();
+
+    this->setBeam(nValues, energy, weight, &flags[0], divergency);
 }
 
 void Beam::normalizeBeam()
@@ -201,9 +184,9 @@ void Beam::normalizeBeam()
 std::vector<std::vector<double> > Beam::getBeamAsDoubleVectors() const
 {
     std::vector<double>::size_type nItems;
-    std::vector<Ray>::const_iterator c_it;
+    std::vector<Ray>::size_type c_it;
     std::vector<std::vector<double> >returnValue;
-    Ray ray;
+    const Ray *ray;
 
     //if (!this->normalized)
     //{
@@ -211,19 +194,20 @@ std::vector<std::vector<double> > Beam::getBeamAsDoubleVectors() const
     //}
     nItems = rays.size();
     returnValue.resize(4);
-    returnValue[0].resize(nItems);
-    returnValue[1].resize(nItems);
-    returnValue[2].resize(nItems);
-    returnValue[3].resize(nItems);
-    nItems = 0;
-    for(c_it = rays.begin(); c_it != rays.end(); ++c_it)
+    if (nItems > 0)
     {
-        ray = *c_it;
-        returnValue[0][nItems] = ray.energy;
-        returnValue[1][nItems] = ray.weight;
-        returnValue[2][nItems] = ray.characteristic;
-        returnValue[3][nItems] = ray.divergency;
-        nItems++;
+        returnValue[0].resize(nItems);
+        returnValue[1].resize(nItems);
+        returnValue[2].resize(nItems);
+        returnValue[3].resize(nItems);
+        for(c_it = 0; c_it < nItems; c_it++)
+        {
+            ray = &(this->rays[c_it]);
+            returnValue[0][c_it] = (*ray).energy;
+            returnValue[1][c_it] = (*ray).weight;
+            returnValue[2][c_it] = (*ray).characteristic;
+            returnValue[3][c_it] = (*ray).divergency;
+        }
     }
     return returnValue;
 }
