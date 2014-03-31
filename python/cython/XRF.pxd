@@ -6,6 +6,7 @@ from libcpp.string cimport string as std_string
 from libcpp.vector cimport vector as std_vector
 from libcpp.map cimport map as std_map
 
+from Detector cimport *
 from Elements cimport *
 from Layer cimport *
 
@@ -21,6 +22,7 @@ cdef extern from "fisx_xrf.h":
         void setAttenuators(std_vector[Layer]) except +
 
         void setGeometry(double, double, double) except +
+        void setDetector(Detector) except +
 
         std_map[std_string, std_map[std_string, double]] getFluorescence(std_string, \
                 Elements, int, std_string, int) except +

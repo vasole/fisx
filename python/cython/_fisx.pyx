@@ -551,6 +551,9 @@ cdef class PyXRF:
             container.push_back(Layer(name, density, thickness, funny))
         self.thisptr.setAttenuators(container)
 
+    def setDetector(self, PyDetector detector):
+        self.thisptr.setDetector(deref(detector.thisptr))
+
     def getFluorescence(self, std_string elementName, PyElements elementsLibrary, \
                             int sampleLayer = 0, std_string lineFamily="", int secondary = 0):
         return self.thisptr.getFluorescence(elementName, deref(elementsLibrary.thisptr), \
