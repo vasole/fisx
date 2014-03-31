@@ -22,8 +22,6 @@ public:
     void setMaterial(const Material & material);
 
     std::string name;
-    double density;
-    double thickness;
 
     /*!
     Eventually get a handle to underlying material
@@ -64,11 +62,18 @@ public:
 
     const std::string & getMaterialName()const {return this->materialName;};
 
+    void setDensity(const double & density);
+    void setThickness(const double & thickness);
+    const double & getDensity()const {return this->density;};
+    const double & getThickness()const {return this->thickness;};
+
 private:
     std::string materialName;
     bool hasMaterial;
     Material material;
     double funnyFactor;
+    double density;
+    double thickness;
 };
 
 #endif //FISX_LAYER_H

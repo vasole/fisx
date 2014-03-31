@@ -13,6 +13,24 @@ Layer::Layer(const std::string & name, const double & density, \
     this->hasMaterial = false;
 }
 
+void Layer::setDensity(const double & value)
+{
+    if (value <= 0.0)
+    {
+        throw std::invalid_argument("Density must be possitive value.");
+    }
+    this->density = value;
+}
+
+void Layer::setThickness(const double & value)
+{
+    if (value <= 0.0)
+    {
+        throw std::invalid_argument("Thickness must be possitive value.");
+    }
+    this->thickness = value;
+}
+
 void Layer::setMaterial(const std::string & materialName)
 {
     this->materialName = materialName;
