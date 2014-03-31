@@ -293,7 +293,9 @@ std::map<std::string, std::map<std::string, double> > XRF::getFluorescence(const
                 {
                     // apply geometric efficiency 0.5 * (1 - cos theta)
                     detectionEfficiency[c_it->first] *= geometricEfficiency;
-
+                }
+                if (detector.hasMaterialComposition() || (detector.getMaterialName().size() > 0))
+                {
                     // calculate intrinsic efficiency
                     detectionEfficiency[c_it->first] *= (1.0 - detector.getTransmission( mapIt->second, \
                                                                             elementsLibrary, 90.0));
