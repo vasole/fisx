@@ -1063,9 +1063,21 @@ Element::getXRayLinesFromVacancyDistribution(const std::map<std::string, double>
                 }
                 if(energy1 <= 0.0)
                 {
-                    std::cout << "Fluorescence transition from unset energy shell ";
-                    std::cout << tmpString << "Assuming 3 eV" << std::endl;
-                    energy1 = 0.003;
+                    if (energy1 < 0.0)
+                    {
+                        std::cout << this->name << " " << bind_it->first << " " ;
+                        std::cout << bind_it->second << std::endl;
+                        throw std::runtime_error("Negative binding energy!");
+                    }
+                    else
+                    {
+#ifndef NDEBUG
+                        std::cout << "rate = " << rate << std::endl;
+                        std::cout << "Fluorescence transition from unset energy shell ";
+                        std::cout << tmpString << "Assuming 3 eV" << std::endl;
+#endif
+                        energy1 = 0.003;
+                    }
                 }
                 result[c_it->first]["energy"] = energy0 - energy1;
             }
