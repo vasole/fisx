@@ -6,6 +6,7 @@
 XRF::XRF()
 {
     // initialize geometry with default parameters
+    this->configuration = XRFConfig();
     this->setGeometry(45., 45.);
     //this->elements = NULL;
 };
@@ -34,6 +35,12 @@ void XRF::setBeam(const Beam & beam)
     this->configuration.setBeam(beam);
 }
 
+void XRF::setBeam(const double & energy, const double & divergency)
+{
+    this->recentBeam = true;
+    this->configuration.setBeam(energy, divergency);
+}
+
 void XRF::setBeam(const std::vector<double> & energies, \
                  const std::vector<double> & weight, \
                  const std::vector<int> & characteristic, \
@@ -53,6 +60,23 @@ void XRF::setSample(const std::vector<Layer> & layers, const int & referenceLaye
     this->configuration.setSample(layers, referenceLayer);
 }
 
+void XRF::setSample(const std::string & name, \
+                   const double & density, \
+                   const double & thickness)
+{
+    std::vector<Layer> vLayer;
+    vLayer.push_back(Layer(name, density, thickness, 1.0));
+    this->configuration.setSample(vLayer, 0);
+}
+
+void XRF::setSample(const Layer & layer)
+{
+    std::vector<Layer> vLayer;
+    vLayer.push_back(layer);
+    this->configuration.setSample(vLayer, 0);
+}
+
+
 void XRF::setAttenuators(const std::vector<Layer> & attenuators)
 {
     this->configuration.setAttenuators(attenuators);
@@ -62,155 +86,6 @@ void XRF::setDetector(const Detector & detector)
 {
     this->configuration.setDetector(detector);
 }
-
-
-/* This implementation tries to optimize things but becomes difficult to understand
-std::map< std::string, std::map< std::string, std::map<std::string, std::map<std::string, double> > > >\
-                XRF::getExpectedPrimaryEmission(const std::vector<std::string> & elementList,
-                                                const Elements & elements)
-{
-    // get the actual beam reaching the sample
-    const Beam & beam = this->configuration.getBeam();
-    std::vector<std::vector<double> >actualRays = beam.getBeamAsDoubleVectors();
-    std::vector<double> & energies = actualRays[0];
-    std::vector<double> weights;
-    std::vector<double> muTotal;
-    std::vector<double> tmpDouble;
-    //const std::vector<Layer> & attenuators = this->configuration.getAttenuators();
-    std::vector<Layer> attenuators;
-    std::vector<Layer>::size_type iLayer;
-    Material material;
-    std::vector<Ray>::size_type iRay;
-    std::vector<std::string>::size_type iString;
-    double argument;
-
-    muTotal.resize(energies.size());
-    std::fill(muTotal.begin(), muTotal.end(), 0.0);
-    attenuators = this->configuration.getBeamFilters();
-    for (iLayer = 0; iLayer < attenuators.size(); iLayer++)
-    {
-        if (attenuators[iLayer].hasMaterialComposition())
-        {
-            material = attenuators[iLayer].getMaterial();
-            tmpDouble = elements.getMassAttenuationCoefficients( \
-                                material.getComposition(), energies)["total"];
-        }
-        else
-        {
-           tmpDouble = elements.getMassAttenuationCoefficients(\
-                                attenuators[iLayer].getMaterialName(), energies)["total"];
-        }
-        for (iRay = 0; iRay < tmpDouble.size(); iRay++)
-        {
-            muTotal[iRay] += (tmpDouble[iRay] * \
-                               attenuators[iLayer].density * \
-                               attenuators[iLayer].thickness);
-        }
-    }
-
-    for(iRay = 0; iRay < actualRays.size(); iRay++)
-    {
-        actualRays[1][iRay] *= exp(- muTotal[iRay]) ;
-    }
-
-    // we have got the actual beam reaching the sample
-
-    // For each layer
-    // for each element
-    // for each energy
-    // calculate the number of primary vacancies (it is function of energy and weight)
-    // calculate the propagation of those vacancies
-    // get the emitted lines from the final vacancy distribution
-
-    // std::map<std::string, double> initialVacancies;
-    // std::map<std::string, std::map<std::string, double> > transitions;
-    // A transition is specified by a key (IUPAC notation), a rate and an energy
-    std::map<std::string, std::vector< std::map<std::string, std::map<std::string, double> > > > transitions;
-
-    for (iString = 0; iString < elementList.size(); iString++)
-    {
-        const Element & elementObject = elements.getElement(elementList[iString]);
-        // calculate the inital vacancy distribution for each energy
-        transitions[elementList[iString]].resize(energies.size());
-        for (iRay = 0; iRay < energies.size(); iRay++)
-        {
-            //initialVacancies = \
-            //    elementObject.getInitialPhotoelectricVacancyDistribution(energies[iRay], cascade, useFluorescenceYield);
-            // and the emitted x-rays energies and ratios already multiplied by the fluorescence yield*
-            // taking into account the cascade
-            transitions[elementList[iString]][iRay] = elementObject.getXRayLinesFromVacancyDistribution( \
-                        elementObject.getInitialPhotoelectricVacancyDistribution(energies[iRay]), 1, true);
-        }
-    }
-
-
-    // copy the rays reaching the sample into other vector that will be updated
-    // as we go through the sample
-    weights = actualRays[1];
-    const std::vector<Layer> & sample = this->configuration.getSample();
-    // map[element][sample_layer_number][transition][energy and rate]
-    std::map<std::string, std::vector<std::map<std::string, std::map<std::string, double> > > > emittedRays;
-
-    // create the needed space
-    for (iString = 0; iString < elementList.size(); iString++)
-    {
-       emittedRays[elementList[iString]].resize(sample.size());
-    }
-
-    for (iLayer = 0; iLayer < sample.size(); iLayer++)
-    {
-        // get the layer total mass attenuation coefficients
-        if (sample[iLayer].hasMaterialComposition())
-        {
-            material = sample[iLayer].getMaterial();
-            muTotal = elements.getMassAttenuationCoefficients( \
-                                material.getComposition(), energies)["total"];
-        }
-        else
-        {
-            muTotal = elements.getMassAttenuationCoefficients(\
-                                attenuators[iLayer].getMaterialName(), energies)["total"];
-        }
-        // get the contribution for each element
-        for (iString = 0; iString < elementList.size(); iString++)
-        {
-            const Element & elementObject = elements.getElement(elementList[iString]);
-            std::vector<std::map<std::string, map<std::string, double> > > transitionsVector;
-            std::map<std::string, map<std::string, double> > >::transitions;
-            std::map<std::string, map<std::string, double> > >::iterator transitionsIt;
-            transitionsVector = elements.getExcitationFactors(elementList[iString], energies, weights);
-            // the rays were ordered by ascending energy, so the last one contains all the emitted lines
-            std::map<std::string, double> muFluoTotal;
-            transitions = transitionsVector[transitionsVector.size() - 1];
-            tmpDouble.resize(transitions.size());
-            for (transitionsIt = transitions.begin(); transitionsIt != transitionsIt.end(); ++transitionsIt)
-            {
-                transitionsIt->second;
-            }
-
-            // We have the total mass attenuation coefficient at each incident energy
-            // We have the excitation factor at each emitted energy
-            // We miss: - the sample total mass attenuation coefficients at each energy
-            //          - the transmission through attenuators (and upper layers)
-            //          - the detection efficiency
-
-            for (iRay=0; iRay < energies.size(); iRay++)
-            {
-            }
-
-            //elementObject.getShellConstants()
-
-        }
-        // update weights
-        tmpDouble = sample[iLayer].getTransmission(energies, elements);
-        for (iRay = 0; iRay < tmpDouble.size(); iRay++)
-        {
-            weights[iRay] *= tmpDouble[iRay];
-        }
-    }
-}
-
-*/
 
 std::map<std::string, std::map<std::string, double> > XRF::getFluorescence(const std::string elementName, \
                 const Elements & elementsLibrary, const int & sampleLayerIndex, \
@@ -224,6 +99,7 @@ std::map<std::string, std::map<std::string, double> > XRF::getFluorescence(const
     const std::vector<Layer> & sample = this->configuration.getSample();
     const std::vector<Layer> & attenuators = this->configuration.getAttenuators();
     const Layer* layerPtr;
+    std::vector<Layer>::size_type iLayer;
     const Detector & detector = this->configuration.getDetector();
     const Element & element = elementsLibrary.getElement(elementName);
     std::string msg;
@@ -294,13 +170,14 @@ std::map<std::string, std::map<std::string, double> > XRF::getFluorescence(const
     std::fill(muTotal.begin(), muTotal.end(), 0.0);
     doubleVector.resize(energies.size());
     std::fill(doubleVector.begin(), doubleVector.end(), 1.0);
-    for (std::vector<Layer>::size_type iLayer = 0; iLayer < filters.size(); iLayer++)
+    for (iLayer = 0; iLayer < filters.size(); iLayer++)
     {
         layerPtr = &filters[iLayer];
         doubleVector = (*layerPtr).getTransmission(energies, elementsLibrary);
         for (iRay = 0; iRay < energies.size(); iRay++)
         {
             actualRays[1][iRay] *= doubleVector[iRay];
+        }
     }
 
     // this has sense if we put all the previous stuff cached
@@ -315,7 +192,7 @@ std::map<std::string, std::map<std::string, double> > XRF::getFluorescence(const
         if (iLayer < referenceLayerIndex)
         {
             // TODO improve distance calculation
-            distance += (*layerPtr).thickness / sinAlphaIn;
+            distance += (*layerPtr).getThickness() / sinAlphaIn;
         }
         doubleVector = (*layerPtr).getTransmission(energies, \
                                             elementsLibrary, alphaIn);
@@ -365,6 +242,7 @@ std::map<std::string, std::map<std::string, double> > XRF::getFluorescence(const
 
     iRay = energies.size();
     while (iRay > 0)
+    {
         --iRay;
         // energy = energies[iRay];
         // we should check the energies that have to be considered
@@ -431,7 +309,9 @@ std::map<std::string, std::map<std::string, double> > XRF::getFluorescence(const
         {
             //The self attenuation term
             tmpDouble = (muTotal[iRay] + muTotalFluo[c_it->first]);
-            tmpDouble = (1.0 - exp(- tmpDouble * sample[sampleLayerIndex].density)) / (tmpDouble * sinAlphaIn);
+            tmpDouble = (1.0 - exp(- tmpDouble * \
+                                   sample[sampleLayerIndex].getDensity() * \
+                                   sample[sampleLayerIndex].getThickness())) / (tmpDouble * sinAlphaIn);
             mapIt = c_it->second.find("rate");
             actualResult[c_it->first]["rate"] += mapIt->second * tmpDouble * \
                                                 detectionEfficiency[c_it->first];

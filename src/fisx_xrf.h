@@ -35,6 +35,12 @@ public:
                  const std::vector<double> & divergency = std::vector<double>());
 
     /*!
+    Funtion to set a single energy excitation beam
+    */
+    void setBeam(const double & energy, const double & divergency = 0.0);
+
+
+    /*!
     Set the beam filters to be applied
     */
     void setBeamFilters(const std::vector<Layer> & filters);
@@ -45,6 +51,18 @@ public:
     The top layer will be taken as reference layer. This can be changed calling setRefenceLayer
     */
     void setSample(const std::vector<Layer> & layers, const int & referenceLayer = 0);
+
+    /*!
+    Convenience method for single layer samples.
+    */
+    void setSample(const std::string & name, \
+                   const double & density = 1.0, \
+                   const double & thickness = 1.0);
+
+    /*!
+    Convenience method for single layer samples.
+    */
+    void setSample(const Layer & layer);
 
     /*!
     It consists on a set of layers of different materials, densities and thicknesses and
