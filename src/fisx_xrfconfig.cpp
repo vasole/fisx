@@ -248,14 +248,22 @@ void XRFConfig::readConfigurationFromFile(const std::string & fileName)
                 if (stringVector.size() == 8 )
                 {
                     // Matrix
-                    this->setGeometry(doubleVector[5], doubleVector[6], doubleVector[7]);
+                    if (doubleVector[6] > 0.0)
+                    {
+                        this->setGeometry(doubleVector[4], doubleVector[5], doubleVector[7]);
+                    }
+                    else
+                    {
+                        this->setGeometry(doubleVector[4], doubleVector[5], doubleVector[4] + doubleVector[5]);
+                    }
                     if (stringVector[1] == "MULTILAYER")
                     {
                         multilayerSample = true;
                     }
                     else
                     {
-                        layer = Layer(c_it->first, doubleVector[2], doubleVector[3], doubleVector[4]);
+                        // funny factor is not set for the sample
+                        layer = Layer(c_it->first, doubleVector[2], doubleVector[3], 1.0);
                         layer.setMaterial(stringVector[1]);
                         for(iMaterial = 0; iMaterial < this->materials.size(); iMaterial++)
                         {
