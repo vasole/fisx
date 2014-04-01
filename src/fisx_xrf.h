@@ -80,10 +80,11 @@ public:
     /*!
     Set the excitation geometry.
     For the time being, just the incident, outgoing angles and scattering angle to detector
-    center.
+    center. A negative scattering angle of 90 degrees indicates the scattering angle is the
+    sum of alphaIn and alphaOut.
     */
     void setGeometry(const double & alphaIn, const double & alphaOut,\
-                      const double & scatteringAngle = 90.);
+                      const double & scatteringAngle = -90.);
 
     /*!
     Set the reference layer. The detector distance is measured from the reference layer surface.

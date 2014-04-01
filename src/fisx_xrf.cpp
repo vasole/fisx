@@ -26,7 +26,14 @@ void XRF::readConfigurationFromFile(const std::string & fileName)
 void XRF::setGeometry(const double & alphaIn, const double & alphaOut, const double & scatteringAngle)
 {
     this->recentBeam = true;
-    this->configuration.setGeometry(alphaIn, alphaOut, scatteringAngle);
+    if (scatteringAngle < 0.0)
+    {
+        this->configuration.setGeometry(alphaIn, alphaOut, alphaIn + alphaOut);
+    }
+    else
+    {
+        this->configuration.setGeometry(alphaIn, alphaOut, scatteringAngle);
+    }
 }
 
 void XRF::setBeam(const Beam & beam)
