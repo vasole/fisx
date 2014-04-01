@@ -227,9 +227,10 @@ void XRFConfig::readConfigurationFromFile(const std::string & fileName)
         }
         if (doubleVector[0] > 0.0)
         {
-            if (c_it->first.substr(0, 9) == "BeamFilter")
+            if (c_it->first.substr(0, 10) == "BeamFilter")
             {
                 //BeamFilter0 = 0, -, 0.0, 0.0, 1.0
+                std::cout << "BEAMFILTER" << std::endl;
                 layer = Layer(c_it->first, doubleVector[2], doubleVector[3], doubleVector[4]);
                 layer.setMaterial(stringVector[1]);
                 for(iMaterial = 0; iMaterial < this->materials.size(); iMaterial++)
