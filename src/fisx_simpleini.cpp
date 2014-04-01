@@ -240,10 +240,10 @@ void SimpleIni::getSubsections(const std::string & parent, \
         for (i = 0; i < this->sections.size(); i++)
         {
             instanceString = this->sections[i];
-            if (instanceString.size() == targetString.size())
+            if (instanceString.size() >= targetString.size())
             {
                 this->toUpper(instanceString, loc);
-                if (instanceString == targetString)
+                if (instanceString.substr(0, targetString.size()) == targetString)
                 {
                     destination.push_back(this->sections[i]);
                 }
