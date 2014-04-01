@@ -1,5 +1,6 @@
 #include <stdexcept>
 #include "fisx_material.h"
+#include <iostream>
 
 Material::Material()
 {
@@ -34,12 +35,13 @@ void Material::initialize(const std::string & materialName, const double & densi
 {
     std::string msg;
 
+/*
     if (this->initialized)
     {
         msg = "Material::initialize. Material is already initialized with name " + this->name;
         throw std::invalid_argument(msg);
     }
-
+*/
     if(materialName.size() < 1)
     {
         throw std::invalid_argument("Material name should have at least one letter");
@@ -82,6 +84,14 @@ void Material::setComposition(const std::vector<std::string> & names, const std:
 
     if (names.size() != amounts.size())
     {
+        for(i = 0; i < names.size(); i++)
+        {
+            std::cout << i << " name " << names[i] << std::endl;
+        }
+        for(i = 0; i < amounts.size(); i++)
+        {
+            std::cout << i << " amount " << amounts[i] << std::endl;
+        }
         throw std::invalid_argument("Number of substances does not match number of amounts");
     }
 
