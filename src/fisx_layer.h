@@ -24,6 +24,12 @@ public:
     std::string name;
 
     /*!
+    Get the layer composition either from internal material or from name.
+    In the later case the elements instance is not used.
+    */
+    std::map<std::string, double> getComposition(const Elements & elements) const;
+
+    /*!
     Eventually get a handle to underlying material
     */
     const Material & getMaterial() const {return this->material;};
@@ -44,6 +50,17 @@ public:
     */
     std::map<std::string, double> getMassAttenuationCoefficients(const double & energy,
                                                                  const Elements & elements) const;
+
+
+    /*!
+    Get the layer mass attenuation coefficients transmission at the given energies using the elements
+    library supplied. If the material is not defined or cannot be handled, it will throw the
+    relevant error.
+    */
+    std::map<std::string, std::vector<double> > getMassAttenuationCoefficients( \
+                                                                const std::vector<double> & energies,
+                                                                const Elements & elements) const;
+
 
     /*!
     Get the layer transmissions at the given energies using the elements library

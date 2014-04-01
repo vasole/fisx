@@ -69,6 +69,32 @@ std::map<std::string, double> Layer::getMassAttenuationCoefficients(const double
     }
 }
 
+std::map<std::string, std::vector<double> > Layer::getMassAttenuationCoefficients( \
+                                                   const std::vector<double> & energy, \
+                                                   const Elements & elements) const
+{
+    if (this->hasMaterial)
+    {
+        return elements.getMassAttenuationCoefficients(this->material.getComposition(), energy);
+    }
+    else
+    {
+        return elements.getMassAttenuationCoefficients(this->materialName, energy);
+    }
+}
+
+std::map<std::string, double> Layer::getComposition(const Elements & elements) const
+{
+    if (this->hasMaterial)
+    {
+        return this->material.getComposition();
+    }
+    else
+    {
+        return elements.getComposition(this->materialName);
+    }
+}
+
 double Layer::getTransmission(const double & energy, const Elements & elements, const double & angle) const
 {
     // The material might not have been defined in the  current Elements instance.
