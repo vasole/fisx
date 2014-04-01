@@ -251,7 +251,6 @@ void XRFConfig::readConfigurationFromFile(const std::string & fileName)
                     this->setGeometry(doubleVector[5], doubleVector[6], doubleVector[7]);
                     if (stringVector[1] == "MULTILAYER")
                     {
-                        std::cout << "MULTILAYER NOT PARSED YET" << std::endl;
                         multilayerSample = true;
                     }
                     else
@@ -270,12 +269,19 @@ void XRFConfig::readConfigurationFromFile(const std::string & fileName)
                 }
                 else
                 {
-                    if (stringVector[1] == "Detector")
+                    if (c_it->first.substr(0, 8) == "Detector")
                     {
                         // DETECTOR
                         std::cout << "DETECTOR " << std::endl;
                         this->detector = Detector(c_it->first, doubleVector[2], doubleVector[3], doubleVector[4]);
                         this->detector.setMaterial(stringVector[1]);
+                        for(iMaterial = 0; iMaterial < this->materials.size(); iMaterial++)
+                        {
+                            if(this->materials[iMaterial].getName() == stringVector[1])
+                            {
+                                detector.setMaterial(this->materials[iMaterial]);
+                            }
+                        }
                     }
                     else
                     {
