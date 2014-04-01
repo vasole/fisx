@@ -573,7 +573,7 @@ std::map<std::string, double> Shell::getDirectVacancyTransferRatios(const std::s
     {
         tmpDouble += it->second;
     }
-    if (tmpDouble > 1.0)
+    if (tmpDouble > 1.0001)
     {
         for (it = this->shellConstants.begin(); it != this->shellConstants.end(); ++it)
         {
