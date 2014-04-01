@@ -32,6 +32,8 @@ void XRFConfig::readConfigurationFromFile(const std::string & fileName)
     std::vector<int> intVector, flagVector;
     std::vector<int>::size_type iIntVector;
     std::map<std::string, std::string>::const_iterator c_it;
+    std::vector<Material>::size_type iMaterial;
+    std::vector<std::string> splitString;
     Material material;
     Layer layer;
     bool fisxFile;
@@ -47,11 +49,14 @@ void XRFConfig::readConfigurationFromFile(const std::string & fileName)
     {
         fisxFile = false;
     }
+    /*
     if (fisxFile)
     {
         std::cout << "Not implemented" << std::endl;
         return;
     }
+    */
+
     // Assume is a PyMca generated file.
     // TODO: Still to find out if it is a fir output file or a configuration file
     // Assume it is configuration file.
@@ -156,6 +161,11 @@ void XRFConfig::readConfigurationFromFile(const std::string & fileName)
         {
             sectionContents.clear();
             sectionContents = iniFile.readSection(stringVector[iStringVector], true);
+            splitString.clear();
+            iniFile.parseStringAsMultipleValues(stringVector[iStringVector],
+                                            splitString,
+                                            std::string(),
+                                            '.');
             for (c_it = sectionContents.begin(); c_it != sectionContents.end(); ++c_it)
             {
                 key = c_it->first;
@@ -185,10 +195,10 @@ void XRFConfig::readConfigurationFromFile(const std::string & fileName)
                 {
                     comment = c_it->second;
                 }
-                material = Material(stringVector[iStringVector], density, thickness, comment);
-                material.setComposition(compoundList, compoundFractions);
-                this->materials.push_back(material);
             }
+            material = Material(splitString[1], density, thickness, comment);
+            material.setComposition(compoundList, compoundFractions);
+            this->materials.push_back(material);
         }
     }
 
@@ -222,6 +232,13 @@ void XRFConfig::readConfigurationFromFile(const std::string & fileName)
                 //BeamFilter0 = 0, -, 0.0, 0.0, 1.0
                 layer = Layer(c_it->first, doubleVector[2], doubleVector[3], doubleVector[4]);
                 layer.setMaterial(stringVector[1]);
+                for(iMaterial = 0; iMaterial < this->materials.size(); iMaterial++)
+                {
+                    if(this->materials[iMaterial].getName() == stringVector[1])
+                    {
+                        layer.setMaterial(this->materials[iMaterial]);
+                    }
+                }
                 this->beamFilters.push_back(layer);
             }
             else
@@ -241,6 +258,13 @@ void XRFConfig::readConfigurationFromFile(const std::string & fileName)
                     {
                         layer = Layer(c_it->first, doubleVector[2], doubleVector[3], doubleVector[4]);
                         layer.setMaterial(stringVector[1]);
+                        for(iMaterial = 0; iMaterial < this->materials.size(); iMaterial++)
+                        {
+                            if(this->materials[iMaterial].getName() == stringVector[1])
+                            {
+                                layer.setMaterial(this->materials[iMaterial]);
+                            }
+                        }
                         this->sample.push_back(layer);
                     }
                 }
@@ -259,6 +283,13 @@ void XRFConfig::readConfigurationFromFile(const std::string & fileName)
                         std::cout << "ATTENUATOR " << std::endl;
                         layer = Layer(c_it->first, doubleVector[2], doubleVector[3], doubleVector[4]);
                         layer.setMaterial(stringVector[1]);
+                        for(iMaterial = 0; iMaterial < this->materials.size(); iMaterial++)
+                        {
+                            if(this->materials[iMaterial].getName() == stringVector[1])
+                            {
+                                layer.setMaterial(this->materials[iMaterial]);
+                            }
+                        }
                         this->attenuators.push_back(layer);
                     }
                 }
@@ -288,6 +319,13 @@ void XRFConfig::readConfigurationFromFile(const std::string & fileName)
                     //BeamFilter0 = 0, -, 0.0, 0.0, 1.0
                     layer = Layer(c_it->first, doubleVector[2], doubleVector[3], doubleVector[4]);
                     layer.setMaterial(stringVector[1]);
+                    for(iMaterial = 0; iMaterial < this->materials.size(); iMaterial++)
+                    {
+                        if(this->materials[iMaterial].getName() == stringVector[1])
+                        {
+                            layer.setMaterial(this->materials[iMaterial]);
+                        }
+                    }
                     this->sample.push_back(layer);
             }
         }
