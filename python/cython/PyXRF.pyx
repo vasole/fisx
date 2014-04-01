@@ -98,6 +98,12 @@ cdef class PyXRF:
     def setDetector(self, PyDetector detector):
         self.thisptr.setDetector(deref(detector.thisptr))
 
+    def setGeometry(self, double alphaIn, double alphaOut, double scatteringAngle = -90.0):
+        if scatteringAngle < 0.0:
+            self.thisptr.setGeometry(alphaIn, alphaOut, alphaIn + alphaOut)
+        else:
+            self.thisptr.setGeometry(alphaIn, alphaOut, scatteringAngle)
+
     def getFluorescence(self, std_string elementName, PyElements elementsLibrary, \
                             int sampleLayer = 0, std_string lineFamily="", int secondary = 0):
         return self.thisptr.getFluorescence(elementName, deref(elementsLibrary.thisptr), \

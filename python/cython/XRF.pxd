@@ -20,7 +20,6 @@ cdef extern from "fisx_xrf.h":
         void setBeamFilters(std_vector[Layer]) except +
         void setSample(std_vector[Layer], int) except +
         void setAttenuators(std_vector[Layer]) except +
-
         void setGeometry(double, double, double) except +
         void setDetector(Detector) except +
 
