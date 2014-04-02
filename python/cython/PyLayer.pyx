@@ -8,6 +8,7 @@ from libcpp.vector cimport vector as std_vector
 from libcpp.map cimport map as std_map
 
 from Elements cimport *
+from Material cimport *
 from Layer cimport *
 
 cdef class PyLayer:
@@ -23,3 +24,6 @@ cdef class PyLayer:
         if not hasattr(energies, "__len__"):
             energies = numpy.array([energies], numpy.float)
         return self.thisptr.getTransmission(energies, deref(elementsLib.thisptr), angle)
+
+    def setMaterial(self, PyMaterial material):
+        self.thisptr.setMaterial(deref(material.thisptr))

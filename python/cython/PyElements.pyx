@@ -7,6 +7,7 @@ from libcpp.vector cimport vector as std_vector
 from libcpp.map cimport map as std_map
 
 from Elements cimport *
+from Material cimport *
     
 cdef class PyElements:
     cdef Elements *thisptr
@@ -23,6 +24,9 @@ cdef class PyElements:
 
     def __dealloc__(self):
         del self.thisptr
+
+    def addMaterial(self, PyMaterial material):
+        self.thisptr.addMaterial(deref(material.thisptr))
 
     def setShellConstantsFile(self, std_string mainShellName, std_string fileName):
         """

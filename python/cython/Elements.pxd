@@ -6,13 +6,15 @@ from libcpp.string cimport string as std_string
 from libcpp.vector cimport vector as std_vector
 from libcpp.map cimport map as std_map
 
-#from Shell cimport *
+from Material cimport *
 
 cdef extern from "fisx_elements.h":
     cdef cppclass Elements:
         Elements(std_string) except +
         Elements(std_string, std_string) except +
         Elements(std_string, std_string, std_string) except +
+
+        void addMaterial(Material) except +
 
         void setShellConstantsFile(std_string, std_string) except +
 
