@@ -985,7 +985,6 @@ Element::getXRayLinesFromVacancyDistribution(const std::map<std::string, double>
     std::map<std::string, double>::const_iterator c_it;
     std::string keys[9] = {"K", "L1", "L2", "L3", "M1", "M2", "M3", "M4", "M5"};
     std::vector<std::string>::size_type i;
-    std::vector<std::string>::size_type j;
     double rate, energy0, energy1;
     std::string tmpString;
     std::map<std::string, double> finalDistribution;
