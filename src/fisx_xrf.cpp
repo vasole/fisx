@@ -1,5 +1,6 @@
 #include "fisx_xrf.h"
-#include <math.h>
+#include "fisx_math.h"
+#include <cmath>
 #include <stdexcept>
 #include <iostream>
 
@@ -96,7 +97,7 @@ void XRF::setDetector(const Detector & detector)
 
 std::map<std::string, std::map<std::string, double> > XRF::getFluorescence(const std::string elementName, \
                 const Elements & elementsLibrary, const int & sampleLayerIndex, \
-                const std::string & lineFamily, const int & secondary)
+                const std::string & lineFamily, const int & secondary, const int & useGeometricEfficiency)
 {
     // get all the needed configuration
     const Beam & beam = this->configuration.getBeam();
@@ -198,8 +199,7 @@ std::map<std::string, std::map<std::string, double> > XRF::getFluorescence(const
         layerPtr = &sample[iLayer];
         if (iLayer < referenceLayerIndex)
         {
-            // TODO improve distance calculation
-            distance += (*layerPtr).getThickness() / sinAlphaIn;
+            distance += (*layerPtr).getThickness() / sinAlphaOut;
         }
         doubleVector = (*layerPtr).getTransmission(energies, \
                                             elementsLibrary, alphaIn);
@@ -210,47 +210,87 @@ std::map<std::string, std::map<std::string, double> > XRF::getFluorescence(const
     }
 
     // we can already calculate the geometric efficiency
-    if (detectorDiameter > 0.0)
+    if ((useGeometricEfficiency != 0) && (detectorDiameter > 0.0))
     {
         distance += detectorDistance;
         // calculate geometric efficiency 0.5 * (1 - cos theta)
-        geometricEfficiency = 0.5 * (1.0 - (detectorDiameter / sqrt(pow(distance, 2) + pow(detectorDiameter, 2))));
+        geometricEfficiency = 0.5 * (1.0 - (distance / sqrt(pow(distance, 2) + pow(0.5 * detectorDiameter, 2))));
     }
     else
     {
         geometricEfficiency = 1.0 ;
     }
-
     // we have reached the layer we are interesed on
     // calculate its total mass attenuation coefficient at each incident energy
     std::fill(muTotal.begin(), muTotal.end(), 0.0);
+    std::map<std::string, double> sampleLayerComposition;
     layerPtr = &sample[sampleLayerIndex];
     if ((*layerPtr).hasMaterialComposition())
     {
         const Material & material = (*layerPtr).getMaterial();
         doubleVector = elementsLibrary.getMassAttenuationCoefficients( \
                             material.getComposition(), energies)["total"];
+        if (secondary > 0)
+        {
+            sampleLayerComposition = material.getComposition();
+        }
     }
     else
     {
        doubleVector = elementsLibrary.getMassAttenuationCoefficients(\
                             (*layerPtr).getMaterialName(), energies)["total"];
+        if (secondary > 0)
+        {
+            sampleLayerComposition = elementsLibrary.getComposition((*layerPtr).getMaterialName());
+        }
     }
     for (iRay = 0; iRay < energies.size(); iRay++)
     {
         muTotal[iRay] = doubleVector[iRay] /sinAlphaIn;
     }
 
+    //std::cout << this->configuration << std::endl;
+
     std::map<std::string, std::map<std::string, double> > tmpResult;
     std::map<std::string, std::map<std::string, double> >::const_iterator c_it;
     std::map<std::string, double>::const_iterator mapIt;
+    std::map<std::string, double>::const_iterator mapIt2;
     std::map<std::string, double> muTotalFluo;
     std::map<std::string, double> detectionEfficiency;
+    std::vector<double> sampleLayerEnergies;
+    std::vector<double> sampleLayerRates;
+    std::vector<double> sampleLayerMuTotal;
+    std::vector<double>::size_type iLambda;
 
     iRay = energies.size();
     while (iRay > 0)
     {
         --iRay;
+
+        if (secondary > 0)
+        {
+            sampleLayerEnergies.clear();
+            sampleLayerRates.clear();
+            sampleLayerMuTotal.clear();
+            layerPtr = &sample[sampleLayerIndex];
+            for (mapIt = sampleLayerComposition.begin(); \
+                 mapIt != sampleLayerComposition.end(); ++mapIt)
+            {
+                // get excitation factors for each element
+                tmpResult = elementsLibrary.getExcitationFactors(mapIt->first,
+                                                    energies[iRay], weights[iRay]);
+                //and add the energies and rates to the sampleLayerLines
+                for (c_it = tmpResult.begin(); c_it != tmpResult.end(); ++c_it)
+                {
+                    mapIt2 = c_it->second.find("energy");
+                    sampleLayerEnergies.push_back(mapIt2->second);
+                    mapIt2 = c_it->second.find("rate");
+                    sampleLayerRates.push_back(mapIt2->second * mapIt->second);
+                }
+                sampleLayerMuTotal = (*layerPtr).getMassAttenuationCoefficients(sampleLayerEnergies, \
+                                                                    elementsLibrary)["total"];
+            }
+        }
         // energy = energies[iRay];
         // we should check the energies that have to be considered
         // now for *each* line, we have to calculate how the "rate" key is to be modified
@@ -293,8 +333,9 @@ std::map<std::string, std::map<std::string, double> > XRF::getFluorescence(const
                     layerPtr = &attenuators[iLayer];
                     detectionEfficiency[c_it->first] *= (*layerPtr).getTransmission( mapIt->second, \
                                                             elementsLibrary, 90.);
-                }
 
+                }
+                //std::cout << mapIt->second << " " << c_it->first << "" << detectionEfficiency[c_it->first] << std::endl;
                 // detection efficienty decomposed in geometric and intrinsic
                 if (detectorDiameter > 0.0)
                 {
@@ -318,13 +359,89 @@ std::map<std::string, std::map<std::string, double> > XRF::getFluorescence(const
         {
             //The self attenuation term
             tmpDouble = (muTotal[iRay] + muTotalFluo[c_it->first]);
+            //std::cout << "sum of mass att coef " << tmpDouble << std::endl;
             tmpDouble = (1.0 - exp(- tmpDouble * \
                                    sample[sampleLayerIndex].getDensity() * \
                                    sample[sampleLayerIndex].getThickness())) / (tmpDouble * sinAlphaIn);
             mapIt = c_it->second.find("rate");
-            actualResult[c_it->first]["rate"] += mapIt->second * tmpDouble * \
+            //std::cout << "RATE = " << mapIt->second << std::endl;
+            //std::cout << "ATT TERM = " << tmpDouble << std::endl;
+            //std::cout << "EFFICIENCY = " << detectionEfficiency[c_it->first] << std::endl;
+            actualResult[c_it->first]["rate"] += mapIt->second * tmpDouble  * \
                                                 detectionEfficiency[c_it->first];
+        }
+        // probably I sould calculate this first to prevent adding small numbers to a bigger one
+        if (secondary > 0)
+        {
+            // std::cout << "sample energies = " << sampleLayerEnergies.size() << std::endl;
+            for(iLambda = 0; iLambda < sampleLayerEnergies.size(); iLambda++)
+            {
+                // analogous to incident beam
+                tmpResult = elementsLibrary.getExcitationFactors(elementName, \
+                            sampleLayerEnergies[iLambda], sampleLayerRates[iLambda]);
+                for (c_it = tmpResult.begin(); c_it != tmpResult.end(); ++c_it)
+                {
+                    tmpDouble = Math::deBoerL0(muTotal[iRay],
+                                               muTotalFluo[c_it->first],
+                                               sampleLayerMuTotal[iLambda],
+                                               sample[sampleLayerIndex].getDensity(),
+                                               sample[sampleLayerIndex].getThickness());
+                    /*
+                    std::cout << "energy0" << energies[iRay] << "L0" << tmpDouble << std::endl;
+                    std::cout << "muTotal[iRay] " << muTotal[iRay] << std::endl;
+                    std::cout << "muTotalFluo[c_it->first] " << muTotalFluo[c_it->first] << std::endl;
+                    std::cout << "sampleLayerMuTotal[iLambda] " << sampleLayerMuTotal[iLambda] << std::endl;
+                    */
+                    tmpDouble += Math::deBoerL0(muTotalFluo[c_it->first],
+                                                muTotal[iRay],
+                                                sampleLayerMuTotal[iLambda],
+                                                sample[sampleLayerIndex].getDensity(),
+                                                sample[sampleLayerIndex].getThickness());
+                    tmpDouble *= 0.5;
+                    mapIt = c_it->second.find("rate");
+                    actualResult[c_it->first]["rate"] += mapIt->second * tmpDouble * \
+                                                         detectionEfficiency[c_it->first];
+                }
+            }
         }
     }
     return actualResult;
 }
+
+double XRF::getGeometricEfficiency(const int & sampleLayerIndex) const
+{
+    const Detector & detector = this->configuration.getDetector();
+    const double PI = acos(-1.0);
+    const double & sinAlphaOut = sin(this->configuration.getAlphaOut()*(PI/180.));
+    const double & detectorDistance = detector.getDistance();
+    const double & detectorDiameter = detector.getDiameter();
+    double distance;
+    double geometricEfficiency;
+    const std::vector<Layer> & sample = this->configuration.getSample();
+    std::vector<Layer>::size_type iLayer;
+    const int & referenceLayerIndex = this->configuration.getReferenceLayer();
+    const Layer* layerPtr;
+
+    // if the detector diameter is zero, return 1
+    if (detectorDiameter == 0.0)
+    {
+        return 1.0;
+    }
+    distance = detectorDistance;
+    if ((distance == 0.0) && (sampleLayerIndex == 0))
+    {
+        return 0.5;
+    }
+    for (iLayer = 0; iLayer < sampleLayerIndex; iLayer++)
+    {
+        layerPtr = &sample[iLayer];
+        if (iLayer < referenceLayerIndex)
+        {
+            distance += (*layerPtr).getThickness() / sinAlphaOut;
+        }
+    }
+    // we can calculate the geometric efficiency for the given layer
+    // calculate geometric efficiency 0.5 * (1 - cos theta)
+    return (0.5 * (1.0 - (distance / sqrt(pow(distance, 2) + pow(0.5 * detectorDiameter, 2)))));
+}
+

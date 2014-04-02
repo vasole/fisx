@@ -144,6 +144,7 @@ from libcpp.vector cimport vector as std_vector
 from libcpp.map cimport map as std_map
 
 from Elements cimport *
+from Material cimport *
     
 cdef class PyElements:
     cdef Elements *thisptr
@@ -160,6 +161,9 @@ cdef class PyElements:
 
     def __dealloc__(self):
         del self.thisptr
+
+    def addMaterial(self, PyMaterial material):
+        self.thisptr.addMaterial(deref(material.thisptr))
 
     def setShellConstantsFile(self, std_string mainShellName, std_string fileName):
         """
@@ -337,6 +341,7 @@ from libcpp.vector cimport vector as std_vector
 from libcpp.map cimport map as std_map
 
 from Elements cimport *
+from Material cimport *
 from Layer cimport *
 
 cdef class PyLayer:
@@ -352,6 +357,62 @@ cdef class PyLayer:
         if not hasattr(energies, "__len__"):
             energies = numpy.array([energies], numpy.float)
         return self.thisptr.getTransmission(energies, deref(elementsLib.thisptr), angle)
+
+    def setMaterial(self, PyMaterial material):
+        self.thisptr.setMaterial(deref(material.thisptr))
+import numpy
+#cimport numpy as np
+cimport cython
+
+from cython.operator cimport dereference as deref
+from libcpp.string cimport string as std_string
+from libcpp.vector cimport vector as std_vector
+from libcpp.map cimport map as std_map
+
+from Material cimport *
+
+cdef class PyMaterial:
+    cdef Material *thisptr
+
+    def __cinit__(self, std_string materialName, double density=1.0, double thickness=1.0, std_string comment=""):
+        self.thisptr = new Material(materialName, density, thickness, comment)
+
+    def __dealloc__(self):
+        del self.thisptr
+
+    def setName(self, std_string name):
+        self.thisptr.setName(name)
+
+    def setCompositionFromLists(self, std_vector[std_string] elementList, std_vector[double] massFractions):
+        self.thisptr.setComposition(elementList, massFractions)
+
+    def setComposition(self, std_map[std_string, double] composition):
+        self.thisptr.setComposition(composition)
+
+    def getComposition(self):
+        return self.thisptr.getComposition()
+import numpy
+#cimport numpy as np
+cimport cython
+
+from libcpp.vector cimport vector as std_vector
+
+from Math cimport *
+
+cdef class PyMath:
+    cdef Math *thisptr
+
+    def __cinit__(self):
+        self.thisptr = new Math()
+
+    def __dealloc__(self):
+        del self.thisptr
+
+    def E1(self, double x):
+        return self.thisptr.E1(x)
+
+    def deBoerD(self, double x):
+        return self.thisptr.deBoerD(x)
 #import numpy as np
 #cimport numpy as np
 cimport cython
@@ -554,7 +615,17 @@ cdef class PyXRF:
     def setDetector(self, PyDetector detector):
         self.thisptr.setDetector(deref(detector.thisptr))
 
+    def setGeometry(self, double alphaIn, double alphaOut, double scatteringAngle = -90.0):
+        if scatteringAngle < 0.0:
+            self.thisptr.setGeometry(alphaIn, alphaOut, alphaIn + alphaOut)
+        else:
+            self.thisptr.setGeometry(alphaIn, alphaOut, scatteringAngle)
+
     def getFluorescence(self, std_string elementName, PyElements elementsLibrary, \
-                            int sampleLayer = 0, std_string lineFamily="", int secondary = 0):
+                            int sampleLayer = 0, std_string lineFamily="", int secondary = 0, \
+                            int useGeometricEfficiency = 1):
         return self.thisptr.getFluorescence(elementName, deref(elementsLibrary.thisptr), \
-                            sampleLayer, lineFamily, secondary)
+                            sampleLayer, lineFamily, secondary, useGeometricEfficiency)
+
+    def getGeometricEfficiency(self, int layerIndex = 0):
+        return self.thisptr.getGeometricEfficiency(layerIndex)

@@ -22,6 +22,7 @@ cdef extern from "fisx_xrf.h":
         void setAttenuators(std_vector[Layer]) except +
         void setGeometry(double, double, double) except +
         void setDetector(Detector) except +
+        double getGeometricEfficiency(int) except +
 
         std_map[std_string, std_map[std_string, double]] getFluorescence(std_string, \
-                Elements, int, std_string, int) except +
+                Elements, int, std_string, int, int) except +

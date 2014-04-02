@@ -7,3 +7,5 @@ from ._fisx import PyElements as Elements
 from ._fisx import PyLayer as Layer
 from ._fisx import PyDetector as Detector
 from ._fisx import PyXRF as XRF
+from ._fisx import PyMath as Math
+from ._fisx import PyMaterial as Material
