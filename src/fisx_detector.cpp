@@ -13,7 +13,7 @@ double Detector::getActiveArea() const
 {
     double pi;
     pi = acos(-1.0);
-    return (0.5 * pi) * (this->diameter * this->diameter);
+    return (0.25 * pi) * (this->diameter * this->diameter);
 }
 
 void Detector::setActiveArea(const double & area)
@@ -24,7 +24,7 @@ void Detector::setActiveArea(const double & area)
     {
         throw std::invalid_argument("Negative detector area");
     }
-    this->diameter = sqrt(area/(0.5 * pi));
+    this->diameter = 2.0 * sqrt(area/pi);
 }
 
 void Detector::setDiameter(const double & diameter)
