@@ -229,8 +229,8 @@ void XRFConfig::readConfigurationFromFile(const std::string & fileName)
         {
             if (c_it->first.substr(0, 10) == "BeamFilter")
             {
-                //BeamFilter0 = 0, -, 0.0, 0.0, 1.0
-                std::cout << "BEAMFILTER" << std::endl;
+                // BeamFilter0 = 0, -, 0.0, 0.0, 1.0
+                // std::cout << "BEAMFILTER" << std::endl;
                 layer = Layer(c_it->first, doubleVector[2], doubleVector[3], doubleVector[4]);
                 layer.setMaterial(stringVector[1]);
                 for(iMaterial = 0; iMaterial < this->materials.size(); iMaterial++)
@@ -281,7 +281,7 @@ void XRFConfig::readConfigurationFromFile(const std::string & fileName)
                     if (c_it->first.substr(0, 8) == "Detector")
                     {
                         // DETECTOR
-                        std::cout << "DETECTOR " << std::endl;
+                        // std::cout << "DETECTOR " << std::endl;
                         this->detector = Detector(c_it->first, doubleVector[2], doubleVector[3], doubleVector[4]);
                         this->detector.setMaterial(stringVector[1]);
                         for(iMaterial = 0; iMaterial < this->materials.size(); iMaterial++)
@@ -295,7 +295,7 @@ void XRFConfig::readConfigurationFromFile(const std::string & fileName)
                     else
                     {
                         // Attenuator
-                        std::cout << "ATTENUATOR " << std::endl;
+                        // std::cout << "ATTENUATOR " << std::endl;
                         layer = Layer(c_it->first, doubleVector[2], doubleVector[3], doubleVector[4]);
                         layer.setMaterial(stringVector[1]);
                         for(iMaterial = 0; iMaterial < this->materials.size(); iMaterial++)
@@ -413,3 +413,33 @@ void XRFConfig::setDetector(const Detector & detector)
 {
     this->detector = detector;
 }
+
+std::ostream& operator<< (std::ostream& o, XRFConfig const& config)
+{
+    std::vector<Layer>::size_type i;
+    o << "BEAM" << std::endl;
+    o << config.beam << std::endl;
+    o << "BEAM FILTERS" << std::endl;
+    for(i = 0; i < config.beamFilters.size(); i++)
+    {
+        o << config.beamFilters[i] << std::endl;
+    }
+    o << "SAMPLE" << std::endl;
+    for(i = 0; i < config.sample.size(); i++)
+    {
+        o << config.sample[i] << std::endl;
+    }
+    o << "ATTENUATORS" << std::endl;
+    for(i = 0; i < config.attenuators.size(); i++)
+    {
+        o << config.attenuators[i] << std::endl;
+    }
+    o << "DETECTOR" << std::endl;
+    o << config.detector << std::endl;
+
+    o << "GEOMETRY" << std::endl;
+    o << "Alpha In(deg): "<< config.getAlphaIn() << std::endl;
+    o << "Alpha In(deg): "<< config.getAlphaOut() << std::endl;
+    return o;
+}
+

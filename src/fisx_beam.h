@@ -2,7 +2,7 @@
 #define FISX_BEAM_H
 #include <cstddef> // needed for NULL definition!!!
 #include <vector>
-
+#include <iostream>
 
 class Ray
 {
@@ -54,7 +54,7 @@ public:
                  const std::vector<int> & characteristic = std::vector<int>(),\
                  const std::vector<double> & divergency = std::vector<double>());
 
-
+    friend std::ostream& operator<< (std::ostream& o, Beam const & beam);
 
     /*!
     Easy to wrap interface functions

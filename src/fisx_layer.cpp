@@ -176,3 +176,12 @@ std::vector<double> Layer::getTransmission(const std::vector<double> & energy, c
     return tmpDoubleVector;
 }
 
+std::ostream& operator<< (std::ostream& o, Layer const & layer)
+{
+    o << "Layer: " << layer.getMaterialName();
+    o << " density(g/cm3) " << layer.getDensity();
+    o << " thickness(cm) " << layer.getThickness();
+    o << " funny " << layer.getFunnyFactor();
+    return o;
+}
+

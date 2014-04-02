@@ -1,6 +1,5 @@
 #include "fisx_beam.h"
 #include <algorithm>
-#include <iostream>
 
 Beam::Beam()
 {
@@ -145,7 +144,7 @@ void Beam::setBeam(const int & nValues, const double *energy, const double *weig
 void Beam::setBeam(const int & nValues, const double *energy, const double *weight,
                    const double *characteristic, const double *divergency)
 {
-    std::vector<int>::size_type i;
+    int i;
     std::vector<int> flags;
 
     flags.resize(nValues);
@@ -219,3 +218,15 @@ const std::vector<Ray> & Beam::getBeam()
     //    this->normalizeBeam();
     return this->rays;
 }
+
+std::ostream& operator<< (std::ostream& o, Beam const & beam)
+{
+    std::vector<Ray>::size_type i;
+    for(i = 0; i < beam.rays.size(); i++)
+    {
+        o << "E (keV) = " << beam.rays[i].energy << " weight = " << beam.rays[i].weight;
+        if (i != (beam.rays.size() - 1)) o << std::endl;
+    }
+    return o;
+}
+

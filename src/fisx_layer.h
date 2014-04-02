@@ -2,6 +2,7 @@
 #define FISX_LAYER_H
 #include <string>
 #include <vector>
+#include <iostream>
 #include "fisx_elements.h"
 
 /*!
@@ -16,6 +17,8 @@ public:
     Layer(const std::string & name="", const double & density = 0.0,
                                        const double & thickness = 0.0,
                                        const double & funnyFactor = 1.0);
+
+    friend std::ostream& operator<< (std::ostream& o, Layer const & layer);
 
     void setMaterial(const std::string & materialName);
 
@@ -83,6 +86,7 @@ public:
     void setThickness(const double & thickness);
     const double & getDensity()const {return this->density;};
     const double & getThickness()const {return this->thickness;};
+    const double & getFunnyFactor()const {return this->funnyFactor;};
 
 private:
     std::string materialName;

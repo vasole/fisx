@@ -9,6 +9,8 @@ class XRFConfig
 public:
     XRFConfig();
 
+    friend std::ostream& operator<< (std::ostream& o, XRFConfig const & config);
+
     void readConfigurationFromFile(const std::string & fileName);
     void saveConfigurationToFile(const std::string & fileName);
 
