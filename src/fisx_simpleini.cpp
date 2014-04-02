@@ -207,7 +207,6 @@ void SimpleIni::getSubsections(const std::string & parent, \
     std::string instanceString;
     std::locale loc;
     std::vector<std::string>::size_type i;
-    std::string::size_type j;
 
     destination.clear();
     if (parent.size() == 0)
