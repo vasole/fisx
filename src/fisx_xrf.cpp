@@ -397,7 +397,7 @@ std::map<std::string, std::map<std::string, double> > XRF::getFluorescence(const
                                                 sampleLayerMuTotal[iLambda],
                                                 sample[sampleLayerIndex].getDensity(),
                                                 sample[sampleLayerIndex].getThickness());
-                    tmpDouble *= 0.5;
+                    tmpDouble *= (0.5/sinAlphaIn);
                     mapIt = c_it->second.find("rate");
                     actualResult[c_it->first]["rate"] += mapIt->second * tmpDouble * \
                                                          detectionEfficiency[c_it->first];
