@@ -93,12 +93,18 @@ double Math::deBoerL0(const double & mu1, const double & mu2, const double & muj
 
     // express the thickness in g/cm2
     d = thickness * density;
-
+/*
+    if (d <= 0.0)
+    {
+        // thick target
+        return (muj/mu1) * std::log(1 + mu1/muj);
+    }
+*/
     // deal with the problematic term
     tmpDouble = (muj - mu2) * d;
     if (tmpDouble > 0.0)
     {
-        tmpDouble = Math::deBoerD(tmpDouble / (mu2 * (mu1 + mu2)));
+        tmpDouble = Math::deBoerD(tmpDouble) / (mu2 * (mu1 + mu2));
     }
     else
     {
@@ -115,5 +121,6 @@ double Math::deBoerL0(const double & mu1, const double & mu2, const double & muj
         tmpDouble += (std::exp(-(mu1 + mu2) * d) / (mu2 * (mu1 + mu2))) * \
                       std::log(1.0 - (mu2 / muj));
     }
+
     return tmpDouble;
 }

@@ -11,3 +11,5 @@ cdef extern from "fisx_math.h":
         double E1(double) except +
 
         double deBoerD(double) except +
+
+        double deBoerL0(double, double, double, double, double)
