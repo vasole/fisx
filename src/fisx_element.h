@@ -85,12 +85,12 @@ public:
     /*!
     Retrieves the internal map of binding energies
     */
-    const std::map<std::string, double> & getBindingEnergies();
+    const std::map<std::string, double> & getBindingEnergies() const;
 
     /*!
     Given a photon energie (in keV) gives back the excited shells
     */
-    std::vector<std::string> getExcitedShells(const double & energy);
+    std::vector<std::string> getExcitedShells(const double & energy) const;
 
     // Mass attenuation coefficients
 

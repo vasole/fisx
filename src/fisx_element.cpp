@@ -106,7 +106,7 @@ void Element::setBindingEnergies(std::vector<std::string> labels, std::vector<do
 }
 
 
-const std::map<std::string, double> & Element::getBindingEnergies()
+const std::map<std::string, double> & Element::getBindingEnergies() const
 {
     return this->bindingEnergy;
 }
@@ -713,7 +713,7 @@ std::map<std::string, double> \
     return result;
 }
 
-std::vector<std::string> Element::getExcitedShells(const double & energy)
+std::vector<std::string> Element::getExcitedShells(const double & energy) const
 {
     // get the excited shells from the binding energies
     std::map<std::string, double>::const_iterator c_binding;
@@ -723,9 +723,12 @@ std::vector<std::string> Element::getExcitedShells(const double & energy)
     for(c_binding=this->bindingEnergy.begin();\
         c_binding!=this->bindingEnergy.end(); ++c_binding)
     {
-        if (energy > c_binding->second)
+        if (c_binding->second > 0.0)
         {
-            result.push_back(c_binding->first);
+            if (energy > c_binding->second)
+            {
+                result.push_back(c_binding->first);
+            }
         }
     }
     return result;
