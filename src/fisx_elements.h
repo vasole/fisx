@@ -261,6 +261,25 @@ public:
                             const double & energy, \
                             const double & weights = 1.0) const;
 
+    /*!
+    Given an element, formula or material return an ordered vector of pairs. The first element
+    is the peak family ("Si K", "Pb L1", ...) and the second the dinding energy.
+    */
+    std::vector<std::pair<std::string, double> > getPeakFamilies(const std::string & name, \
+                                                 const double & energy) const;
+
+
+    /*!
+    Given a list of elements return an ordered vector of pairs. The first element
+    is the peak family ("Si K", "Pb L1", ...) and the second the dinding energy.
+    */
+    std::vector<std::pair<std::string, double> > getPeakFamilies(const std::vector<std::string> & elementList, \
+                                             const double & energy) const;
+
+    /*!
+    Convenience function to simplify python use ...
+    */
+    const std::map<std::string, double> & getElementBindingEnergies(const std::string & name) const;
 
 
     /*!
@@ -296,5 +315,12 @@ private:
     std::map<std::string, std::string> shellConstantsFile;
     std::map<std::string, std::string> shellRadiativeTransitionsFile;
     std::map<std::string, std::string> shellNonradiativeTransitionsFile;
+
+    struct sortVectorOfExcited {
+        bool operator()(const std::pair<std::string, double> &left, const std::pair<std::string,int> &right) {
+        return left.second < right.second;
+    }
+};
+
 };
 #endif

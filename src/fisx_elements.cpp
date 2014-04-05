@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <cctype>
 #include <sstream>
+#include <algorithm>
 #include "fisx_elements.h"
 
 Elements::Elements(std::string epdl97Directory, std::string bindingEnergiesFileName, std::string crossSectionsFile)
@@ -1492,6 +1493,71 @@ const std::string & Elements::getShellNonradiativeTransitionsFile( \
         throw std::invalid_argument("Invalid main shell. It should be K, L or M");
     }
     return c_it->second;
+}
+
+std::vector<std::pair<std::string, double> > Elements::getPeakFamilies( \
+                            const std::vector<std::string> & elementList, const double & energy) const
+{
+    std::map<std::string, double>::const_iterator c_it;
+    std::vector<std::string>::size_type i, j;
+    std::vector<std::string> shells;
+    std::vector<std::pair<std::string, double> >result;
+    const Element* element;
+
+    result.clear();
+    for (i = 0; i < elementList.size(); i++)
+    {
+        shells = getElement(elementList[i]).getExcitedShells(energy);
+        if (shells.size())
+        {
+            const std::map<std::string, double> & bindingEnergies = \
+                        getElement(elementList[i]).getBindingEnergies();
+            for (j = 0; j < shells.size(); j++)
+            {
+                c_it = bindingEnergies.find(shells[j]);
+                if ((shells[j][0] == 'K') || (shells[j][0] == 'L') || (shells[j][0] == 'M'))
+                {
+                    if (getElement(elementList[i]).getShellConstants(shells[j])["omega"] > 0.0)
+                    {
+                        result.push_back(std::make_pair(elementList[i] + " " + shells[j], c_it->second));
+                    }
+                }
+            }
+        }
+    }
+    if(result.size())
+        std::sort(result.begin(), result.end(), sortVectorOfExcited());
+
+    // now fill an easier to wrap vector
+    return result;
+};
+
+
+const std::map<std::string, double> & Elements::getElementBindingEnergies(const std::string & element) const
+{
+    return getElement(element).getBindingEnergies();
+}
+
+std::vector<std::pair<std::string, double> > Elements::getPeakFamilies( \
+                                            const std::string & name, const double & energy) const
+{
+    std::map<std::string, double> composition;
+    std::map<std::string, double>::const_iterator c_it;
+    std::vector<std::string> names;
+    std::string msg;
+
+    composition = this->getComposition(name);
+    if (composition.size() < 1)
+    {
+        msg = "Name " + name + " not accepted as element, material or chemical formula";
+        throw std::invalid_argument(msg);
+    }
+    names.clear();
+    for (c_it = composition.begin(); c_it != composition.end(); ++c_it)
+    {
+        names.push_back(c_it->first);
+    }
+    return this->getPeakFamilies(names, energy);
 }
 
 
