@@ -124,3 +124,47 @@ double Math::deBoerL0(const double & mu1, const double & mu2, const double & muj
 
     return tmpDouble;
 }
+
+double Math::deBoerX(const double & p, const double & q, const double & d1, const double & d2)
+{
+    return Math::deBoerV(p, q, d1, d2) - Math::deBoerV(p, q, d1, 0.0) \
+                                       - Math::deBoerV(p, q, 0.0, d2) + Math::deBoerV(p, q, 0.0, 0.0);
+}
+
+double Math::deBoerV(const double & p, const double & q, const double & d1, const double & d2)
+{
+    double mu1j, mu2j, mubj, db;
+    double tmpDouble1;
+    double tmpDouble2;
+
+    // case V(0,0) with db equal to 0
+    if ((db == 0) && (p == 0) && (q == 0))
+    {
+        tmpDouble2 = (mu2j / p) * std::log(1.0 + (p / mu2j));
+        tmpDouble1 =  1.0 - (q / mu1j);
+        if (tmpDouble1 > 0.0)
+            tmpDouble1 = - tmpDouble2 - (mu1j / q) * std::log(tmpDouble1);
+        else
+            tmpDouble1 = - tmpDouble2;
+        return tmpDouble1 / (p * mu1j + q * mu2j);
+    }
+
+    // X(p, q, d1, d2) = V(d1, d2) - V(d1, 0) - V(0, d2) + V(0, 0)
+    // V(inf, d2) = 0.0;
+    // V(d1, inf) = 0.0; provided that q - muij < 0
+    // Therefore, for a layer on thick substrate
+    // X (p, q, d1, inf) = - V(d1, 0) + V(0,0)
+    // and for small values of d1 (thin layer on thick substrate) that gives
+    // X (p, q, d1, inf)X (p, q, d1, inf) is about (d1/p) * std::log(1.0 + (p/mu2j))
+
+
+    tmpDouble1 = Math::deBoerD((1.0 + (p / mu2j)) * (mu1j*d1 + mubj * db + mu2j*d2));
+    tmpDouble1 *= (mu2j /(p * (p * mu1j + q * mu2j)));
+    tmpDouble1 *= std::exp((q - mu1j) * d1 - (p + mu2j) * d2 -mubj * db);
+
+    tmpDouble2 = mu1j * d1 + mubj * db + mu2j * d2;
+    tmpDouble2 = ((mu1j / (q * (p * mu1j + q * mu2j))) * Math::deBoerD(( 1.0 - (q/mu1j)) * tmpDouble2)) - \
+                 (Math::deBoerD(tmpDouble2)/(p * q));
+
+    return tmpDouble1 + tmpDouble2;
+}

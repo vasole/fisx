@@ -46,6 +46,13 @@ class Math
 
 
         /*!
+        For multilayers
+        */
+        static double deBoerX(const double & p, const double & q, const double & d1, const double & d2);
+
+        static double deBoerV(const double & p, const double & q, const double & d1, const double & d2);
+
+        /*!
         Help function, see formula A2a appendix
         */
         static double Y(double a, double b, double c, double d);
