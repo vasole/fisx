@@ -139,6 +139,7 @@ cdef class PyElement:
 #cimport numpy as np
 cimport cython
 
+from operator import itemgetter
 from libcpp.string cimport string as std_string
 from libcpp.vector cimport vector as std_vector
 from libcpp.map cimport map as std_map
@@ -274,6 +275,20 @@ cdef class PyElements:
                                    std_vector[double] weights):
         return self.thisptr.getExcitationFactors(element, energies, weights)
 
+    def getPeakFamilies(self, nameOrVector, energy):
+        if type(nameOrVector) in [type([]), type(())]:
+            return sorted(self._getPeakFamiliesFromVectorOfElements(nameOrVector, energy), key=itemgetter(1))
+        else:
+            return sorted(self._getPeakFamilies(nameOrVector, energy), key=itemgetter(1))
+
+    def _getPeakFamilies(self, std_string name, double energy):
+        return self.thisptr.getPeakFamilies(name, energy)
+
+    def _getPeakFamiliesFromVectorOfElements(self, std_vector[std_string] elementList, double energy):
+        return self.thisptr.getPeakFamilies(elementList, energy)
+
+    def getElementBindingEnergies(self, std_string name):
+        return self.thisptr.getElementBindingEnergies(name)
 
 #import numpy as np
 #cimport numpy as np

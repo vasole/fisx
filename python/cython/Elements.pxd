@@ -5,6 +5,7 @@ cimport cython
 from libcpp.string cimport string as std_string
 from libcpp.vector cimport vector as std_vector
 from libcpp.map cimport map as std_map
+from libcpp.pair cimport pair as std_pair
 
 from Material cimport *
 
@@ -56,5 +57,8 @@ cdef extern from "fisx_elements.h":
                             std_vector[double] energy,
                             std_vector[double] weights) except +
 
+        std_vector[std_pair[std_string, double]] getPeakFamilies(std_string, double) except +
 
+        std_vector[std_pair[std_string, double]] getPeakFamilies(std_vector[std_string], double) except +
 
+        std_map[std_string, double] getElementBindingEnergies(std_string) except +
