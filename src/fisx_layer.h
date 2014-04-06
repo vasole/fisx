@@ -80,6 +80,14 @@ public:
     */
     bool hasMaterialComposition() const;
 
+    /*!
+    Given an energy and a reference to an elements library return an ordered vector of pairs.
+    The first element is the peak family ("Si K", "Pb L1", ...) and the second the binding energy.
+    */
+    std::vector<std::pair<std::string, double> > getPeakFamilies(const double & energy, \
+                                                                 const Elements & elements) const;
+
+
     const std::string & getMaterialName()const {return this->materialName;};
 
     void setDensity(const double & density);

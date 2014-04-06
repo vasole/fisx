@@ -176,6 +176,27 @@ std::vector<double> Layer::getTransmission(const std::vector<double> & energy, c
     return tmpDoubleVector;
 }
 
+std::vector<std::pair<std::string, double> > Layer::getPeakFamilies(const double & energy, \
+                                                                 const Elements & elements) const
+{
+    if (this->hasMaterial)
+    {
+        const std::map<std::string, double> & composition = this->material.getComposition();
+        std::vector<std::string> elementsList;
+        std::map<std::string, double>::const_iterator c_it;
+
+        for(c_it = composition.begin(); c_it != composition.end(); ++c_it)
+        {
+            elementsList.push_back(c_it->first);
+        }
+        return elements.getPeakFamilies(elementsList, energy);
+    }
+    else
+    {
+        return elements.getPeakFamilies(this->materialName, energy);
+    }
+}
+
 std::ostream& operator<< (std::ostream& o, Layer const & layer)
 {
     o << "Layer: " << layer.getMaterialName();
