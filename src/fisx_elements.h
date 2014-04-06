@@ -263,7 +263,7 @@ public:
 
     /*!
     Given an element, formula or material return an ordered vector of pairs. The first element
-    is the peak family ("Si K", "Pb L1", ...) and the second the dinding energy.
+    is the peak family ("Si K", "Pb L1", ...) and the second the binding energy.
     */
     std::vector<std::pair<std::string, double> > getPeakFamilies(const std::string & name, \
                                                  const double & energy) const;
@@ -271,7 +271,7 @@ public:
 
     /*!
     Given a list of elements return an ordered vector of pairs. The first element
-    is the peak family ("Si K", "Pb L1", ...) and the second the dinding energy.
+    is the peak family ("Si K", "Pb L1", ...) and the second the binding energy.
     */
     std::vector<std::pair<std::string, double> > getPeakFamilies(const std::vector<std::string> & elementList, \
                                              const double & energy) const;
