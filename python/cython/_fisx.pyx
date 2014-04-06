@@ -354,6 +354,8 @@ from cython.operator cimport dereference as deref
 from libcpp.string cimport string as std_string
 from libcpp.vector cimport vector as std_vector
 from libcpp.map cimport map as std_map
+from libcpp.map cimport pair as std_pair
+from operator import itemgetter
 
 from Elements cimport *
 from Material cimport *
@@ -375,6 +377,11 @@ cdef class PyLayer:
 
     def setMaterial(self, PyMaterial material):
         self.thisptr.setMaterial(deref(material.thisptr))
+
+    def getPeakFamilies(self, double energy, PyElements elementsLib):
+        tmpResult = self.thisptr.getPeakFamilies(energy, deref(elementsLib.thisptr))
+        return sorted(tmpResult, key=itemgetter(1))
+
 import numpy
 #cimport numpy as np
 cimport cython
