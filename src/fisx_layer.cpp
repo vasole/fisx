@@ -1,6 +1,7 @@
 #include "fisx_layer.h"
-#include <math.h>
+#include <cmath>
 #include <stdexcept>
+#include <algorithm>
 
 Layer::Layer(const std::string & name, const double & density, \
              const double & thickness, const double & funnyFactor)
@@ -182,12 +183,21 @@ std::vector<std::pair<std::string, double> > Layer::getPeakFamilies(const double
     if (this->hasMaterial)
     {
         const std::map<std::string, double> & composition = this->material.getComposition();
+        std::map<std::string, double> actualComposition;
         std::vector<std::string> elementsList;
         std::map<std::string, double>::const_iterator c_it;
+        std::map<std::string, double>::const_iterator c_it2;
 
         for(c_it = composition.begin(); c_it != composition.end(); ++c_it)
         {
-            elementsList.push_back(c_it->first);
+            actualComposition = elements.getComposition(c_it->first);
+            for(c_it2 = actualComposition.begin(); c_it2 != actualComposition.end(); ++c_it2)
+            {
+                if (std::find(elementsList.begin(), elementsList.end(), c_it2->first) == elementsList.end())
+                {
+                    elementsList.push_back(c_it2->first);
+                }
+            }
         }
         return elements.getPeakFamilies(elementsList, energy);
     }
