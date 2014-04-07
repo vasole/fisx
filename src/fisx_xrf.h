@@ -140,7 +140,12 @@ public:
     */
     double getGeometricEfficiency(const int & layerIndex = 0) const;
 
-    std::map<std::string, std::map<std::string, double> > getFluorescence(const std::string element, \
+    std::map<std::string, std::map<std::string, double> > getFluorescence(const std::string & element, \
+                const Elements & elementsLibrary, const int & sampleLayerIndex = 0, \
+                const std::string & lineFamily = "", const int & secondary = 0, \
+                const int & useGeometricEfficiency = 1);
+
+    std::map<std::string, std::map<std::string, double> > getMultilayerFluorescence(const std::string & element, \
                 const Elements & elementsLibrary, const int & sampleLayerIndex = 0, \
                 const std::string & lineFamily = "", const int & secondary = 0, \
                 const int & useGeometricEfficiency = 1);
