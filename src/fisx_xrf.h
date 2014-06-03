@@ -145,10 +145,21 @@ public:
                 const std::string & lineFamily = "", const int & secondary = 0, \
                 const int & useGeometricEfficiency = 1);
 
-    std::map<std::string, std::map<std::string, double> > getMultilayerFluorescence(const std::string & element, \
+
+    /*!
+    Return a complete output of the form
+    [Element Family][Layer][line]["energy"]
+    [Element Family][Layer][line]["primary"] - Primary rate prior to correct for detection efficiency
+    [Element Family][Layer][line]["rate"] - Overall rate
+    [Element Family][Layer][line]["efficiency"] - Detection efficiency
+    [Element Family][Layer][line]["element line layer"] - Secondary rate prior to correct for detection efficiency
+    */
+    std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, double> > > > \
+                getMultilayerFluorescence(const std::string & element, \
                 const Elements & elementsLibrary, const int & sampleLayerIndex = 0, \
                 const std::string & lineFamily = "", const int & secondary = 0, \
                 const int & useGeometricEfficiency = 1);
+
 
 private:
     /*!

@@ -445,7 +445,8 @@ double XRF::getGeometricEfficiency(const int & sampleLayerIndex) const
     return (0.5 * (1.0 - (distance / sqrt(pow(distance, 2) + pow(0.5 * detectorDiameter, 2)))));
 }
 
-std::map<std::string, std::map<std::string, double> > XRF::getMultilayerFluorescence( \
+std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, double> > > > \
+                XRF::getMultilayerFluorescence( \
                 const std::string & elementName, \
                 const Elements & elementsLibrary, const int & sampleLayerIndex, \
                 const std::string & lineFamily, const int & secondary, \
@@ -464,8 +465,6 @@ std::map<std::string, std::map<std::string, double> > XRF::getMultilayerFluoresc
     const Detector & detector = this->configuration.getDetector();
     const Element & element = elementsLibrary.getElement(elementName);
     std::string msg;
-    std::map<std::string, std::map<std::string, double> >  result;
-    std::map<std::string, std::map<std::string, double> > actualResult;
     const double PI = acos(-1.0);
     const double & alphaIn = this->configuration.getAlphaIn();
     const double & alphaOut = this->configuration.getAlphaOut();
@@ -481,6 +480,8 @@ std::map<std::string, std::map<std::string, double> > XRF::getMultilayerFluoresc
     std::vector<double> weights;
     std::vector<double> doubleVector;
     double maxEnergy;
+    std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, double> > > > result;
+    std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, double> > > > actualResult;
 
     // beam is ordered
     maxEnergy = energies[energies.size() - 1];
@@ -600,9 +601,11 @@ std::map<std::string, std::map<std::string, double> > XRF::getMultilayerFluoresc
         std::map<std::string, double>::const_iterator mapIt2;
         std::map<std::string, double> muTotalFluo;
         std::map<std::string, double> detectionEfficiency;
+        std::string key;
         tmpExcitationFactors = elementsLibrary.getExcitationFactors(elementName, energies[iRay], weights[iRay]);
         for (iLayer = 0; iLayer < sample.size(); iLayer++)
         {
+            key = elementName + " " + lineFamily;
             // calculate primary
             // we need to calculate the layer mass attenuation coefficients at the fluorescent energies
             layerPtr = &sample[iLayer];
@@ -611,9 +614,20 @@ std::map<std::string, std::map<std::string, double> > XRF::getMultilayerFluoresc
                 if (c_it->first.compare(0, lineFamily.length(), lineFamily) == 0)
                 {
                     mapIt = c_it->second.find("energy");
-                    muTotalFluo[c_it->first] = (*layerPtr).getMassAttenuationCoefficients( \
-                                                                mapIt->second, \
-                                                                elementsLibrary) ["total"];
+                    if (actualResult.find(key) == actualResult.end())
+                    {
+                        actualResult[key][iLayer][c_it->first]["energy"] = mapIt->second;
+                        actualResult[key][iLayer][c_it->first]["primary"] = 0.0;
+                        actualResult[key][iLayer][c_it->first]["rate"] = 0.0;
+                        actualResult[key][iLayer][c_it->first]["efficiency"] = 1.0;
+                    }
+                    else
+                    {
+                        // we have to calculate the mass attenuation coefficient
+                        actualResult[key][iLayer][c_it->first]["mu_1_i"] = \
+                                    (*layerPtr).getMassAttenuationCoefficients(mapIt->second, \
+                                                                            elementsLibrary) ["total"];
+                    }
                 }
             }
 
@@ -634,6 +648,13 @@ std::map<std::string, std::map<std::string, double> > XRF::getMultilayerFluoresc
                     // case b)
                 }
             }
+
+            // calculate the transmission of the fluorescent photons in the way back
+            // it will be the same for each incident photon energy ...
+            // in the sample upper layers
+            // in the attenuators
+            // the geometric factor
+            // the detector efficiency
         }
         iLayer = sample.size();
         while(iLayer > 0)
