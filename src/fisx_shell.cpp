@@ -267,22 +267,22 @@ void Shell::setRadiativeTransitions(const char *c_strings[], const double *value
     this->setRadiativeTransitions(labels, vValues);
 }
 
-const std::map<std::string, double> & Shell::getRadiativeTransitions()
+const std::map<std::string, double> & Shell::getRadiativeTransitions() const
 {
     return this->radiativeTransitions;
 }
 
-const std::map<std::string, double> & Shell::getNonradiativeTransitions()
+const std::map<std::string, double> & Shell::getNonradiativeTransitions() const
 {
     return this->nonradiativeTransitions;
 }
 
-const std::map<std::string, double> & Shell::getAugerRatios()
+const std::map<std::string, double> & Shell::getAugerRatios() const
 {
     return this->augerRatios;
 }
 
-const std::map<std::string, std::map<std::string, double> > & Shell::getCosterKronigRatios()
+const std::map<std::string, std::map<std::string, double> > & Shell::getCosterKronigRatios() const
 {
     return this->costerKronigRatios;
 }

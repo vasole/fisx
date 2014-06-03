@@ -48,20 +48,20 @@ public:
     /*!
     Get Auger transition ratios
     */
-    const std::map<std::string, double> & getAugerRatios();
+    const std::map<std::string, double> & getAugerRatios() const;
 
     /*!
     Get Coster-Kronig transition ratios
     */
-    const std::map<std::string, std::map<std::string, double> > & getCosterKronigRatios();
+    const std::map<std::string, std::map<std::string, double> > & getCosterKronigRatios() const;
 
     /*!
     Get X-ray fluorescence transition ratios
     */
     const std::map<std::string, double> & getFluorescenceRatios() const;
 
-    const std::map<std::string, double> & getRadiativeTransitions();
-    const std::map<std::string, double> & getNonradiativeTransitions();
+    const std::map<std::string, double> & getRadiativeTransitions() const;
+    const std::map<std::string, double> & getNonradiativeTransitions() const;
 
     /*! Return the probabilities of direct transfer of a vacancy to a higher shell following
     an X-ray emission, an Auger transition and Coster-Kronig transitions (if any).
