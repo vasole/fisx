@@ -555,12 +555,16 @@ std::map<std::string, std::map<std::string, double> > XRF::getMultilayerFluoresc
                 // and add the energies and rates to the sampleLayerLines
                 for (c_it = tmpResult.begin(); c_it != tmpResult.end(); ++c_it)
                 {
-                    mapIt2 = c_it->second.find("energy");
-                    sampleLayerEnergies[iLayer].push_back(mapIt2->second);
-                    mapIt2 = c_it->second.find("rate");
-                    sampleLayerRates[iLayer].push_back(mapIt2->second *
-                                                       sampleLayerComposition[ele]);
-                    sampleLayerFamilies[iLayer].push_back(iString);
+                    // be carefull not to add twice a ceerting element
+                    if (c_it->first.compare(0, family.length(), family) == 0)
+                    {
+                        mapIt2 = c_it->second.find("energy");
+                        sampleLayerEnergies[iLayer].push_back(mapIt2->second);
+                        mapIt2 = c_it->second.find("rate");
+                        sampleLayerRates[iLayer].push_back(mapIt2->second *
+                                                           sampleLayerComposition[ele]);
+                        sampleLayerFamilies[iLayer].push_back(iString);
+                    }
                 }
             }
             // calculate sample mu total at all those energies
@@ -577,7 +581,60 @@ std::map<std::string, std::map<std::string, double> > XRF::getMultilayerFluoresc
             sampleLayerThickness[iLayer] = (*layerPtr).getThickness();
         }
 
-        // we start calculation by the bottom layer
+        // we start calculation
+        // mu_1_lambda = Mass attenuation coefficient of iLayer at incident energy
+        // mu_1_i = Mass attenuation coefficient of iLayer at fluorescent energy
+        // mu_a_lambda = Mass attenuation coefficient of layers above iLayer at incident energy
+        // mu_a_i = Mass attenuation coefficient of layers above iLayer at fluorescent energy
+        // mu_b_lambda = Mass attenuation coefficient of layers between iLayer and jLayer at incident energy
+        // mu_b_j = Mass attenuation coefficient of layers between iLayer and jLayer at jLayer fluorescent energy j
+        // mu_2_lambda = Mass attenuation coefficient of jLayer at incident energy
+        // mu_2_j = Mass attenuation coefficient of jLayer at jLayer fluorescent energy j
+        // mu_1_j = Mass attenuation coefficient of iLayer at jLayer fluorescent energy j
+        // elementName is the element to be analyzed
+        // lineFamily is the family of  elementName X-ray lines to be considered
+        // this line can be moved out of the loop
+        std::map<std::string, std::map<std::string, double> > tmpExcitationFactors;
+        std::map<std::string, std::map<std::string, double> >::const_iterator c_it;
+        std::map<std::string, double>::const_iterator mapIt;
+        std::map<std::string, double>::const_iterator mapIt2;
+        std::map<std::string, double> muTotalFluo;
+        std::map<std::string, double> detectionEfficiency;
+        tmpExcitationFactors = elementsLibrary.getExcitationFactors(elementName, energies[iRay], weights[iRay]);
+        for (iLayer = 0; iLayer < sample.size(); iLayer++)
+        {
+            // calculate primary
+            // we need to calculate the layer mass attenuation coefficients at the fluorescent energies
+            layerPtr = &sample[iLayer];
+            for (c_it = tmpExcitationFactors.begin(); c_it != tmpExcitationFactors.end(); ++c_it)
+            {
+                if (c_it->first.compare(0, lineFamily.length(), lineFamily) == 0)
+                {
+                    mapIt = c_it->second.find("energy");
+                    muTotalFluo[c_it->first] = (*layerPtr).getMassAttenuationCoefficients( \
+                                                                mapIt->second, \
+                                                                elementsLibrary) ["total"];
+                }
+            }
+
+            // calculate secondary
+            for (jLayer = 0; jLayer < sample.size(); jLayer++)
+            {
+                //calculate secondary
+                if (iLayer == jLayer)
+                {
+                    // intra layer secondary
+                }
+                if (iLayer < jLayer)
+                {
+                    // case a)
+                }
+                if (iLayer > jLayer)
+                {
+                    // case b)
+                }
+            }
+        }
         iLayer = sample.size();
         while(iLayer > 0)
         {
