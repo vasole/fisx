@@ -166,7 +166,8 @@ public:
     void setRadiativeTransitions(std::string subshell,\
                                  std::vector<std::string>,\
                                  std::vector<double> values);
-    const std::map<std::string, double> & getRadiativeTransitions(std::string subshell);
+
+    const std::map<std::string, double> & getRadiativeTransitions(const std::string & subshell) const;
 
     void setNonradiativeTransitions(std::string subshell,
                                     std::vector<std::string>,
@@ -181,7 +182,23 @@ public:
     void setShellConstants(std::string subshell, std::map<std::string, double> constants);
     std::map<std::string, double> getShellConstants(const std::string & subshell) const;
 
+
+    /*!
+    Given a transition (KL3, L3M5, ...) returns the transition energy
+    */
+    double getTransitionEnergy(const std::string & transition) const;
+
+
+    /*!
+    Given a subshell, return a map where the key is the line name and the content the energy.
+    */
     const std::map<std::string, double> & getXRayLines(const std::string & family = "") const;
+
+    /*!
+    Given an excitation energy (in keV), return a map where the key is the line name and the content
+    the energy.
+    */
+    const std::map<std::string, double> & getEmittedXRayLines(const double & energy= 1000.) const;
 
     /*!
     Given a set of energies, give the initial distribution of vacancies (before cascade) due to

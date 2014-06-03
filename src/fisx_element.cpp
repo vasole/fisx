@@ -831,9 +831,15 @@ void Element::setRadiativeTransitions(std::string subshell, std::map<std::string
     this->shellInstance[subshell].setRadiativeTransitions(values);
 }
 
-const std::map<std::string, double> & Element::getRadiativeTransitions(std::string subshell)
+const std::map<std::string, double> & Element::getRadiativeTransitions(const std::string & subshell) const
 {
-    return this->shellInstance[subshell].getRadiativeTransitions();
+    std::map<std::string, Shell>::const_iterator c_it;
+    c_it = this->shellInstance.find(subshell);
+    if (c_it == this->shellInstance.end())
+    {
+        throw std::invalid_argument("Requested shell is not a defined K, L or M subshell");
+    }
+    return c_it->second.getRadiativeTransitions();
 }
 
 void Element::setNonradiativeTransitions(std::string subshell, std::vector<std::string> labels, std::vector<double> values)
@@ -922,6 +928,120 @@ std::map<std::string, double> Element::getShellConstants(const std::string & sub
 const std::map<std::string, double> & Element::getXRayLines(const std::string & family) const
 {
     return this->getFluorescenceRatios(family);
+}
+
+const std::map<std::string, double> & Element::getEmittedXRayLines(const double & energy) const
+{
+    std::string keys[9] = {"K", "L1", "L2", "L3", "M1", "M2", "M3", "M4", "M5"};
+    std::map<std::string, Shell>::const_iterator shell_it;
+    std::map<std::string, double> fluorescenceRatios;
+    std::map<std::string, double>::const_iterator c_it;
+    std::map<std::string, double> result;
+    double rate;
+    int i;
+
+    result.clear();
+    for (i = 0; i < 9; i++)
+    {
+        // get all the fluorescence transitions to that shell
+        shell_it = this->shellInstance.find(keys[i]);
+        if(shell_it == this->shellInstance.end())
+        {
+            // shell is not defined, we are done
+            return result;
+        }
+
+        c_it = this->bindingEnergy.find(keys[i]);
+        if(c_it == this->bindingEnergy.end())
+        {
+            std::cout << "Shell defined but energy not set " << keys[i] << std::endl;
+            throw std::runtime_error("Shell defined but shell energy not set!");
+        }
+        if (energy <= c_it->second)
+        {
+            // we cannot excite that shell
+            continue;
+        }
+        fluorescenceRatios = shell_it->second.getFluorescenceRatios();
+        for (c_it = fluorescenceRatios.begin(); c_it != fluorescenceRatios.end(); c_it++)
+        {
+            rate = shell_it->second.getFluorescenceYield();
+            if (rate > 0.0)
+            {
+                result[c_it->first] = this->getTransitionEnergy(c_it->first);
+            }
+        }
+    }
+    return result;
+}
+
+double Element::getTransitionEnergy(const std::string & transition) const
+{
+    std::string fromShell, toShell;
+    std::map<std::string, Shell>::const_iterator shell_it;
+    std::map<std::string, double>::const_iterator bind_it;
+    double energy0, energy1;
+
+    if (transition.size() == 4)
+    {
+        fromShell = transition.substr(transition.size() - 2 , 2);
+        toShell = transition.substr(0, 2);
+    }
+    else
+    {
+        if (transition.size() == 3)
+        {
+            fromShell = transition.substr(transition.size() - 2 , 2);
+            toShell = transition.substr(0, 1);
+        }
+        else
+        {
+            std::cout << "Fluorescence transition " << transition << std::endl;
+            throw std::domain_error("Invalid flurescence transition");
+        }
+    }
+
+    bind_it = this->bindingEnergy.find(toShell);
+    if(bind_it == this->bindingEnergy.end())
+    {
+        std::cout << "Fluorescence transition " << transition << std::endl;
+        throw std::domain_error("Transition to an undefined shell!");
+    }
+    energy0 = bind_it->second;
+    if (energy0 <= 0)
+    {
+        std::cout << "Fluorescence transition " << transition << std::endl;
+        throw std::domain_error("Transition to a shell with 0 binding energy!");
+    }
+    bind_it = this->bindingEnergy.find(fromShell);
+    if (bind_it == this->bindingEnergy.end())
+    {
+        std::cout << "Fluorescence transition from undefined shell ";
+        std::cout << fromShell << std::endl;
+        energy1 = 0.0;
+    }
+    else
+    {
+        energy1 = bind_it->second;
+    }
+    if(energy1 <= 0.0)
+    {
+        if (energy1 < 0.0)
+        {
+            std::cout << this->name << " " << bind_it->first << " " ;
+            std::cout << bind_it->second << std::endl;
+            throw std::runtime_error("Negative binding energy!");
+        }
+        else
+        {
+#ifndef NDEBUG
+            std::cout << "Fluorescence transition from unset energy shell ";
+            std::cout << fromShell << "Assuming 3 eV" << std::endl;
+#endif
+            energy1 = 0.003;
+        }
+    }
+    return (energy0 - energy1);
 }
 
 std::map<std::string, double> \
