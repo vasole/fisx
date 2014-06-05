@@ -111,7 +111,7 @@ std::map<std::string, std::map<std::string, double> > XRF::getFluorescence(const
     const Detector & detector = this->configuration.getDetector();
     const Element & element = elementsLibrary.getElement(elementName);
     std::string msg;
-    std::map<std::string, std::map<std::string, double> >  result;
+    std::map<std::string, std::map<std::string, double> > result;
     std::map<std::string, std::map<std::string, double> > actualResult;
     const double PI = acos(-1.0);
     const double & alphaIn = this->configuration.getAlphaIn();
@@ -471,7 +471,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
     const double & detectorDistance = detector.getDistance();
     const double & detectorDiameter = detector.getDiameter();
     double distance;
-    double geometricEfficiency;
+    std::vector<double> geometricEfficiency;
     const int & referenceLayerIndex = this->configuration.getReferenceLayer();
     double sinAlphaIn = sin(alphaIn*(PI/180.));
     double sinAlphaOut = sin(alphaOut*(PI/180.));
@@ -480,7 +480,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
     std::vector<double> weights;
     std::vector<double> doubleVector;
     double maxEnergy;
-    std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, double> > > > result;
+    std::map<std::string, std::map<std::string, double> > result;
     std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, double> > > > actualResult;
 
     // beam is ordered
@@ -502,6 +502,22 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
         }
     }
 
+    // we can already calculate the geometric efficiency
+    geometricEfficiency.resize(sample.size());
+    if (useGeometricEfficiency != 0)
+    {
+        for (iLayer = 0; iLayer < sample.size(); iLayer++)
+        {
+            geometricEfficiency[iLayer] = this->getGeometricEfficiency(iLayer);
+        }
+    }
+    else
+    {
+        for (iLayer = 0; iLayer < sample.size(); iLayer++)
+        {
+            geometricEfficiency[iLayer] = 1.0;
+        }
+    }
 
     std::vector<std::vector<double> >sampleLayerEnergies;
     std::vector<std::vector<double> >sampleLayerRates;
@@ -584,7 +600,12 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
 
         // we start calculation
         // mu_1_lambda = Mass attenuation coefficient of iLayer at incident energy
+        double mu_1_lambda;
         // mu_1_i = Mass attenuation coefficient of iLayer at fluorescent energy
+        double mu_1_i;
+        // density and thickness of fluorescent layer
+        double density_1;
+        double thickness_1;
         // mu_a_lambda = Mass attenuation coefficient of layers above iLayer at incident energy
         // mu_a_i = Mass attenuation coefficient of layers above iLayer at fluorescent energy
         // mu_b_lambda = Mass attenuation coefficient of layers between iLayer and jLayer at incident energy
@@ -600,52 +621,152 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
         std::map<std::string, double>::const_iterator mapIt;
         std::map<std::string, double>::const_iterator mapIt2;
         std::map<std::string, double> muTotalFluo;
-        std::map<std::string, double> detectionEfficiency;
+        double detectionEfficiency;
+        double energy;
         std::string key;
         tmpExcitationFactors = elementsLibrary.getExcitationFactors(elementName, energies[iRay], weights[iRay]);
         for (iLayer = 0; iLayer < sample.size(); iLayer++)
         {
             key = elementName + " " + lineFamily;
-            // calculate primary
             // we need to calculate the layer mass attenuation coefficients at the fluorescent energies
             layerPtr = &sample[iLayer];
+            result.clear();
             for (c_it = tmpExcitationFactors.begin(); c_it != tmpExcitationFactors.end(); ++c_it)
             {
                 if (c_it->first.compare(0, lineFamily.length(), lineFamily) == 0)
                 {
-                    mapIt = c_it->second.find("energy");
-                    if (actualResult.find(key) == actualResult.end())
+                    mapIt = c_it->second.find("factor");
+                    if (mapIt == c_it->second.end())
                     {
-                        actualResult[key][iLayer][c_it->first]["energy"] = mapIt->second;
-                        actualResult[key][iLayer][c_it->first]["primary"] = 0.0;
+                        std::cout << "Key <factor> not found in excitation factor" << std::endl;
+                    }
+                    if (mapIt->second <= 0.0)
+                    {
+                        // not excited
+                        continue;
+                    }
+                    mapIt = c_it->second.find("energy");
+                    energy = mapIt->second;
+                    result[c_it->first]["energy"] = energy;
+                    mapIt = c_it->second.find("rate");
+                    result[c_it->first]["rate"] = mapIt->second;
+                    mapIt = c_it->second.find("factor");
+                    result[c_it->first]["factor"] = mapIt->second;
+                    if (actualResult[key][iLayer].find(c_it->first) == actualResult[key][iLayer].end())
+                    {
+                        // calculate layer mu total at fluorescent energy
+                        result[c_it->first]["mu_1_i"] = \
+                                (*layerPtr).getMassAttenuationCoefficients(energy, \
+                                                                            elementsLibrary) ["total"];
+                        // calculate detection efficiency of fluorescent energy
+                        detectionEfficiency = 1.0;
+                        // transmission through upper layers
+                        jLayer = iLayer;
+                        while (jLayer > 0)
+                        {
+                            jLayer--;
+                            layerPtr = &sample[jLayer];
+                            detectionEfficiency *= (*layerPtr).getTransmission(energy, \
+                                                                               elementsLibrary, \
+                                                                               alphaOut);
+                        }
+                        // transmission through attenuators
+                        for (jLayer = 0; jLayer < attenuators.size(); jLayer++)
+                        {
+                            layerPtr = &attenuators[jLayer];
+                            detectionEfficiency *= (*layerPtr).getTransmission(energy, \
+                                                                               elementsLibrary, \
+                                                                               90.0);
+                        }
+
+                        // detection efficiency decomposed in geometric and intrinsic
+                        detectionEfficiency *= geometricEfficiency[iLayer];
+
+                        if (detector.hasMaterialComposition() || (detector.getMaterialName().size() > 0 ))
+                        {
+                            // calculate intrinsic efficiency
+                            detectionEfficiency *= (1.0 - detector.getTransmission(energy, \
+                                                                                   elementsLibrary, \
+                                                                                   90.0));
+                        }
+                        result[c_it->first]["efficiency"] = detectionEfficiency;
+                        actualResult[key][iLayer][c_it->first]["efficiency"] = detectionEfficiency;
+                        actualResult[key][iLayer][c_it->first]["energy"] = energy;
                         actualResult[key][iLayer][c_it->first]["rate"] = 0.0;
-                        actualResult[key][iLayer][c_it->first]["efficiency"] = 1.0;
+                        actualResult[key][iLayer][c_it->first]["primary"] = 0.0;
+                        actualResult[key][iLayer][c_it->first]["secondary"] = 0.0;
                     }
                     else
                     {
-                        // we have to calculate the mass attenuation coefficient
-                        actualResult[key][iLayer][c_it->first]["mu_1_i"] = \
-                                    (*layerPtr).getMassAttenuationCoefficients(mapIt->second, \
-                                                                            elementsLibrary) ["total"];
+                        result[c_it->first]["efficiency"] = \
+                                    actualResult[key][iLayer][c_it->first]["efficiency"];
+                        result[c_it->first]["energy"] = actualResult[key][iLayer][c_it->first]["energy"];
+                        result[c_it->first]["mu_1_i"] = actualResult[key][iLayer][c_it->first]["mu_1_i"];
                     }
                 }
             }
+            // primary
+            mu_1_lambda = muTotal[iLayer];
+            density_1 = sample[iLayer].getDensity();
+            thickness_1 = sample[iLayer].getThickness();
+            for (c_it = result.begin(); c_it != result.end(); ++c_it)
+            {
+                mapIt = c_it->second.find("mu_1_i");
+                mu_1_i = mapIt->second;
+                tmpDouble = (mu_1_lambda / sinAlphaIn) + (mu_1_lambda / sinAlphaOut);
+                tmpDouble = (1.0 - exp( - tmpDouble * density_1 * thickness_1)) / (tmpDouble * sinAlphaIn);
+                result[c_it->first]["primary"] = tmpDouble * tmpExcitationFactors[c_it->first]["rate"];
+                result[c_it->first]["rate"] = result[c_it->first]["primary"] * \
+                                              result[c_it->first]["efficiency"];
+            }
 
+            // secondary
+            if (result.size() == 0)
+            {
+                // no need to calculate secondary excitation
+                continue;
+            }
+            /*
+            // initialize output in case nothing comes out (element not excited)
+            // this is to be done at the very end
+            if (actualResult[key].find(iLayer) == actualResult.end())
+            {
+                // element family has not been excited (and it will never will) because
+                // we start by the highest energy
+                // we need to fill some defaults
+                std::map<std::string, double> tmpMap;
+                tmpMap = elementsLibrary.getElement(elementName).getEmittedXRayLines(1000.);
+                for (mapIt = tmpMap.begin(); mapIt != tmpMap.end(); ++mapIt)
+                {
+                    if (mapIt->first.compare(0, lineFamily.length(), lineFamily) == 0)
+                    {
+                        actualResult[key][iLayer][mapIt->first]["energy"] = mapIt->second;
+                        actualResult[key][iLayer][mapIt->first]["primary"] = 0.0;
+                        actualResult[key][iLayer][mapIt->first]["rate"] = 0.0;
+                    }
+                }
+            }
+            */
+            if (actualResult[key].find(iLayer) == actualResult[key].end())
+            {
+                // element family was not excited;
+                continue;
+            }
             // calculate secondary
             for (jLayer = 0; jLayer < sample.size(); jLayer++)
             {
                 //calculate secondary
                 if (iLayer == jLayer)
                 {
-                    // intra layer secondary
+                    // intralayer secondary
                 }
                 if (iLayer < jLayer)
                 {
-                    // case a)
+                    // interlayer case a)
                 }
                 if (iLayer > jLayer)
                 {
-                    // case b)
+                    // interlayer case b)
                 }
             }
 

@@ -1271,6 +1271,7 @@ std::vector<std::map<std::string, std::map<std::string, double> > >Element::getP
         weight = weights[0];
     else
         weight = 1.0 / energy.size();
+    result.clear();
     for(i = 0; i < energy.size(); i++)
     {
         if (weights.size() > 1)
