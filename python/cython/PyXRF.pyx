@@ -110,5 +110,11 @@ cdef class PyXRF:
         return self.thisptr.getFluorescence(elementName, deref(elementsLibrary.thisptr), \
                             sampleLayer, lineFamily, secondary, useGeometricEfficiency)
 
+    def getMultilayerFluorescence(self, std_string elementName, PyElements elementsLibrary, \
+                            int sampleLayer = 0, std_string lineFamily="K", int secondary = 0, \
+                            int useGeometricEfficiency = 1):
+        return self.thisptr.getMultilayerFluorescence(elementName, deref(elementsLibrary.thisptr), \
+                            sampleLayer, lineFamily, secondary, useGeometricEfficiency)
+
     def getGeometricEfficiency(self, int layerIndex = 0):
         return self.thisptr.getGeometricEfficiency(layerIndex)

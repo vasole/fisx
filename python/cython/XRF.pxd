@@ -26,3 +26,7 @@ cdef extern from "fisx_xrf.h":
 
         std_map[std_string, std_map[std_string, double]] getFluorescence(std_string, \
                 Elements, int, std_string, int, int) except +
+
+        std_map[std_string, std_map[int, std_map[std_string, std_map[std_string, double]]]] \
+                getMultilayerFluorescence(std_string, \
+                                          Elements, int, std_string, int, int) except +
