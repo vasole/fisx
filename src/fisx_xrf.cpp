@@ -543,61 +543,63 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
     {
         --iRay;
         weights[iRay] = actualRays[1][iRay];
-        // get the excitation factor for each layer at incident energy
-        for(iLayer = 0; iLayer < sample.size(); iLayer++)
+        if (secondary > 0)
         {
-            sampleLayerEnergies[iLayer].clear();
-            sampleLayerRates[iLayer].clear();
-            sampleLayerFamilies[iLayer].clear();
-            sampleLayerMuTotal[iLayer].clear();
-            layerPtr = &sample[iLayer];
-            sampleLayerPeakFamilies[iLayer] = (*layerPtr).getPeakFamilies(energies[iRay], elementsLibrary);
-            // They are ordered by increasing increasing binding energy
-            std::string::size_type iString;
-            std::string ele;
-            std::string family;
-            std::map<std::string, std::map<std::string, double> > tmpResult;
-            std::map<std::string, std::map<std::string, double> >::const_iterator c_it;
-            std::map<std::string, double> sampleLayerComposition;
-            std::map<std::string, double>::const_iterator mapIt;
-            std::map<std::string, double>::const_iterator mapIt2;
-            sampleLayerComposition = (*layerPtr).getComposition(elementsLibrary);
-            for (iPeakFamily = 0 ; iPeakFamily < sampleLayerPeakFamilies[iLayer].size(); iPeakFamily++)
+            // get the excitation factor for each layer at incident energy
+            for(iLayer = 0; iLayer < sample.size(); iLayer++)
             {
-                iString = sampleLayerPeakFamilies[iLayer][iPeakFamily].first.find(' ');
-                ele = sampleLayerPeakFamilies[iLayer][iPeakFamily].first.substr(0, iString);
-                family = sampleLayerPeakFamilies[iLayer][iPeakFamily].first.substr(iString + 1, \
-                                sampleLayerPeakFamilies[iLayer][iPeakFamily].first.size() - iString - 1);
-                tmpResult = elementsLibrary.getExcitationFactors(ele, energies[iRay],  weights[iRay]);
-                // and add the energies and rates to the sampleLayerLines
-                for (c_it = tmpResult.begin(); c_it != tmpResult.end(); ++c_it)
+                sampleLayerEnergies[iLayer].clear();
+                sampleLayerRates[iLayer].clear();
+                sampleLayerFamilies[iLayer].clear();
+                sampleLayerMuTotal[iLayer].clear();
+                layerPtr = &sample[iLayer];
+                sampleLayerPeakFamilies[iLayer] = (*layerPtr).getPeakFamilies(energies[iRay], elementsLibrary);
+                // They are ordered by increasing increasing binding energy
+                std::string::size_type iString;
+                std::string ele;
+                std::string family;
+                std::map<std::string, std::map<std::string, double> > tmpResult;
+                std::map<std::string, std::map<std::string, double> >::const_iterator c_it;
+                std::map<std::string, double> sampleLayerComposition;
+                std::map<std::string, double>::const_iterator mapIt;
+                std::map<std::string, double>::const_iterator mapIt2;
+                sampleLayerComposition = (*layerPtr).getComposition(elementsLibrary);
+                for (iPeakFamily = 0 ; iPeakFamily < sampleLayerPeakFamilies[iLayer].size(); iPeakFamily++)
                 {
-                    // be carefull not to add twice a ceerting element
-                    if (c_it->first.compare(0, family.length(), family) == 0)
+                    iString = sampleLayerPeakFamilies[iLayer][iPeakFamily].first.find(' ');
+                    ele = sampleLayerPeakFamilies[iLayer][iPeakFamily].first.substr(0, iString);
+                    family = sampleLayerPeakFamilies[iLayer][iPeakFamily].first.substr(iString + 1, \
+                                    sampleLayerPeakFamilies[iLayer][iPeakFamily].first.size() - iString - 1);
+                    tmpResult = elementsLibrary.getExcitationFactors(ele, energies[iRay],  weights[iRay]);
+                    // and add the energies and rates to the sampleLayerLines
+                    for (c_it = tmpResult.begin(); c_it != tmpResult.end(); ++c_it)
                     {
-                        mapIt2 = c_it->second.find("energy");
-                        sampleLayerEnergies[iLayer].push_back(mapIt2->second);
-                        mapIt2 = c_it->second.find("rate");
-                        sampleLayerRates[iLayer].push_back(mapIt2->second *
-                                                           sampleLayerComposition[ele]);
-                        sampleLayerFamilies[iLayer].push_back(iString);
+                        // be carefull not to add twice a ceerting element
+                        if (c_it->first.compare(0, family.length(), family) == 0)
+                        {
+                            mapIt2 = c_it->second.find("energy");
+                            sampleLayerEnergies[iLayer].push_back(mapIt2->second);
+                            mapIt2 = c_it->second.find("rate");
+                            sampleLayerRates[iLayer].push_back(mapIt2->second *
+                                                               sampleLayerComposition[ele]);
+                            sampleLayerFamilies[iLayer].push_back(iString);
+                        }
                     }
                 }
+                // calculate sample mu total at all those energies
+                // Doubtfull. It has to be calculated for intermediate layers too.
+                sampleLayerMuTotal[iLayer] = (*layerPtr).getMassAttenuationCoefficients( \
+                                                                sampleLayerEnergies[iLayer], \
+                                                                elementsLibrary)["total"];
+                // get muTotal at the incident energy
+                muTotal[iLayer] = (*layerPtr).getMassAttenuationCoefficients( \
+                                                                energies[iRay], \
+                                                                elementsLibrary)["total"];
+                // layer thickness and density
+                sampleLayerDensity[iLayer] = (*layerPtr).getDensity();
+                sampleLayerThickness[iLayer] = (*layerPtr).getThickness();
             }
-            // calculate sample mu total at all those energies
-            // Doubtfull. It has to be calculated for intermediate layers too.
-            sampleLayerMuTotal[iLayer] = (*layerPtr).getMassAttenuationCoefficients( \
-                                                            sampleLayerEnergies[iLayer], \
-                                                            elementsLibrary)["total"];
-            // get muTotal at the incident energy
-            muTotal[iLayer] = (*layerPtr).getMassAttenuationCoefficients( \
-                                                            energies[iRay], \
-                                                            elementsLibrary)["total"];
-            // layer thickness and density
-            sampleLayerDensity[iLayer] = (*layerPtr).getDensity();
-            sampleLayerThickness[iLayer] = (*layerPtr).getThickness();
         }
-
         // we start calculation
         // mu_1_lambda = Mass attenuation coefficient of iLayer at incident energy
         double mu_1_lambda;
@@ -627,6 +629,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
         tmpExcitationFactors = elementsLibrary.getExcitationFactors(elementName, energies[iRay], weights[iRay]);
         for (iLayer = 0; iLayer < sample.size(); iLayer++)
         {
+            // here I should loop for all elements and families
             key = elementName + " " + lineFamily;
             // we need to calculate the layer mass attenuation coefficients at the fluorescent energies
             layerPtr = &sample[iLayer];
@@ -705,30 +708,37 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                     }
                 }
             }
+            if (result.size() == 0)
+            {
+                // no need to calculate anything
+                continue;
+            }
             // primary
-            mu_1_lambda = muTotal[iLayer];
+            mu_1_lambda = sample[iLayer].getMassAttenuationCoefficients( \
+                                                            energies[iRay], \
+                                                            elementsLibrary)["total"];
             density_1 = sample[iLayer].getDensity();
             thickness_1 = sample[iLayer].getThickness();
             for (c_it = result.begin(); c_it != result.end(); ++c_it)
             {
                 mapIt = c_it->second.find("mu_1_i");
                 mu_1_i = mapIt->second;
-                tmpDouble = (mu_1_lambda / sinAlphaIn) + (mu_1_lambda / sinAlphaOut);
+                tmpDouble = (mu_1_lambda / sinAlphaIn) + (mu_1_i / sinAlphaOut);
                 tmpDouble = (1.0 - exp( - tmpDouble * density_1 * thickness_1)) / (tmpDouble * sinAlphaIn);
                 result[c_it->first]["primary"] = tmpDouble * tmpExcitationFactors[c_it->first]["rate"];
                 result[c_it->first]["rate"] = result[c_it->first]["primary"] * \
                                               result[c_it->first]["efficiency"];
+                result[c_it->first]["secondary"] = 0.0;
             }
 
-            // secondary
-            if (result.size() == 0)
-            {
-                // no need to calculate secondary excitation
-                continue;
-            }
             /*
             // initialize output in case nothing comes out (element not excited)
             // this is to be done at the very end
+            if (actualResult[key].find(iLayer) == actualResult[key].end())
+            {
+                // element family was not excited;
+                continue;
+            }
             if (actualResult[key].find(iLayer) == actualResult.end())
             {
                 // element family has not been excited (and it will never will) because
@@ -747,11 +757,6 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                 }
             }
             */
-            if (actualResult[key].find(iLayer) == actualResult[key].end())
-            {
-                // element family was not excited;
-                continue;
-            }
             // calculate secondary
             for (jLayer = 0; jLayer < sample.size(); jLayer++)
             {
@@ -759,7 +764,36 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                 if (iLayer == jLayer)
                 {
                     // intralayer secondary
-                }
+                    for(iLambda = 0; iLambda < sampleLayerEnergies[iLayer].size(); iLambda++)
+                    {
+                        // analogous to incident beam
+                        tmpExcitationFactors = elementsLibrary.getExcitationFactors(elementName, \
+                                    sampleLayerEnergies[iLayer][iLambda], \
+                                    sampleLayerRates[iLayer][iLambda]);
+                        for (c_it = tmpExcitationFactors.begin(); c_it != tmpExcitationFactors.end(); ++c_it)
+                        {
+                            if (result.find(c_it->first) == result.end())
+                            {
+                                std::cout << "Not considered " << c_it->first ;
+                                std::cout << " energy = " << sampleLayerEnergies[iLayer][iLambda] << std::endl;
+                            }
+                            mu_1_i = result[c_it->first]["mu_1_i"];
+                            tmpDouble = Math::deBoerL0(mu_1_lambda / sinAlphaIn,
+                                                       mu_1_i / sinAlphaOut,
+                                                       sampleLayerMuTotal[iLayer][iLambda],
+                                                       density_1,
+                                                       thickness_1);
+                            tmpDouble *= (0.5/sinAlphaIn);
+                            mapIt = c_it->second.find("rate");
+                            // key = iLayer + " " +
+                            // result[c_it->first][key] =
+                            result[c_it->first]["secondary"] += mapIt->second * tmpDouble;
+                            result[c_it->first]["rate"] += mapIt->second * tmpDouble * \
+                                                           result[c_it->first]["efficiency"];
+
+                        }
+                    }
+                 }
                 if (iLayer < jLayer)
                 {
                     // interlayer case a)
@@ -769,64 +803,15 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                     // interlayer case b)
                 }
             }
-
-            // calculate the transmission of the fluorescent photons in the way back
-            // it will be the same for each incident photon energy ...
-            // in the sample upper layers
-            // in the attenuators
-            // the geometric factor
-            // the detector efficiency
-        }
-        iLayer = sample.size();
-        while(iLayer > 0)
-        {
-            --iLayer;
-            // calculate excitation from top to bottom (case b in de Boer's article)
-            for (jLayer = 0; jLayer < iLayer; jLayer++)
+            // here we are done for the element and the layer
+            key = elementName + " " + lineFamily;
+            for (c_it = result.begin(); c_it != result.end(); ++c_it)
             {
-                // get the mu, density and thickness b terms for each emission from j
-                //mu_d_t_b = 0.0;
-                for (int i = jLayer + 1; i < jLayer; i++)
-                {
-                    // for each fitted element and family
-                    // get binding energy of family
-                    // calculate contribution from all the emitted energies
-                    /*
-                    for (int iEnergy=0; iEnergy < sampleLayerEnergies[i]; iEnergy++)
-                    {
-                    //mu_d_t_b += sampleLayerDensity[i] * sampleLayerThickness[i] * \
-                                    sampleLayerMuTotal[iEnergy];
-
-                    }
-                    */
-                }
+                actualResult[key][iLayer][c_it->first]["rate"] += result[c_it->first]["rate"];
+                actualResult[key][iLayer][c_it->first]["primary"] += result[c_it->first]["primary"];
+                actualResult[key][iLayer][c_it->first]["secondary"] += result[c_it->first]["secondary"];
             }
         }
-
-
-            /*
-            layerPtr = &sample[iLayer];
-            sampleLayerComposition[iLayer] = (*layerPtr).getComposition();
-            for (mapIt = sampleLayerComposition.begin(); \
-                 mapIt != sampleLayerComposition.end(); ++mapIt)
-            {
-                // get excitation factors for each element
-                tmpResult = elementsLibrary.getExcitationFactors(mapIt->first,
-                                                    energies[iRay], weights[iRay]);
-                // and add the energies and rates to the sampleLayerLines
-                for (c_it = tmpResult.begin(); c_it != tmpResult.end(); ++c_it)
-                {
-                    mapIt2 = c_it->second.find("energy");
-                    sampleLayerEnergies[iLayer].push_back(mapIt2->second);
-                    mapIt2 = c_it->second.find("rate");
-                    sampleLayerRates[iLayer].push_back(mapIt2->second * mapIt->second);
-                }
-
-                // the layer
-                sampleLayerMuTotal[iLayer] = (*layerPtr).getMassAttenuationCoefficients( \
-                                                            sampleLayerEnergies[iLayer], \
-                                                            elementsLibrary)["total"];
-            }
-            */
     }
+    return actualResult;
 }
