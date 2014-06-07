@@ -536,13 +536,18 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
     sampleLayerDensity.resize(sample.size());
     sampleLayerThickness.resize(sample.size());
 
-    iRay = energies.size() - 1;
+    iRay = energies.size();
+    std::cout << "element name = " << elementName << " " << lineFamily << std::endl;;
+
+    std::cout << "iRAY = " << iRay << std::endl;
     double weight;
     muTotal.resize(sample.size());
+    weights.resize(actualRays[1].size());
     while (iRay > 0)
     {
         --iRay;
         weights[iRay] = actualRays[1][iRay];
+        std::cout << "secondary = " << secondary << std::endl;
         if (secondary > 0)
         {
             // get the excitation factor for each layer at incident energy
@@ -632,7 +637,6 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
             // here I should loop for all elements and families
             key = elementName + " " + lineFamily;
             // we need to calculate the layer mass attenuation coefficients at the fluorescent energies
-            layerPtr = &sample[iLayer];
             result.clear();
             for (c_it = tmpExcitationFactors.begin(); c_it != tmpExcitationFactors.end(); ++c_it)
             {
@@ -658,8 +662,10 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                     if (actualResult[key][iLayer].find(c_it->first) == actualResult[key][iLayer].end())
                     {
                         // calculate layer mu total at fluorescent energy
+                        std::cout << "CALCULATING mu_1_i for " << c_it->first << " ";
+                        std::cout << "energy " << energy;
                         result[c_it->first]["mu_1_i"] = \
-                                (*layerPtr).getMassAttenuationCoefficients(energy, \
+                                sample[iLayer].getMassAttenuationCoefficients(energy, \
                                                                             elementsLibrary) ["total"];
                         // calculate detection efficiency of fluorescent energy
                         detectionEfficiency = 1.0;
@@ -722,6 +728,10 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
             for (c_it = result.begin(); c_it != result.end(); ++c_it)
             {
                 mapIt = c_it->second.find("mu_1_i");
+                if (mapIt == c_it->second.end())
+                {
+                    throw std::runtime_error("Mass attenuation coefficient not calculated!!!");
+                }
                 mu_1_i = mapIt->second;
                 tmpDouble = (mu_1_lambda / sinAlphaIn) + (mu_1_i / sinAlphaOut);
                 tmpDouble = (1.0 - exp( - tmpDouble * density_1 * thickness_1)) / (tmpDouble * sinAlphaIn);
@@ -729,6 +739,11 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                 result[c_it->first]["rate"] = result[c_it->first]["primary"] * \
                                               result[c_it->first]["efficiency"];
                 result[c_it->first]["secondary"] = 0.0;
+                //std::cout << c_it->first << "efficiency = " << result[c_it->first]["efficiency"] << std::endl;
+                //std::cout << c_it->first << "primary = " << result[c_it->first]["primary"] << std::endl;
+                //std::cout << c_it->first << "rate = " << result[c_it->first]["rate"] << std::endl;
+                std::cout << c_it->first << "energy = " << result[c_it->first]["energy"] << std::endl;
+                std::cout << c_it->first << "mu_1_i = " << result[c_it->first]["mu_1_i"] << std::endl;
             }
 
             /*
@@ -757,50 +772,53 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                 }
             }
             */
-            // calculate secondary
-            for (jLayer = 0; jLayer < sample.size(); jLayer++)
+            if (secondary > 0)
             {
-                //calculate secondary
-                if (iLayer == jLayer)
+                // calculate secondary
+                for (jLayer = 0; jLayer < sample.size(); jLayer++)
                 {
-                    // intralayer secondary
-                    for(iLambda = 0; iLambda < sampleLayerEnergies[iLayer].size(); iLambda++)
+                    //calculate secondary
+                    if (iLayer == jLayer)
                     {
-                        // analogous to incident beam
-                        tmpExcitationFactors = elementsLibrary.getExcitationFactors(elementName, \
-                                    sampleLayerEnergies[iLayer][iLambda], \
-                                    sampleLayerRates[iLayer][iLambda]);
-                        for (c_it = tmpExcitationFactors.begin(); c_it != tmpExcitationFactors.end(); ++c_it)
+                        // intralayer secondary
+                        for(iLambda = 0; iLambda < sampleLayerEnergies[iLayer].size(); iLambda++)
                         {
-                            if (result.find(c_it->first) == result.end())
+                            // analogous to incident beam
+                            tmpExcitationFactors = elementsLibrary.getExcitationFactors(elementName, \
+                                        sampleLayerEnergies[iLayer][iLambda], \
+                                        sampleLayerRates[iLayer][iLambda]);
+                            for (c_it = tmpExcitationFactors.begin(); c_it != tmpExcitationFactors.end(); ++c_it)
                             {
-                                std::cout << "Not considered " << c_it->first ;
-                                std::cout << " energy = " << sampleLayerEnergies[iLayer][iLambda] << std::endl;
-                            }
-                            mu_1_i = result[c_it->first]["mu_1_i"];
-                            tmpDouble = Math::deBoerL0(mu_1_lambda / sinAlphaIn,
-                                                       mu_1_i / sinAlphaOut,
-                                                       sampleLayerMuTotal[iLayer][iLambda],
-                                                       density_1,
-                                                       thickness_1);
-                            tmpDouble *= (0.5/sinAlphaIn);
-                            mapIt = c_it->second.find("rate");
-                            // key = iLayer + " " +
-                            // result[c_it->first][key] =
-                            result[c_it->first]["secondary"] += mapIt->second * tmpDouble;
-                            result[c_it->first]["rate"] += mapIt->second * tmpDouble * \
-                                                           result[c_it->first]["efficiency"];
+                                if (result.find(c_it->first) == result.end())
+                                {
+                                    std::cout << "Not considered " << c_it->first ;
+                                    std::cout << " energy = " << sampleLayerEnergies[iLayer][iLambda] << std::endl;
+                                }
+                                mu_1_i = result[c_it->first]["mu_1_i"];
+                                tmpDouble = Math::deBoerL0(mu_1_lambda / sinAlphaIn,
+                                                           mu_1_i / sinAlphaOut,
+                                                           sampleLayerMuTotal[iLayer][iLambda],
+                                                           density_1,
+                                                           thickness_1);
+                                tmpDouble *= (0.5/sinAlphaIn);
+                                mapIt = c_it->second.find("rate");
+                                // key = iLayer + " " +
+                                // result[c_it->first][key] =
+                                result[c_it->first]["secondary"] += mapIt->second * tmpDouble;
+                                result[c_it->first]["rate"] += mapIt->second * tmpDouble * \
+                                                               result[c_it->first]["efficiency"];
 
+                            }
                         }
+                     }
+                    if (iLayer < jLayer)
+                    {
+                        // interlayer case a)
                     }
-                 }
-                if (iLayer < jLayer)
-                {
-                    // interlayer case a)
-                }
-                if (iLayer > jLayer)
-                {
-                    // interlayer case b)
+                    if (iLayer > jLayer)
+                    {
+                        // interlayer case b)
+                    }
                 }
             }
             // here we are done for the element and the layer
