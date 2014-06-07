@@ -532,6 +532,8 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
 
     sampleLayerEnergies.resize(sample.size());
     sampleLayerRates.resize(sample.size());
+    sampleLayerFamilies.resize(sample.size());
+    sampleLayerPeakFamilies.resize(sample.size());
     sampleLayerMuTotal.resize(sample.size());
     sampleLayerDensity.resize(sample.size());
     sampleLayerThickness.resize(sample.size());
@@ -547,7 +549,6 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
     {
         --iRay;
         weights[iRay] = actualRays[1][iRay];
-        std::cout << "secondary = " << secondary << std::endl;
         if (secondary > 0)
         {
             // get the excitation factor for each layer at incident energy
@@ -662,8 +663,8 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                     if (actualResult[key][iLayer].find(c_it->first) == actualResult[key][iLayer].end())
                     {
                         // calculate layer mu total at fluorescent energy
-                        std::cout << "CALCULATING mu_1_i for " << c_it->first << " ";
-                        std::cout << "energy " << energy;
+                        // std::cout << "CALCULATING mu_1_i for " << c_it->first << " ";
+                        // std::cout << "energy " << energy;
                         result[c_it->first]["mu_1_i"] = \
                                 sample[iLayer].getMassAttenuationCoefficients(energy, \
                                                                             elementsLibrary) ["total"];
@@ -707,6 +708,8 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                     }
                     else
                     {
+                        // std::cout << "USING mu_1_i for " << c_it->first << " ";
+                        // std::cout << "energy " << energy;
                         result[c_it->first]["efficiency"] = \
                                     actualResult[key][iLayer][c_it->first]["efficiency"];
                         result[c_it->first]["energy"] = actualResult[key][iLayer][c_it->first]["energy"];
@@ -742,8 +745,8 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                 //std::cout << c_it->first << "efficiency = " << result[c_it->first]["efficiency"] << std::endl;
                 //std::cout << c_it->first << "primary = " << result[c_it->first]["primary"] << std::endl;
                 //std::cout << c_it->first << "rate = " << result[c_it->first]["rate"] << std::endl;
-                std::cout << c_it->first << "energy = " << result[c_it->first]["energy"] << std::endl;
-                std::cout << c_it->first << "mu_1_i = " << result[c_it->first]["mu_1_i"] << std::endl;
+                //std::cout << c_it->first << "energy = " << result[c_it->first]["energy"] << std::endl;
+                //std::cout << c_it->first << "mu_1_i = " << result[c_it->first]["mu_1_i"] << std::endl;
             }
 
             /*
@@ -791,12 +794,20 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                             {
                                 if (result.find(c_it->first) == result.end())
                                 {
-                                    std::cout << "Not considered " << c_it->first ;
-                                    std::cout << " energy = " << sampleLayerEnergies[iLayer][iLambda] << std::endl;
+                                    // This happens when we look for K lines, but obviously L lines are
+                                    // present
+                                    //std::cout << "Not considered " << c_it->first ;
+                                    //std::cout << " energy = " << sampleLayerEnergies[iLayer][iLambda] << std::endl;
+                                    continue;
                                 }
                                 mu_1_i = result[c_it->first]["mu_1_i"];
                                 tmpDouble = Math::deBoerL0(mu_1_lambda / sinAlphaIn,
                                                            mu_1_i / sinAlphaOut,
+                                                           sampleLayerMuTotal[iLayer][iLambda],
+                                                           density_1,
+                                                           thickness_1);
+                                tmpDouble += Math::deBoerL0(mu_1_i / sinAlphaOut,
+                                                           mu_1_lambda / sinAlphaIn,
                                                            sampleLayerMuTotal[iLayer][iLambda],
                                                            density_1,
                                                            thickness_1);
