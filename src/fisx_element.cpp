@@ -1036,6 +1036,8 @@ double Element::getTransitionEnergy(const std::string & transition) const
         {
 #ifndef NDEBUG
             std::cout << "Fluorescence transition from unset energy shell ";
+            std::cout << " Element = " << this->name;
+            std::cout << "Transition = " << transition << std::endl;
             std::cout << fromShell << "Assuming 3 eV" << std::endl;
 #endif
             energy1 = 0.003;
@@ -1194,8 +1196,11 @@ Element::getXRayLinesFromVacancyDistribution(const std::map<std::string, double>
                     else
                     {
 #ifndef NDEBUG
+                        std::cout << "Element = " << this->name << " ";
+                        std::cout << "Fluorescence transition " << c_it->first << std::endl;
                         std::cout << "rate = " << rate << std::endl;
                         std::cout << "Fluorescence transition from unset energy shell ";
+                        std::cout << " destination shell energy = " << energy0 << std::endl;
                         std::cout << tmpString << "Assuming 3 eV" << std::endl;
 #endif
                         energy1 = 0.003;
