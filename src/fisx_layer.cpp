@@ -118,10 +118,14 @@ double Layer::getTransmission(const double & energy, const Elements & elements, 
     else
     {
         if (angle < 0)
+        {
             tmpDouble = sin(-angle * PI / 180.);
+        }
         else
-            tmpDouble = sin(-angle * PI / 180.);
-        tmpDouble /= this->density * this->thickness;
+        {
+            tmpDouble = sin(angle * PI / 180.);
+        }
+        tmpDouble = (this->density * this->thickness) / tmpDouble;
     }
     if(tmpDouble <= 0.0)
     {
