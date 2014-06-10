@@ -47,10 +47,22 @@ class Math
 
         /*!
         For multilayers
+        p and q following article
+        d1 is the product density * thickness of fluorescing layer
+        d2 is the product density * thickness of layer j originating the secondary excitation
+        mu_1_j is the mass attenuation coefficient of fluorescing layer at j excitation energy
+        mu_2_j is the mass attenuation coefficient of layer j at j excitation energy
+        mu_b_d_t is the sum of the products mu * density * thickness of layers between layer i and j
         */
-        static double deBoerX(const double & p, const double & q, const double & d1, const double & d2);
+        static double deBoerX(const double & p, const double & q, \
+                              const double & d1, const double & d2, \
+                              const double & mu_1_j, const double & mu_2_j, \
+                              const double & mu_b_j_d_t = 0.0);
 
-        static double deBoerV(const double & p, const double & q, const double & d1, const double & d2);
+        static double deBoerV(const double & p, const double & q, \
+                              const double & d1, const double & d2, \
+                              const double & mu_1_j, const double & mu_2_j, \
+                              const double & mu_b_j_d_t);
 
         /*!
         Help function, see formula A2a appendix

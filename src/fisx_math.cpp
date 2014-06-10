@@ -125,20 +125,23 @@ double Math::deBoerL0(const double & mu1, const double & mu2, const double & muj
     return tmpDouble;
 }
 
-double Math::deBoerX(const double & p, const double & q, const double & d1, const double & d2)
+double Math::deBoerX(const double & p, const double & q, const double & d1, const double & d2, \
+                     const double & mu_1_j, const double & mu_2_j, const double & mu_b_j_d_t)
 {
-    return Math::deBoerV(p, q, d1, d2) - Math::deBoerV(p, q, d1, 0.0) \
-                                       - Math::deBoerV(p, q, 0.0, d2) + Math::deBoerV(p, q, 0.0, 0.0);
+    return Math::deBoerV(p, q, d1, d2, mu_1_j, mu_2_j, mu_b_j_d_t) - \
+           Math::deBoerV(p, q, d1, 0.0, mu_1_j, mu_2_j, mu_b_j_d_t) - \
+           Math::deBoerV(p, q, 0.0, d2, mu_1_j, mu_2_j, mu_b_j_d_t) + \
+           Math::deBoerV(p, q, 0.0, 0.0, mu_1_j, mu_2_j, mu_b_j_d_t);
 }
 
-double Math::deBoerV(const double & p, const double & q, const double & d1, const double & d2)
+double Math::deBoerV(const double & p, const double & q, const double & d1, const double & d2, \
+                     const double & mu1j, const double & mu2j, const double & mubjdt)
 {
-    double mu1j, mu2j, mubj, db;
     double tmpDouble1;
     double tmpDouble2;
 
     // case V(0,0) with db equal to 0
-    if ((db == 0) && (p == 0) && (q == 0))
+    if ((mubjdt == 0) && (p == 0) && (q == 0))
     {
         tmpDouble2 = (mu2j / p) * std::log(1.0 + (p / mu2j));
         tmpDouble1 =  1.0 - (q / mu1j);
@@ -158,11 +161,11 @@ double Math::deBoerV(const double & p, const double & q, const double & d1, cons
     // X (p, q, d1, inf)X (p, q, d1, inf) is about (d1/p) * std::log(1.0 + (p/mu2j))
 
 
-    tmpDouble1 = Math::deBoerD((1.0 + (p / mu2j)) * (mu1j*d1 + mubj * db + mu2j*d2));
+    tmpDouble1 = Math::deBoerD((1.0 + (p / mu2j)) * (mu1j*d1 + mubjdt + mu2j*d2));
     tmpDouble1 *= (mu2j /(p * (p * mu1j + q * mu2j)));
-    tmpDouble1 *= std::exp((q - mu1j) * d1 - (p + mu2j) * d2 -mubj * db);
+    tmpDouble1 *= std::exp((q - mu1j) * d1 - (p + mu2j) * d2 -mubjdt);
 
-    tmpDouble2 = mu1j * d1 + mubj * db + mu2j * d2;
+    tmpDouble2 = mu1j * d1 + mubjdt + mu2j * d2;
     tmpDouble2 = ((mu1j / (q * (p * mu1j + q * mu2j))) * Math::deBoerD(( 1.0 - (q/mu1j)) * tmpDouble2)) - \
                  (Math::deBoerD(tmpDouble2)/(p * q));
 
