@@ -65,6 +65,16 @@ class Math
                               const double & mu_b_j_d_t);
 
         /*!
+        Returns false is x is NaN
+        */
+        static bool isNumber(const double & x);
+
+        /*!
+        Returns false is x is NaN or an infinite number
+        */
+        static bool isFiniteNumber(const double & x);
+
+        /*!
         Help function, see formula A2a appendix
         */
         static double Y(double a, double b, double c, double d);

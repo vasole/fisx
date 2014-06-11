@@ -1,5 +1,6 @@
 #include "fisx_math.h"
 #include <cmath>
+#include <cfloat>
 #include <stdexcept>
 #include <iostream>
 
@@ -91,15 +92,51 @@ double Math::deBoerL0(const double & mu1, const double & mu2, const double & muj
     double d;
     double tmpDouble;
 
+    if (!Math::isFiniteNumber(mu1))
+    {
+        std::cout << "mu1 = " << mu1 << std::endl;
+        throw std::runtime_error("Math::deBoerL0. Received not finite mu1 < 0");
+    }
+    if (!Math::isFiniteNumber(mu2))
+    {
+        std::cout << "mu2 = " << mu2 << std::endl;
+        throw std::runtime_error("Math::deBoerL0. Received not finite mu2 < 0");
+    }
+    if (!Math::isFiniteNumber(muj))
+    {
+        std::cout << "muj = " << muj << std::endl;
+        throw std::runtime_error("Math::deBoerL0. Received non finite muj < 0");
+    }
+
     // express the thickness in g/cm2
     d = thickness * density;
-/*
-    if (d <= 0.0)
+    if (((mu1 + mu2) * d) > 10.)
     {
         // thick target
-        return (muj/mu1) * std::log(1 + mu1/muj);
+        tmpDouble = (muj/mu1) * std::log(1 + mu1/muj) / ((mu1 + mu2) * muj);
+        //std::cout << "THICK TARGET = " << tmpDouble << std::endl;
+        return tmpDouble;
     }
-*/
+    std::cout << " (mu1 + mu2) * d = " << (mu1 + mu2) * d << std::endl;
+    if (((mu1 + mu2) * d) < 0.01)
+    {
+        // thin target, neglect enhancement
+        //std::cout << "Very thin target, not considered = " << 0.0 << std::endl;
+        return 0.0;
+    }
+
+    /*
+    if ((muj * d) < 1)
+    {
+        // thin target (this approximation only gives the order of magnitude.
+        // it is not as good as the thick target one
+        std::cout << " d = " << d << " muj * d " << muj * d << " ";
+        tmpDouble = -0.5 * (muj * d) * std::log(muj * d) / ((mu1 + mu2) * muj);
+        tmpDouble *= (1.0 - exp(-(mu1 + mu2) * d));
+        std::cout << "THIN TARGET = " << tmpDouble << std::endl;
+    }
+    */
+
     // deal with the problematic term
     tmpDouble = (muj - mu2) * d;
     if (tmpDouble > 0.0)
@@ -110,7 +147,7 @@ double Math::deBoerL0(const double & mu1, const double & mu2, const double & muj
     {
         tmpDouble = 0.0;
     }
-    tmpDouble = -(Math::deBoerD(muj * d) / (mu1 * mu2)) + \
+    tmpDouble = tmpDouble -(Math::deBoerD(muj * d) / (mu1 * mu2)) + \
                  (Math::deBoerD((muj + mu1) * d) / (mu1 * (mu1 + mu2)));
     tmpDouble *= std::exp(-(mu1 + muj) * d);
 
@@ -121,7 +158,7 @@ double Math::deBoerL0(const double & mu1, const double & mu2, const double & muj
         tmpDouble += (std::exp(-(mu1 + mu2) * d) / (mu2 * (mu1 + mu2))) * \
                       std::log(1.0 - (mu2 / muj));
     }
-
+    std::cout << "CALCULATED = " << tmpDouble << std::endl;
     return tmpDouble;
 }
 
@@ -170,4 +207,14 @@ double Math::deBoerV(const double & p, const double & q, const double & d1, cons
                  (Math::deBoerD(tmpDouble2)/(p * q));
 
     return tmpDouble1 + tmpDouble2;
+}
+
+bool Math::isNumber(const double & x)
+{
+    return (x == x);
+}
+
+bool Math::isFiniteNumber(const double & x)
+{
+    return (x <= DBL_MAX && x >= -DBL_MAX);
 }
