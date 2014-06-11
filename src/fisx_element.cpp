@@ -1,4 +1,5 @@
 #include "fisx_element.h"
+#include "fisx_math.h"
 #include <iostream>
 #include <math.h>
 #include <stdexcept>
@@ -263,7 +264,7 @@ std::map<std::string, double> Element::getMassAttenuationCoefficients(const doub
         }
     }
 
-    //std::cout << "Calling interpolation" <<std::endl;
+    // std::cout << "Calling interpolation" <<std::endl;
     indices = this->getInterpolationIndices(this->muEnergy, energy);
 
     i1 = indices.first;
@@ -296,7 +297,7 @@ std::map<std::string, double> Element::getMassAttenuationCoefficients(const doub
     result["energy"] = energy;
     if ((i1 == i2) ||((x1 - x0) < 5.E-10))
     {
-        //std::cout << "case a" <<std::endl;
+        // std::cout << "case a" <<std::endl;
         //std::cout << "x0, x1 " << x0 << " " << x1 << " energy = " << energy <<std::endl;
         for (c_it = this->mu.begin(); c_it != this->mu.end(); ++c_it)
         {
@@ -310,7 +311,7 @@ std::map<std::string, double> Element::getMassAttenuationCoefficients(const doub
     else
     {
         // y = exp(( log(y0)*log(x1/x) + log(y1)*log(x/x0)) / log(x1/x0))
-        //std::cout << "case b" <<std::endl;
+        // std::cout << "case b" <<std::endl;
         B = 1.0 / log( x1 / x0);
         A = log(x1/energy) * B;
         B *= log( energy / x0);
@@ -349,7 +350,16 @@ std::map<std::string, double> Element::getMassAttenuationCoefficients(const doub
                 result["all other"]);
 
     result["total"] = result["photoelectric"] + result["coherent"] + result["compton"] + result["pair"];
-
+    if (!Math::isFiniteNumber(result["total"]))
+    {
+        std::cout << "element = " << this->name << std::endl;
+        std::cout << "energy = " << energy << std::endl;
+        std::cout << "Photo = " << result["photoelectric"] << std::endl;
+        std::cout << "coherent = " << result["coherent"] << std::endl;
+        std::cout << "compton = " << result["compton"] << std::endl;
+        std::cout << "pair = " << result["pair"] << std::endl;
+        throw std::runtime_error("Invalid total mass attenuation coefficient");
+    }
     return result;
 }
 
@@ -588,8 +598,8 @@ std::map<std::string, double> \
         i2 = indices.second;
         x0 = c_it->second[i1];
         x1 = c_it->second[i2];
-        // std::cout << "partials i1, i2 " << i1 << " " << i2 <<std::endl;
-        // std::cout << "partials x0, x1 " << x0 << " " << x1 <<std::endl;
+        //std::cout << "partials i1, i2 " << i1 << " " << i2 <<std::endl;
+        //std::cout << "partials x0, x1 " << x0 << " " << x1 <<std::endl;
         if (energy == x1)
         {
             if ((i2 + 1) < ((int) c_it->second.size()))
@@ -634,7 +644,7 @@ std::map<std::string, double> \
                         // according to the binding energies, the shell is excited, but the
                         // respective mass attenuation is zero. We have to extrapolate
                         i1w = i1;
-                        while(c_it->second[i1w] <= 0.0)
+                        while(y_it->second[i1w] <= 0.0)
                         {
                             i1w += 1;
                         }
@@ -683,6 +693,7 @@ std::map<std::string, double> \
                 // we are dealing with a shell
                 if (y0 > 0.0)
                 {
+                    // std::cout << "case b1" << std::endl;
                     // usual interpolation case
                     // the shell is excited and the photoelectric coefficient is positive
                     result[shell] = exp(A * log(y0) + B * log(y1));
@@ -691,8 +702,9 @@ std::map<std::string, double> \
                 {
                     // according to the binding energies, the shell is excited, but the
                     // respective mass attenuation is zero. We have to extrapolate
+                    //  std::cout << "case b2" << std::endl;
                     i1w = i1;
-                    while(c_it->second[i1w] <= 0.0)
+                    while(y_it->second[i1w] <= 0.0)
                     {
                         i1w += 1;
                     }
@@ -707,6 +719,15 @@ std::map<std::string, double> \
                     result[shell] = exp(A * log(y0) + B * log(y1));
                 }
             }
+        }
+        if (!Math::isFiniteNumber(result[shell]))
+        {
+            std::cout << "energy " << energy << std::endl;
+            std::cout << "i1 " << i1 << " i2 " << i2 << std::endl;
+            std::cout << "A " << A << " B " << B << std::endl;
+            std::cout << "x0 " << x0 << " x1 " << x1 << std::endl;
+            std::cout << "y0 " << y0 << " y1 " << y1 << std::endl;
+            throw std::runtime_error("Partial photoelectric coefficient is not finite");
         }
     }
 
@@ -1035,10 +1056,13 @@ double Element::getTransitionEnergy(const std::string & transition) const
         else
         {
 #ifndef NDEBUG
-            std::cout << "Fluorescence transition from unset energy shell ";
-            std::cout << " Element = " << this->name;
-            std::cout << "Transition = " << transition << std::endl;
-            std::cout << fromShell << "Assuming 3 eV" << std::endl;
+            if (0)
+            {
+                std::cout << "Fluorescence transition from unset energy shell ";
+                std::cout << " Element = " << this->name;
+                std::cout << "Transition = " << transition << std::endl;
+                std::cout << fromShell << "Assuming 3 eV" << std::endl;
+            }
 #endif
             energy1 = 0.003;
         }
@@ -1196,12 +1220,15 @@ Element::getXRayLinesFromVacancyDistribution(const std::map<std::string, double>
                     else
                     {
 #ifndef NDEBUG
+                        if (0)
+                        {
                         std::cout << "Element = " << this->name << " ";
                         std::cout << "Fluorescence transition " << c_it->first << std::endl;
                         std::cout << "rate = " << rate << std::endl;
                         std::cout << "Fluorescence transition from unset energy shell ";
                         std::cout << " destination shell energy = " << energy0 << std::endl;
                         std::cout << tmpString << "Assuming 3 eV" << std::endl;
+                        }
 #endif
                         energy1 = 0.003;
                     }
