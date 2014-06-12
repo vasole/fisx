@@ -12,16 +12,25 @@ double Math::E1(const double & x)
     }
     if(x < 1)
     {
-        return Math::AS_5_1_53(x);
+        return Math::AS_5_1_53(x) - log(x);
     }
     else
     {
-        return Math::AS_5_1_56(x);
+        if (0)
+        {
+            // rational approximation is less accurate
+            return Math::AS_5_1_56(x) / (x * exp(x));
+        }
+        else
+        {
+            return exp(-x) * Math::_deBoerD(x);
+        }
     }
 }
 
 double Math::AS_5_1_53(const double & x)
 {
+    // Returns E1(x) + log(x)
     // Euler's gamma = 0.577215664901532860
     double a[6] = {-0.57721566, 0.99999193, -0.24991055,\
                     0.05519968, -0.00976004, 0.00107857};
@@ -37,12 +46,13 @@ double Math::AS_5_1_53(const double & x)
     {
         result = (result + a[i]) * x;
     }
-    result = result + a[0] - std::log(x);
+    result = result + a[0];
     return result;
 }
 
 double Math::AS_5_1_56(const double & x)
 {
+    // Returns x * exp(x) * E1(x)
     double a[4] = {8.5733287401, 18.0590169730, 8.6347608925, 0.2677737343};
     double b[4] = {9.5733223454, 25.6329561486, 21.0996530827, 3.9584969228};
     double num, den, result;
@@ -58,31 +68,46 @@ double Math::AS_5_1_56(const double & x)
         num = (num + a[i]) * x;
         den = (den + b[i]) * x;
     }
-    result = (num / den) * (std::exp(-x)/x);
+    result = (num / den);
     return result;
 }
 
 double Math::deBoerD(const double & x)
 {
-    if  (x > 1)
+
+#ifndef NDEBUG
+    // AS 5.1.19
+    // 1 / (x + 1) < exp(x) * E1(x) < (1.0 /x)
+    // AS 5.1.20
+    // 0.5 * log(1 + 2.0/x) < exp(x) * E1(x) < log(1 + 1.0 /x)
+    double tmpResult;
+    double limit0, limit1;
+    if (x > 1)
     {
-        // follow AS_5_1_56
-        double a[4] = {8.5733287401, 18.0590169730, 8.6347608925, 0.2677737343};
-        double b[4] = {9.5733223454, 25.6329561486, 21.0996530827, 3.9584969228};
-        double num, den;
-        num = x;
-        den = x;
-        for (int i = 4; i > 0; --i)
-        {
-            num = (num + a[i]) * x;
-            den = (den + b[i]) * x;
-        }
-        return (num/den)/x;
+        tmpResult = Math::_deBoerD(x);
+        //tmpResult = Math::AS_5_1_56(x) / x;
     }
     else
+        tmpResult = std::exp(x) * (Math::AS_5_1_53(x) - log(x));
+    limit0 = 0.5 * log(1 + 2.0/x);
+    limit1 = log(1 + 1.0 /x);
+    if ((tmpResult < limit0) || (tmpResult > limit1))
     {
-        return std::exp(x) * Math::AS_5_1_53(x);
+        std::cout << "deBoerD error with x = " << x << std::endl;
+        std::cout << "old result = " << Math::AS_5_1_56(x) / x << std::endl;
+        std::cout << "new result = " << Math::_deBoerD(x, 1.0e-5) << std::endl;
+        std::cout << "limit0 = " << limit0 << std::endl;
+        std::cout << "limit1 = " << limit1 << std::endl;
     }
+    return tmpResult;
+#else
+    if (x > 1)
+    {
+        return Math::_deBoerD(x);
+    }
+    else
+        return std::exp(x) * (Math::AS_5_1_53(x) - log(x));
+#endif
 }
 
 
@@ -92,6 +117,7 @@ double Math::deBoerL0(const double & mu1, const double & mu2, const double & muj
     double d;
     double tmpDouble;
 
+    /*
     if (!Math::isFiniteNumber(mu1))
     {
         std::cout << "mu1 = " << mu1 << std::endl;
@@ -107,6 +133,7 @@ double Math::deBoerL0(const double & mu1, const double & mu2, const double & muj
         std::cout << "muj = " << muj << std::endl;
         throw std::runtime_error("Math::deBoerL0. Received non finite muj < 0");
     }
+    */
 
     // express the thickness in g/cm2
     d = thickness * density;
@@ -117,7 +144,7 @@ double Math::deBoerL0(const double & mu1, const double & mu2, const double & muj
         //std::cout << "THICK TARGET = " << tmpDouble << std::endl;
         return tmpDouble;
     }
-    std::cout << " (mu1 + mu2) * d = " << (mu1 + mu2) * d << std::endl;
+    // std::cout << " (mu1 + mu2) * d = " << (mu1 + mu2) * d << std::endl;
     if (((mu1 + mu2) * d) < 0.01)
     {
         // thin target, neglect enhancement
@@ -158,7 +185,14 @@ double Math::deBoerL0(const double & mu1, const double & mu2, const double & muj
         tmpDouble += (std::exp(-(mu1 + mu2) * d) / (mu2 * (mu1 + mu2))) * \
                       std::log(1.0 - (mu2 / muj));
     }
-    std::cout << "CALCULATED = " << tmpDouble << std::endl;
+    if (tmpDouble < 0)
+    {
+        std::cout << "CALCULATED = " << tmpDouble << std::endl;
+        std::cout << " mu1 = " << mu1 << std::endl;
+        std::cout << " mu2 = " << mu2 << std::endl;
+        std::cout << " muj = " << muj << std::endl;
+        std::cout << " d = " << d << std::endl;
+    }
     return tmpDouble;
 }
 
@@ -217,4 +251,58 @@ bool Math::isNumber(const double & x)
 bool Math::isFiniteNumber(const double & x)
 {
     return (x <= DBL_MAX && x >= -DBL_MAX);
+}
+
+double Math::_deBoerD(const double &x, const double & epsilon, const int & maxIter)
+{
+    // Evaluate exp(x) * E1(x) for x > 1
+    //
+    // Adapted from continued fraction expression of En(x) from Mathematica wb site
+    //
+    // Modified Lentz algorithm following Numerical Recipes description
+    //
+    double f, D, C;
+    // double tiny = 1.0e-30; not needed, we never get 0 denominator.
+    double a, b, delta;
+
+    if (x <= 1)
+    {
+        std::cout << "x = " << x << std::endl;
+        throw std::runtime_error("_deBoerD algorithm converges for x > 1");
+    }
+
+    // In the Lentz algorithm, we have to provide b0, b(i) and a(i) for i = 1, ...
+    // The rest of the algorithm is the same for each function
+    //b = 1 + x;  // b0
+    b = 1 + x;
+    f = b;          // f = b0
+    C = f;          // C = f0
+    D = 0.0;        // D = 0.0
+    for (int i = 1; i < maxIter; i++)
+    {
+        b = b + 2;      // b(i) = x + 2 * i + 1;
+        a = - i * i;    // a(i) = - (i * i)
+        C = b + a / C;              // C(i) = b(i) + a(i) / C(i-1)
+        //if (C == 0)   // This check is not needed
+        //    C = tiny;
+        D = b + a * D;  // D(i) = b(i) - a(i) * D(i-1)
+        //if (D == 0)   // This check is not needed
+        //    D = tiny;
+        D = 1.0 / D;
+        delta = C * D;
+        f *= delta;
+        if (std::abs(delta - 1) < epsilon)
+        {
+            // The continued fraction is already summed in f
+            // adapt to what we want to calculate
+            return 1.0 / f;
+        }
+    }
+
+    std::cout << " Continued fraction failed to converge for x = " << x << std::endl;
+    // return average of quoted values
+    double limit0, limit1;
+    limit0 = 0.5 * log(1 + 2.0/x);
+    limit1 = log(1 + 1.0 /x);
+    return 0.5 * (limit0 + limit1);
 }

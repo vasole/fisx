@@ -86,13 +86,29 @@ class Math
 
         /*!
         Abramowitz and Stegun formula 5.1.53
+        Returns E1(x) + log(x)
+        Formula is valid for 0 <= x <= 1
         */
         static double AS_5_1_53(const double & x);
 
         /*!
         Abramowitz and Stegun formula 5.1.56
+        Returns x * exp(x) * E1(x)
+        Formula is valid for 1 <= x < +inf
         */
         static double AS_5_1_56(const double & x);
-};
+    private:
+        /*!
+        Evaluate exp(x) * E1(x) for x > 1
 
+        This makes use of the continued fraction expandion of E1(x) derived from
+        Mathematica web site expression for En(z).
+
+        The modified Lenz algorithm is implemented as described in Numerical
+        Recipes.
+        */
+        static double _deBoerD(const double &x, \
+                        const double & epsilon = 1.0e-7, \
+                        const int & maxIter = 100);
+};
 #endif // FISX_DEBOER_H
