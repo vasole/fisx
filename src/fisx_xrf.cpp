@@ -3,6 +3,8 @@
 #include <cmath>
 #include <stdexcept>
 #include <iostream>
+#include <sstream>
+#include <iomanip>
 
 XRF::XRF()
 {
@@ -124,6 +126,7 @@ std::map<std::string, std::map<std::string, double> > XRF::getFluorescence(const
     double sinAlphaIn = sin(alphaIn*(PI/180.));
     double sinAlphaOut = sin(alphaOut*(PI/180.));
     double tmpDouble;
+    std::string tmpString;
 
     if (actualRays.size() == 0)
     {
@@ -258,6 +261,7 @@ std::map<std::string, std::map<std::string, double> > XRF::getFluorescence(const
     std::map<std::string, double> muTotalFluo;
     std::map<std::string, double> detectionEfficiency;
     std::vector<double> sampleLayerEnergies;
+    std::vector<std::string> sampleLayerEnergyNames;
     std::vector<double> sampleLayerRates;
     std::vector<double> sampleLayerMuTotal;
     std::vector<double>::size_type iLambda;
@@ -270,6 +274,7 @@ std::map<std::string, std::map<std::string, double> > XRF::getFluorescence(const
         if (secondary > 0)
         {
             sampleLayerEnergies.clear();
+            sampleLayerEnergyNames.clear();
             sampleLayerRates.clear();
             sampleLayerMuTotal.clear();
             layerPtr = &sample[sampleLayerIndex];
@@ -286,6 +291,8 @@ std::map<std::string, std::map<std::string, double> > XRF::getFluorescence(const
                     sampleLayerEnergies.push_back(mapIt2->second);
                     mapIt2 = c_it->second.find("rate");
                     sampleLayerRates.push_back(mapIt2->second * mapIt->second);
+                    tmpString = mapIt->first + " " + c_it->first;
+                    sampleLayerEnergyNames.push_back(tmpString);
                 }
                 sampleLayerMuTotal = (*layerPtr).getMassAttenuationCoefficients(sampleLayerEnergies, \
                                                                     elementsLibrary)["total"];
@@ -304,7 +311,7 @@ std::map<std::string, std::map<std::string, double> > XRF::getFluorescence(const
                 mapIt = c_it->second.find("energy");
                 muTotalFluo[c_it->first] = (*layerPtr).getMassAttenuationCoefficients( \
                                                                 mapIt->second, \
-                                                                elementsLibrary)["total"] / sinAlphaOut;
+                                                elementsLibrary)["total"] / sinAlphaOut;
             }
             // calculate the transmission of the fluorescence photon in the way back.
             // it will be the same for each incident energy.
@@ -377,6 +384,8 @@ std::map<std::string, std::map<std::string, double> > XRF::getFluorescence(const
             for(iLambda = 0; iLambda < sampleLayerEnergies.size(); iLambda++)
             {
                 // analogous to incident beam
+                //if (sampleLayerEnergies[iLambda] < this->getEnergyThreshold(elementName, lineFamily, elementsLibrary))
+                //    continue;
                 tmpResult = elementsLibrary.getExcitationFactors(elementName, \
                             sampleLayerEnergies[iLambda], sampleLayerRates[iLambda]);
                 for (c_it = tmpResult.begin(); c_it != tmpResult.end(); ++c_it)
@@ -521,6 +530,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
     }
 
     std::vector<std::vector<double> >sampleLayerEnergies;
+    std::vector<std::vector<std::string> > sampleLayerEnergyNames;
     std::vector<std::vector<double> >sampleLayerRates;
     std::vector<std::vector<double> >sampleLayerMuTotal;
     std::map<std::string, double> sampleLayerComposition;
@@ -533,6 +543,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
     std::vector<double> sampleLayerWeight;
 
     sampleLayerEnergies.resize(sample.size());
+    sampleLayerEnergyNames.resize(sample.size());
     sampleLayerRates.resize(sample.size());
     sampleLayerFamilies.resize(sample.size());
     sampleLayerPeakFamilies.resize(sample.size());
@@ -573,6 +584,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
             for(iLayer = 0; iLayer < sample.size(); iLayer++)
             {
                 sampleLayerEnergies[iLayer].clear();
+                sampleLayerEnergyNames[iLayer].clear();
                 sampleLayerRates[iLayer].clear();
                 sampleLayerFamilies[iLayer].clear();
                 sampleLayerMuTotal[iLayer].clear();
@@ -601,7 +613,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                     // and add the energies and rates to the sampleLayerLines
                     for (c_it = tmpResult.begin(); c_it != tmpResult.end(); ++c_it)
                     {
-                        // be carefull not to add twice a ceerting element
+                        // be carefull not to add twice an element
                         if (c_it->first.compare(0, family.length(), family) == 0)
                         {
                             mapIt2 = c_it->second.find("energy");
@@ -610,6 +622,9 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                             sampleLayerRates[iLayer].push_back(mapIt2->second *
                                                                sampleLayerComposition[ele]);
                             sampleLayerFamilies[iLayer].push_back(iString);
+                            sampleLayerEnergyNames[iLayer].push_back(ele + \
+                                                                     " " +\
+                                                                     c_it->first);
                         }
                     }
                 }
@@ -648,6 +663,8 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
         double mu_1_j;
         // elementName is the element to be analyzed
         // lineFamily is the family of  elementName X-ray lines to be considered
+        double energyThreshold;
+
         // this line can be moved out of the loop
         std::map<std::string, std::map<std::string, double> > tmpExcitationFactors;
         std::map<std::string, std::map<std::string, double> >::const_iterator c_it;
@@ -657,6 +674,8 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
         double detectionEfficiency;
         double energy;
         std::string key;
+        std::string tmpString;
+        std::ostringstream tmpStringStream;
         tmpExcitationFactors = elementsLibrary.getExcitationFactors(elementName, \
                                                                     energies[iRay], \
                                                                     weights[iRay]);
@@ -687,6 +706,18 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                     result[c_it->first]["rate"] = mapIt->second;
                     mapIt = c_it->second.find("factor");
                     result[c_it->first]["factor"] = mapIt->second;
+                    if (c_it->first.size() == 4)
+                    {
+                        energyThreshold = this->getEnergyThreshold(elementName,
+                                                                            c_it->first.substr(0, 2),
+                                                                            elementsLibrary);
+                    }
+                    else
+                    {
+                        energyThreshold = this->getEnergyThreshold(elementName,
+                                                                        c_it->first.substr(0, 1),
+                                                                        elementsLibrary);
+                    }
                     if (actualResult[key][iLayer].find(c_it->first) == actualResult[key][iLayer].end())
                     {
                         // calculate layer mu total at fluorescent energy
@@ -726,9 +757,12 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                                                                    elementsLibrary, \
                                                                                    90.0));
                         }
+                        result[c_it->first]["energy_threshold"] = energyThreshold;
                         result[c_it->first]["efficiency"] = detectionEfficiency;
                         actualResult[key][iLayer][c_it->first]["efficiency"] = detectionEfficiency;
                         actualResult[key][iLayer][c_it->first]["energy"] = energy;
+                        actualResult[key][iLayer][c_it->first]["energy_threshold"] = energyThreshold;
+                        actualResult[key][iLayer][c_it->first]["mu_1_i"] = result[c_it->first]["mu_1_i"];
                         actualResult[key][iLayer][c_it->first]["rate"] = 0.0;
                         actualResult[key][iLayer][c_it->first]["primary"] = 0.0;
                         actualResult[key][iLayer][c_it->first]["secondary"] = 0.0;
@@ -740,6 +774,8 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                         result[c_it->first]["efficiency"] = \
                                     actualResult[key][iLayer][c_it->first]["efficiency"];
                         result[c_it->first]["energy"] = actualResult[key][iLayer][c_it->first]["energy"];
+                        result[c_it->first]["energy_threshold"] = \
+                                                actualResult[key][iLayer][c_it->first]["energy_threshold"];
                         result[c_it->first]["mu_1_i"] = actualResult[key][iLayer][c_it->first]["mu_1_i"];
                     }
                 }
@@ -829,6 +865,13 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                     //std::cout << " energy = " << sampleLayerEnergies[iLayer][iLambda] << std::endl;
                                     continue;
                                 }
+                                energyThreshold = result[c_it->first]["energy_threshold"];
+                                if (sampleLayerEnergies[iLayer][iLambda] < energyThreshold)
+                                {
+                                    mapIt = c_it->second.find("rate");
+                                    std::cout << " SKIPPING rate = " << mapIt->second << std::endl;
+                                    continue;
+                                }
                                 mu_1_i = result[c_it->first]["mu_1_i"];
                                 tmpDouble = Math::deBoerL0(mu_1_lambda / sinAlphaIn,
                                                            mu_1_i / sinAlphaOut,
@@ -842,17 +885,48 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                                            thickness_1);
                                 tmpDouble *= (0.5/sinAlphaIn);
                                 mapIt = c_it->second.find("rate");
-                                // key = iLayer + " " +
-                                // result[c_it->first][key] =
-                                result[c_it->first]["secondary"] += mapIt->second * tmpDouble;
-                                result[c_it->first]["rate"] += mapIt->second * tmpDouble * \
+                                tmpDouble *= mapIt->second;
+                                tmpStringStream.str(std::string());
+                                tmpStringStream.clear();
+                                tmpStringStream << std::setfill('0') << std::setw(2) << iLayer;
+                                tmpString = sampleLayerEnergyNames[iLayer][iLambda] + " " + tmpStringStream.str();
+                                actualResult[elementName + " " + lineFamily][iLayer][c_it->first][tmpString] = \
+                                                                                                tmpDouble;
+                                result[c_it->first]["secondary"] += tmpDouble;
+                                result[c_it->first]["rate"] += tmpDouble * \
                                                                result[c_it->first]["efficiency"];
-
+                                /*
+                                if ((sampleLayerEnergyNames[iLayer][iLambda] == "Fe KL2") || \
+                                    (sampleLayerEnergyNames[iLayer][iLambda] == "Fe KL3"))
+                                {
+                                    std::cout << c_it->first << " FROM ";
+                                    std::cout << sampleLayerEnergyNames[iLayer][iLambda] << std::endl;
+                                    std::cout << "Enhancement = ";
+                                    std::cout << tmpDouble/result[c_it->first]["primary"] << std::endl;
+                                    std::cout << "mu1 " << mu_1_lambda / sinAlphaIn << std::endl;
+                                    std::cout << "mu2 " << mu_1_i / sinAlphaOut << std::endl;
+                                    std::cout << "muj " << sampleLayerMuTotal[iLayer][iLambda] << std::endl;
+                                    std::cout << "L0 = " << Math::deBoerL0(mu_1_lambda / sinAlphaIn,
+                                                           mu_1_i / sinAlphaOut,
+                                                           sampleLayerMuTotal[iLayer][iLambda],
+                                                           density_1,
+                                                           thickness_1) << std::endl;
+                                    std::cout << "mu1 " << mu_1_i / sinAlphaOut << std::endl;
+                                    std::cout << "mu2 " << mu_1_lambda / sinAlphaIn << std::endl;
+                                    std::cout << "muj " << sampleLayerMuTotal[iLayer][iLambda] << std::endl;
+                                    std::cout << "L0 = " << Math::deBoerL0(mu_1_i / sinAlphaOut,
+                                                           mu_1_lambda / sinAlphaIn,
+                                                           sampleLayerMuTotal[iLayer][iLambda],
+                                                           density_1,
+                                                           thickness_1) << std::endl;
+                                }
+                                */
                             }
                         }
                      }
                      else
                     {
+                        continue;
                         mu_2_lambda = muTotal[jLayer];
                         density_2 = sampleLayerDensity[jLayer];
                         thickness_2 = sampleLayerThickness[jLayer];
@@ -921,4 +995,36 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
         }
     }
     return actualResult;
+}
+
+double XRF::getEnergyThreshold(const std::string & elementName, const std::string & family, \
+                                const Elements & elementsLibrary) const
+{
+    std::map<std::string, double> binding;
+    binding = elementsLibrary.getElementBindingEnergies(elementName);
+    if ((family == "K") || (family.size() == 2))
+        return binding[family];
+
+    if (family == "L")
+    {
+        if (binding["L3"] > 0)
+            return binding["L3"];
+        if (binding["L2"] > 0)
+            return binding["L2"];
+        return binding["L1"]; // It can be 0.0
+    }
+
+    if (family == "M")
+    {
+        if (binding["M5"] > 0)
+            return binding["M5"];
+        if (binding["M4"] > 0)
+            return binding["M4"];
+        if (binding["M3"] > 0)
+            return binding["M3"];
+        if (binding["M2"] > 0)
+            return binding["M2"];
+        return binding["M1"]; // It can be 0.0
+    }
+    return 0.0;
 }

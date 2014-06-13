@@ -161,6 +161,10 @@ public:
                 const int & useGeometricEfficiency = 1);
 
 
+    double getEnergyThreshold(const std::string & elementName, const std::string & family, \
+                                const Elements & elementsLibrary) const;
+
+
 private:
     /*!
     Reference to elements library to be used for calculations
