@@ -155,7 +155,7 @@ std::vector<double> Layer::getTransmission(const std::vector<double> & energy, c
             tmpDouble = sin(-angle * PI / 180.);
         else
             tmpDouble = sin(angle * PI / 180.);
-        tmpDouble /= this->density * this->thickness;
+        tmpDouble = this->density * this->thickness / tmpDouble;
     }
 
     if(tmpDouble <= 0.0)
