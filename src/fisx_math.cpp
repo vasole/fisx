@@ -233,17 +233,19 @@ double Math::deBoerV(const double & p, const double & q, const double & d1, cons
 {
     double tmpDouble1;
     double tmpDouble2;
+    double tmpHelp;
+
 
     // case V(0,0) with db equal to 0
     if ((mubjdt == 0) && (p == 0) && (q == 0))
     {
-        tmpDouble2 = (mu2j / p) * std::log(1.0 + (p / mu2j));
+        // V(0, 0) with db = 0;
         tmpDouble1 =  1.0 - (q / mu1j);
-        if (tmpDouble1 > 0.0)
-            tmpDouble1 = - tmpDouble2 - (mu1j / q) * std::log(tmpDouble1);
+        if (tmpDouble1 < 0)
+            tmpDouble2 = (mu2j / p) * std::log(1.0 + (p / mu2j)) + (mu1j/q) * std::log(-tmpDouble1);
         else
-            tmpDouble1 = - tmpDouble2;
-        return tmpDouble1 / (p * mu1j + q * mu2j);
+            tmpDouble2 = (mu2j / p) * std::log(1.0 + (p / mu2j)) + (mu1j/q) * std::log(tmpDouble1);
+        return -tmpDouble2 / (p * mu1j + q * mu2j);
     }
 
     // X(p, q, d1, d2) = V(d1, d2) - V(d1, 0) - V(0, d2) + V(0, 0)
@@ -254,16 +256,16 @@ double Math::deBoerV(const double & p, const double & q, const double & d1, cons
     // and for small values of d1 (thin layer on thick substrate) that gives
     // X (p, q, d1, inf)X (p, q, d1, inf) is about (d1/p) * std::log(1.0 + (p/mu2j))
 
-
     tmpDouble1 = Math::deBoerD((1.0 + (p / mu2j)) * (mu1j*d1 + mubjdt + mu2j*d2));
     tmpDouble1 *= (mu2j /(p * (p * mu1j + q * mu2j)));
-    tmpDouble1 *= std::exp((q - mu1j) * d1 - (p + mu2j) * d2 -mubjdt);
 
-    tmpDouble2 = mu1j * d1 + mubjdt + mu2j * d2;
-    tmpDouble2 = ((mu1j / (q * (p * mu1j + q * mu2j))) * Math::deBoerD(( 1.0 - (q/mu1j)) * tmpDouble2)) - \
-                 (Math::deBoerD(tmpDouble2)/(p * q));
 
-    return tmpDouble1 + tmpDouble2;
+    tmpHelp = mu1j * d1 + mubjdt + mu2j * d2;
+    tmpDouble2 = Math::deBoerD(( 1.0 - (q / mu1j)) * tmpHelp);
+    tmpDouble2 *= mu1j / (q * (p * mu1j + q * mu2j));
+    tmpDouble2 -= Math::deBoerD(tmpHelp)/(p * q);
+
+    return std::exp((q - mu1j) * d1 - (p + mu2j) * d2 - mubjdt)* (tmpDouble1 + tmpDouble2);
 }
 
 bool Math::isNumber(const double & x)
