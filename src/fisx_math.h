@@ -77,12 +77,12 @@ class Math
         /*!
         Help function, see formula A2a appendix
         */
-        static double Y(double a, double b, double c, double d);
+        static double deBoerY(const double & a, const double & b, const double & c, const double & d);
 
         /*!
         Help function, see formula A2b appendix
         */
-        static double W(double a, double b, double d);
+        static double deBoerW(const double & a, const double & b, const double & d);
 
         /*!
         Abramowitz and Stegun formula 5.1.53
@@ -97,6 +97,7 @@ class Math
         Formula is valid for 1 <= x < +inf
         */
         static double AS_5_1_56(const double & x);
+
     private:
         /*!
         Evaluate exp(x) * E1(x) for x > 1

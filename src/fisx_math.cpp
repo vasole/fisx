@@ -6,9 +6,27 @@
 
 double Math::E1(const double & x)
 {
-    if (x <= 0)
+    if (x == 0)
     {
-		throw std::invalid_argument("E1(x) Invalid argument. x should be positive");
+        throw std::invalid_argument("E1(x) Invalid argument. x cannot be 0");
+    }
+    //if (x < -1)
+    //{
+    // throw std::invalid_argument("Not implemented. x cannot be less than -1");
+    //}
+    if (x < 0)
+    {
+        // AS 5.1.11
+        // Euler's gamma = 0.577215664901532860;
+        // I decide to evaluate just 10 terms of the series
+        double result;
+        double factorial[11] = {1.0, 1.0, 2.0, 6.0, 24., 120.0, 720., 5040., 40320., 362880., 3628800.};
+        result = -0.577215664901532860;
+        for(int n = 10; n > 0; --n)
+        {
+            result -= pow(-x, n) /(n * factorial[n]);
+        }
+        return result - std::log(-x);
     }
     if(x < 1)
     {
@@ -19,11 +37,11 @@ double Math::E1(const double & x)
         if (0)
         {
             // rational approximation is less accurate
-            return Math::AS_5_1_56(x) / (x * exp(x));
+            return Math::AS_5_1_56(x) / (x * std::exp(x));
         }
         else
         {
-            return exp(-x) * Math::_deBoerD(x);
+            return std::exp(-x) * Math::_deBoerD(x);
         }
     }
 }
@@ -82,6 +100,10 @@ double Math::deBoerD(const double & x)
     // 0.5 * log(1 + 2.0/x) < exp(x) * E1(x) < log(1 + 1.0 /x)
     double tmpResult;
     double limit0, limit1;
+    if (x < 0)
+    {
+        return std::exp(x) * E1(x);
+    }
     if (x > 1)
     {
         tmpResult = Math::_deBoerD(x);
@@ -101,6 +123,10 @@ double Math::deBoerD(const double & x)
     }
     return tmpResult;
 #else
+    if (x < 0)
+    {
+        return std::exp(x) * E1(x);
+    }
     if (x > 1)
     {
         return Math::_deBoerD(x);
@@ -147,33 +173,25 @@ double Math::deBoerL0(const double & mu1, const double & mu2, const double & muj
     // std::cout << " (mu1 + mu2) * d = " << (mu1 + mu2) * d << std::endl;
     if (((mu1 + mu2) * d) < 0.01)
     {
-        // thin target, neglect enhancement
+        // very thin target, neglect enhancement
         //std::cout << "Very thin target, not considered = " << 0.0 << std::endl;
         return 0.0;
     }
 
     /*
-    if ((muj * d) < 1)
+    if ((mu1*d < 0.1) && (muj * d < 1) )
     {
         // thin target (this approximation only gives the order of magnitude.
         // it is not as good as the thick target one
-        std::cout << " d = " << d << " muj * d " << muj * d << " ";
+        // std::cout << " d = " << d << " muj * d " << muj * d << " ";
         tmpDouble = -0.5 * (muj * d) * std::log(muj * d) / ((mu1 + mu2) * muj);
         tmpDouble *= (1.0 - exp(-(mu1 + mu2) * d));
         std::cout << "THIN TARGET = " << tmpDouble << std::endl;
+        return tmpDouble;
     }
     */
 
-    // deal with the problematic term
-    tmpDouble = (muj - mu2) * d;
-    if (tmpDouble > 0.0)
-    {
-        tmpDouble = Math::deBoerD(tmpDouble) / (mu2 * (mu1 + mu2));
-    }
-    else
-    {
-        tmpDouble = 0.0;
-    }
+    tmpDouble = Math::deBoerD((muj - mu2) * d) / (mu2 * (mu1 + mu2));
     tmpDouble = tmpDouble -(Math::deBoerD(muj * d) / (mu1 * mu2)) + \
                  (Math::deBoerD((muj + mu1) * d) / (mu1 * (mu1 + mu2)));
     tmpDouble *= std::exp(-(mu1 + muj) * d);
@@ -184,6 +202,11 @@ double Math::deBoerL0(const double & mu1, const double & mu2, const double & muj
     {
         tmpDouble += (std::exp(-(mu1 + mu2) * d) / (mu2 * (mu1 + mu2))) * \
                       std::log(1.0 - (mu2 / muj));
+    }
+    else
+    {
+        tmpDouble += (std::exp(-(mu1 + mu2) * d) / (mu2 * (mu1 + mu2))) * \
+                      std::log((mu2 / muj) - 1.0);
     }
     if (tmpDouble < 0)
     {
