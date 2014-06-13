@@ -200,7 +200,7 @@ std::map<std::string, std::map<std::string, double> > XRF::getFluorescence(const
     for (iLayer = 0; iLayer < sampleLayerIndex; iLayer++)
     {
         layerPtr = &sample[iLayer];
-        if (iLayer < referenceLayerIndex)
+        if (iLayer >= referenceLayerIndex)
         {
             distance += (*layerPtr).getThickness() / sinAlphaOut;
         }
@@ -322,6 +322,7 @@ std::map<std::string, std::map<std::string, double> > XRF::getFluorescence(const
             for (c_it = tmpResult.begin(); c_it != tmpResult.end(); ++c_it)
             {
                 mapIt = c_it->second.find("energy");
+                tmpDouble = mapIt->second;
                 detectionEfficiency[c_it->first] = 1.0;
 
                 // transmission through upper layers
@@ -329,18 +330,16 @@ std::map<std::string, std::map<std::string, double> > XRF::getFluorescence(const
                 while (iLayer > 0)
                 {
                     --iLayer;
-                    layerPtr = &sample[sampleLayerIndex];
+                    layerPtr = &sample[iLayer];
                     detectionEfficiency[c_it->first] *= (*layerPtr).getTransmission( mapIt->second, \
                                                             elementsLibrary, alphaOut);
                 }
-
                 // transmission through attenuators
                 for (iLayer = 0; iLayer < attenuators.size(); iLayer++)
                 {
                     layerPtr = &attenuators[iLayer];
                     detectionEfficiency[c_it->first] *= (*layerPtr).getTransmission( mapIt->second, \
                                                             elementsLibrary, 90.);
-
                 }
                 //std::cout << mapIt->second << " " << c_it->first << "" << detectionEfficiency[c_it->first] << std::endl;
                 // detection efficienty decomposed in geometric and intrinsic
@@ -356,6 +355,7 @@ std::map<std::string, std::map<std::string, double> > XRF::getFluorescence(const
                                                                             elementsLibrary, 90.0));
                 }
             }
+
             actualResult = tmpResult;
             for (c_it = tmpResult.begin(); c_it != tmpResult.end(); ++c_it)
             {
@@ -377,6 +377,7 @@ std::map<std::string, std::map<std::string, double> > XRF::getFluorescence(const
             actualResult[c_it->first]["rate"] += mapIt->second * tmpDouble  * \
                                                 detectionEfficiency[c_it->first];
         }
+
         // probably I sould calculate this first to prevent adding small numbers to a bigger one
         if (secondary > 0)
         {
@@ -926,13 +927,13 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                      }
                      else
                     {
-                        continue;
                         mu_2_lambda = muTotal[jLayer];
                         density_2 = sampleLayerDensity[jLayer];
                         thickness_2 = sampleLayerThickness[jLayer];
                         if (iLayer < jLayer)
                         {
                             // interlayer case a)
+                            continue;
                             for(iLambda = 0;
                                 iLambda < sampleLayerEnergies[jLayer].size(); \
                                 iLambda++)
