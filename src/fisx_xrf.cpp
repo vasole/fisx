@@ -196,14 +196,9 @@ std::map<std::string, std::map<std::string, double> > XRF::getFluorescence(const
     std::vector<double> weights;
     weights = actualRays[1];
     std::fill(muTotal.begin(), muTotal.end(), 0.0);
-    distance = 0.0;
     for (iLayer = 0; iLayer < sampleLayerIndex; iLayer++)
     {
         layerPtr = &sample[iLayer];
-        if (iLayer >= referenceLayerIndex)
-        {
-            distance += (*layerPtr).getThickness() / sinAlphaOut;
-        }
         doubleVector = (*layerPtr).getTransmission(energies, \
                                             elementsLibrary, alphaIn);
         for (iRay = 0; iRay < energies.size(); iRay++)
@@ -215,9 +210,8 @@ std::map<std::string, std::map<std::string, double> > XRF::getFluorescence(const
     // we can already calculate the geometric efficiency
     if ((useGeometricEfficiency != 0) && (detectorDiameter > 0.0))
     {
-        distance += detectorDistance;
         // calculate geometric efficiency 0.5 * (1 - cos theta)
-        geometricEfficiency = 0.5 * (1.0 - (distance / sqrt(pow(distance, 2) + pow(0.5 * detectorDiameter, 2))));
+        geometricEfficiency = this->getGeometricEfficiency(sampleLayerIndex);
     }
     else
     {
@@ -442,14 +436,27 @@ double XRF::getGeometricEfficiency(const int & sampleLayerIndex) const
     {
         return 0.5;
     }
-    for (iLayer = 0; iLayer < sampleLayerIndex; iLayer++)
+
+    if (sampleLayerIndex != referenceLayerIndex)
     {
-        layerPtr = &sample[iLayer];
-        if (iLayer < referenceLayerIndex)
+        if (sampleLayerIndex > referenceLayerIndex)
         {
-            distance += (*layerPtr).getThickness() / sinAlphaOut;
+            for (iLayer = referenceLayerIndex; iLayer < sampleLayerIndex; iLayer++)
+            {
+                layerPtr = &sample[iLayer];
+                distance += (*layerPtr).getThickness() / sinAlphaOut;
+            }
+        }
+        else
+        {
+            for (iLayer = sampleLayerIndex; iLayer < referenceLayerIndex; iLayer++)
+            {
+                layerPtr = &sample[iLayer];
+                distance -= (*layerPtr).getThickness() / sinAlphaOut;
+            }
         }
     }
+
     // we can calculate the geometric efficiency for the given layer
     // calculate geometric efficiency 0.5 * (1 - cos theta)
     return (0.5 * (1.0 - (distance / sqrt(pow(distance, 2) + pow(0.5 * detectorDiameter, 2)))));
