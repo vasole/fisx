@@ -237,7 +237,7 @@ double Math::deBoerV(const double & p, const double & q, const double & d1, cons
 
 
     // case V(0,0) with db equal to 0
-    if ((mubjdt == 0) && (p == 0) && (q == 0))
+    if ((mubjdt == 0) && (d1 == 0) && (d2 == 0))
     {
         // V(0, 0) with db = 0;
         tmpDouble1 =  1.0 - (q / mu1j);
@@ -257,13 +257,62 @@ double Math::deBoerV(const double & p, const double & q, const double & d1, cons
     // X (p, q, d1, inf)X (p, q, d1, inf) is about (d1/p) * std::log(1.0 + (p/mu2j))
 
     tmpDouble1 = Math::deBoerD((1.0 + (p / mu2j)) * (mu1j*d1 + mubjdt + mu2j*d2));
+    if (!Math::isFiniteNumber(tmpDouble1))
+    {
+        std::cout << "p    " << p << std::endl;
+        std::cout << "q    " << q << std::endl;
+        std::cout << "d1   " << d1 << std::endl;
+        std::cout << "d2   " << d2 << std::endl;
+        std::cout << "mu1j " << mu1j << std::endl;
+        std::cout << "mu2j " << mu2j << std::endl;
+        std::cout << "mubjdt " << mubjdt << std::endl;
+        std::cout << " error 1 " << std::endl;
+        throw std::runtime_error("error1");
+    }
     tmpDouble1 *= (mu2j /(p * (p * mu1j + q * mu2j)));
+    if (!Math::isFiniteNumber(tmpDouble1))
+    {
+        std::cout << "p    " << p << std::endl;
+        std::cout << "q    " << q << std::endl;
+        std::cout << "d1   " << d1 << std::endl;
+        std::cout << "d2   " << d2 << std::endl;
+        std::cout << "mu1j " << mu1j << std::endl;
+        std::cout << "mu2j " << mu2j << std::endl;
+        std::cout << "mubjdt " << mubjdt << std::endl;
+        std::cout << " error 2 " << std::endl;
+        throw std::runtime_error("error2");
+    }
 
 
     tmpHelp = mu1j * d1 + mubjdt + mu2j * d2;
     tmpDouble2 = Math::deBoerD(( 1.0 - (q / mu1j)) * tmpHelp);
+    if (!Math::isFiniteNumber(tmpDouble2))
+    {
+        std::cout << "p    " << p << std::endl;
+        std::cout << "q    " << q << std::endl;
+        std::cout << "d1   " << d1 << std::endl;
+        std::cout << "d2   " << d2 << std::endl;
+        std::cout << "mu1j " << mu1j << std::endl;
+        std::cout << "mu2j " << mu2j << std::endl;
+        std::cout << "mubjdt " << mubjdt << std::endl;
+        std::cout << " error 3 " << std::endl;
+        throw std::runtime_error("error3");
+    }
+
     tmpDouble2 *= mu1j / (q * (p * mu1j + q * mu2j));
     tmpDouble2 -= Math::deBoerD(tmpHelp)/(p * q);
+    if (!Math::isFiniteNumber(tmpDouble2))
+    {
+        std::cout << "p    " << p << std::endl;
+        std::cout << "q    " << q << std::endl;
+        std::cout << "d1   " << d1 << std::endl;
+        std::cout << "d2   " << d2 << std::endl;
+        std::cout << "mu1j " << mu1j << std::endl;
+        std::cout << "mu2j " << mu2j << std::endl;
+        std::cout << "mubjdt " << mubjdt << std::endl;
+        std::cout << " error 4 " << std::endl;
+        throw std::runtime_error("error4");
+    }
 
     return std::exp((q - mu1j) * d1 - (p + mu2j) * d2 - mubjdt)* (tmpDouble1 + tmpDouble2);
 }
