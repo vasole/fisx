@@ -855,12 +855,12 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                     if (iLayer == jLayer)
                     {
                         // intralayer secondary
-                        for(iLambda = 0; iLambda < sampleLayerEnergies[iLayer].size(); iLambda++)
+                        for(iLambda = 0; iLambda < sampleLayerEnergies[jLayer].size(); iLambda++)
                         {
                             // analogous to incident beam
                             tmpExcitationFactors = elementsLibrary.getExcitationFactors(elementName, \
-                                        sampleLayerEnergies[iLayer][iLambda], \
-                                        sampleLayerRates[iLayer][iLambda]);
+                                        sampleLayerEnergies[jLayer][iLambda], \
+                                        sampleLayerRates[jLayer][iLambda]);
                             for (c_it = result.begin(); c_it != result.end(); ++c_it)
                             {
                                 if (tmpExcitationFactors.find(c_it->first) == tmpExcitationFactors.end())
@@ -876,20 +876,20 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                 mu_1_i = mapIt->second;
                                 tmpDouble = Math::deBoerL0(mu_1_lambda / sinAlphaIn,
                                                            mu_1_i / sinAlphaOut,
-                                                           sampleLayerMuTotal[iLayer][iLambda],
+                                                           sampleLayerMuTotal[jLayer][iLambda],
                                                            density_1,
                                                            thickness_1);
                                 tmpDouble += Math::deBoerL0(mu_1_i / sinAlphaOut,
                                                            mu_1_lambda / sinAlphaIn,
-                                                           sampleLayerMuTotal[iLayer][iLambda],
+                                                           sampleLayerMuTotal[jLayer][iLambda],
                                                            density_1,
                                                            thickness_1);
                                 tmpDouble *= (0.5/sinAlphaIn);
                                 tmpDouble *= tmpExcitationFactors[c_it->first]["rate"];
                                 tmpStringStream.str(std::string());
                                 tmpStringStream.clear();
-                                tmpStringStream << std::setfill('0') << std::setw(2) << iLayer;
-                                tmpString = sampleLayerEnergyNames[iLayer][iLambda] + " " + tmpStringStream.str();
+                                tmpStringStream << std::setfill('0') << std::setw(2) << jLayer;
+                                tmpString = sampleLayerEnergyNames[jLayer][iLambda] + " " + tmpStringStream.str();
                                 actualResult[elementName + " " + lineFamily][iLayer][c_it->first][tmpString] = \
                                                                                                 tmpDouble;
                                 result[c_it->first]["secondary"] += tmpDouble;
@@ -938,11 +938,11 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                 iLambda++)
                             {
                                 // analogous to incident beam
-                                energy = sampleLayerEnergies[iLayer][iLambda];
+                                energy = sampleLayerEnergies[jLayer][iLambda];
                                 tmpExcitationFactors = elementsLibrary.getExcitationFactors( \
                                                         elementName, \
                                                         energy, \
-                                                        sampleLayerRates[iLayer][iLambda]);
+                                                        sampleLayerRates[jLayer][iLambda]);
                                 for (c_it = result.begin(); c_it != result.end(); ++c_it)
                                 {
                                     if (tmpExcitationFactors.find(c_it->first) == tmpExcitationFactors.end())
@@ -982,8 +982,8 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                     tmpDouble *= tmpExcitationFactors[c_it->first]["rate"];
                                     tmpStringStream.str(std::string());
                                     tmpStringStream.clear();
-                                    tmpStringStream << std::setfill('0') << std::setw(2) << iLayer;
-                                    tmpString = sampleLayerEnergyNames[iLayer][iLambda] + " " + tmpStringStream.str();
+                                    tmpStringStream << std::setfill('0') << std::setw(2) << jLayer;
+                                    tmpString = sampleLayerEnergyNames[jLayer][iLambda] + " " + tmpStringStream.str();
                                     actualResult[elementName + " " + lineFamily][iLayer][c_it->first][tmpString] = \
                                                                                                     tmpDouble;
                                     result[c_it->first]["secondary"] += tmpDouble;
@@ -1000,11 +1000,11 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                 iLambda++)
                             {
                                 // analogous to incident beam
-                                energy = sampleLayerEnergies[iLayer][iLambda];
+                                energy = sampleLayerEnergies[jLayer][iLambda];
                                 tmpExcitationFactors = elementsLibrary.getExcitationFactors( \
                                                         elementName, \
                                                         energy, \
-                                                        sampleLayerRates[iLayer][iLambda]);
+                                                        sampleLayerRates[jLayer][iLambda]);
                                 for (c_it = result.begin(); c_it != result.end(); ++c_it)
                                 {
                                     if (tmpExcitationFactors.find(c_it->first) == tmpExcitationFactors.end())
@@ -1023,9 +1023,9 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                         sample[iLayer].getMassAttenuationCoefficients(energy, \
                                                                             elementsLibrary)["total"];
                                     mu_2_j = sampleLayerMuTotal[jLayer][iLambda];
-                                    bLayer = iLayer + 1;
+                                    bLayer = jLayer + 1;
                                     mu_b_j_d_t = 0.0;
-                                    while (bLayer < jLayer)
+                                    while (bLayer < iLayer)
                                     {
                                         mu_b_j_d_t += sampleLayerDensity[bLayer] * \
                                                       sampleLayerThickness[bLayer] * \
@@ -1045,7 +1045,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                     tmpStringStream.str(std::string());
                                     tmpStringStream.clear();
                                     tmpStringStream << std::setfill('0') << std::setw(2) << iLayer;
-                                    tmpString = sampleLayerEnergyNames[iLayer][iLambda] + " " + tmpStringStream.str();
+                                    tmpString = sampleLayerEnergyNames[jLayer][iLambda] + " " + tmpStringStream.str();
                                     actualResult[elementName + " " + lineFamily][iLayer][c_it->first][tmpString] = \
                                                                                                     tmpDouble;
                                     result[c_it->first]["secondary"] += tmpDouble;
