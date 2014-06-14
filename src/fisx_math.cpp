@@ -17,8 +17,14 @@ double Math::E1(const double & x)
     if (x < 0)
     {
         // AS 5.1.11
+        //
+        // E1(z) = - gamma - log(z) - sum ( (-1)^n * x^n / (n * n! ))
+        //
+        //
         // Euler's gamma = 0.577215664901532860;
         // I decide to evaluate just 10 terms of the series
+        //
+        // TODO: Unroll the loop with n * factorial(n) already computed.
         double result;
         double factorial[11] = {1.0, 1.0, 2.0, 6.0, 24., 120.0, 720., 5040., 40320., 362880., 3628800.};
         result = -0.577215664901532860;
@@ -222,6 +228,19 @@ double Math::deBoerL0(const double & mu1, const double & mu2, const double & muj
 double Math::deBoerX(const double & p, const double & q, const double & d1, const double & d2, \
                      const double & mu_1_j, const double & mu_2_j, const double & mu_b_j_d_t)
 {
+    /*
+    double result;
+    result =  Math::deBoerV(p, q, d1, d2, mu_1_j, mu_2_j, mu_b_j_d_t) - \
+           Math::deBoerV(p, q, d1, 0.0, mu_1_j, mu_2_j, mu_b_j_d_t) - \
+           Math::deBoerV(p, q, 0.0, d2, mu_1_j, mu_2_j, mu_b_j_d_t) + \
+           Math::deBoerV(p, q, 0.0, 0.0, mu_1_j, mu_2_j, mu_b_j_d_t);
+    if (d1 < 0.01)
+    {
+        std::cout << " EXPECTED = " << (d1 / p) * std::log(1 + p / mu_2_j) << std::endl;
+        std::cout << " MEASURED = " << result << std::endl;
+    }
+    return result;
+    */
     return Math::deBoerV(p, q, d1, d2, mu_1_j, mu_2_j, mu_b_j_d_t) - \
            Math::deBoerV(p, q, d1, 0.0, mu_1_j, mu_2_j, mu_b_j_d_t) - \
            Math::deBoerV(p, q, 0.0, d2, mu_1_j, mu_2_j, mu_b_j_d_t) + \
