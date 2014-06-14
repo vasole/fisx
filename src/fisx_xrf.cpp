@@ -926,7 +926,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                     }
                     else
                     {
-                        continue;
+                        //continue;
                         mu_2_lambda = muTotal[jLayer];
                         density_2 = sampleLayerDensity[jLayer];
                         thickness_2 = sampleLayerThickness[jLayer];
@@ -943,14 +943,18 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                                         elementName, \
                                                         energy, \
                                                         sampleLayerRates[iLayer][iLambda]);
-                                for (c_it = tmpExcitationFactors.begin(); c_it != tmpExcitationFactors.end(); ++c_it)
+                                for (c_it = result.begin(); c_it != result.end(); ++c_it)
                                 {
-                                    if (result.find(c_it->first) == result.end())
+                                    if (tmpExcitationFactors.find(c_it->first) == tmpExcitationFactors.end())
                                     {
                                         // This happens when we look for K lines, but obviously L lines are
                                         // present
                                         //std::cout << "Not considered " << c_it->first ;
                                         //std::cout << " energy = " << sampleLayerEnergies[iLayer][iLambda] << std::endl;
+                                        continue;
+                                    }
+                                    if (tmpExcitationFactors[c_it->first]["rate"] < 1.0e-30)
+                                    {
                                         continue;
                                     }
                                     mu_1_j = \
@@ -974,12 +978,81 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                                               mu_1_j, \
                                                               mu_2_j, \
                                                               mu_b_j_d_t);
+                                    tmpDouble *= (0.5/sinAlphaIn);
+                                    tmpDouble *= tmpExcitationFactors[c_it->first]["rate"];
+                                    tmpStringStream.str(std::string());
+                                    tmpStringStream.clear();
+                                    tmpStringStream << std::setfill('0') << std::setw(2) << iLayer;
+                                    tmpString = sampleLayerEnergyNames[iLayer][iLambda] + " " + tmpStringStream.str();
+                                    actualResult[elementName + " " + lineFamily][iLayer][c_it->first][tmpString] = \
+                                                                                                    tmpDouble;
+                                    result[c_it->first]["secondary"] += tmpDouble;
+                                    result[c_it->first]["rate"] += tmpDouble * \
+                                                                   result[c_it->first]["efficiency"];
                                 }
                             }
                         }
                         if (iLayer > jLayer)
                         {
                             // interlayer case b)
+                            for(iLambda = 0;
+                                iLambda < sampleLayerEnergies[jLayer].size(); \
+                                iLambda++)
+                            {
+                                // analogous to incident beam
+                                energy = sampleLayerEnergies[iLayer][iLambda];
+                                tmpExcitationFactors = elementsLibrary.getExcitationFactors( \
+                                                        elementName, \
+                                                        energy, \
+                                                        sampleLayerRates[iLayer][iLambda]);
+                                for (c_it = result.begin(); c_it != result.end(); ++c_it)
+                                {
+                                    if (tmpExcitationFactors.find(c_it->first) == tmpExcitationFactors.end())
+                                    {
+                                        // This happens when we look for K lines, but obviously L lines are
+                                        // present
+                                        //std::cout << "Not considered " << c_it->first ;
+                                        //std::cout << " energy = " << sampleLayerEnergies[iLayer][iLambda] << std::endl;
+                                        continue;
+                                    }
+                                    if (tmpExcitationFactors[c_it->first]["rate"] < 1.0e-30)
+                                    {
+                                        continue;
+                                    }
+                                    mu_1_j = \
+                                        sample[iLayer].getMassAttenuationCoefficients(energy, \
+                                                                            elementsLibrary)["total"];
+                                    mu_2_j = sampleLayerMuTotal[jLayer][iLambda];
+                                    bLayer = iLayer + 1;
+                                    mu_b_j_d_t = 0.0;
+                                    while (bLayer < jLayer)
+                                    {
+                                        mu_b_j_d_t += sampleLayerDensity[bLayer] * \
+                                                      sampleLayerThickness[bLayer] * \
+                                                      sample[bLayer].getMassAttenuationCoefficients(energy, \
+                                                                                elementsLibrary)["total"];
+                                        bLayer++;
+                                    }
+                                    tmpDouble = Math::deBoerX(-mu_2_lambda/sinAlphaIn, \
+                                                              -mu_1_i/sinAlphaOut, \
+                                                              density_1 * thickness_1, \
+                                                              density_2 * thickness_2, \
+                                                              mu_1_j, \
+                                                              mu_2_j, \
+                                                              mu_b_j_d_t);
+                                    tmpDouble *= (0.5/sinAlphaIn);
+                                    tmpDouble *= tmpExcitationFactors[c_it->first]["rate"];
+                                    tmpStringStream.str(std::string());
+                                    tmpStringStream.clear();
+                                    tmpStringStream << std::setfill('0') << std::setw(2) << iLayer;
+                                    tmpString = sampleLayerEnergyNames[iLayer][iLambda] + " " + tmpStringStream.str();
+                                    actualResult[elementName + " " + lineFamily][iLayer][c_it->first][tmpString] = \
+                                                                                                    tmpDouble;
+                                    result[c_it->first]["secondary"] += tmpDouble;
+                                    result[c_it->first]["rate"] += tmpDouble * \
+                                                                   result[c_it->first]["efficiency"];
+                                }
+                            }
                         }
                     }
                 }
