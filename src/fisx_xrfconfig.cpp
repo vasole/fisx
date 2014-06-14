@@ -311,7 +311,8 @@ void XRFConfig::readConfigurationFromFile(const std::string & fileName)
             }
         }
     }
-
+    // for the time being it is not yet in the file
+    this->referenceLayer = 0;
     // GET MULTILAYER SAMPLE IF NEEDED
     if (multilayerSample)
     {
