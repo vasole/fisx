@@ -617,7 +617,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                     // The secondary rates are already corrected for the beam intensity reaching the layer
                     tmpResult = elementsLibrary.getExcitationFactors(ele, \
                                                                      energies[iRay], \
-                                                    weights[iRay] * sampleLayerWeight[iLayer]);
+                                                                     weights[iRay] * sampleLayerWeight[iLayer]);
                     // and add the energies and rates to the sampleLayerLines
                     for (c_it = tmpResult.begin(); c_it != tmpResult.end(); ++c_it)
                     {
@@ -674,17 +674,17 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
         double energyThreshold;
 
         // this line can be moved out of the loop
+        std::map<std::string, std::map<std::string, double> > primaryExcitationFactors;
         std::map<std::string, std::map<std::string, double> > tmpExcitationFactors;
         std::map<std::string, std::map<std::string, double> >::const_iterator c_it;
         std::map<std::string, double>::const_iterator mapIt;
-        std::map<std::string, double>::const_iterator mapIt2;
         std::map<std::string, double> muTotalFluo;
         double detectionEfficiency;
         double energy;
         std::string key;
         std::string tmpString;
         std::ostringstream tmpStringStream;
-        tmpExcitationFactors = elementsLibrary.getExcitationFactors(elementName, \
+        primaryExcitationFactors = elementsLibrary.getExcitationFactors(elementName, \
                                                                     energies[iRay], \
                                                                     weights[iRay]);
         for (iLayer = 0; iLayer < sample.size(); iLayer++)
@@ -693,7 +693,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
             key = elementName + " " + lineFamily;
             // we need to calculate the layer mass attenuation coefficients at the fluorescent energies
             result.clear();
-            for (c_it = tmpExcitationFactors.begin(); c_it != tmpExcitationFactors.end(); ++c_it)
+            for (c_it = primaryExcitationFactors.begin(); c_it != primaryExcitationFactors.end(); ++c_it)
             {
                 if (c_it->first.compare(0, lineFamily.length(), lineFamily) == 0)
                 {
@@ -810,14 +810,13 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                 tmpDouble = (mu_1_lambda / sinAlphaIn) + (mu_1_i / sinAlphaOut);
                 tmpDouble = (1.0 - exp( - tmpDouble * density_1 * thickness_1)) / (tmpDouble * sinAlphaIn);
                 result[c_it->first]["primary"] = tmpDouble * \
-                                                 tmpExcitationFactors[c_it->first]["rate"] * \
+                                                 primaryExcitationFactors[c_it->first]["rate"] * \
                                                  sampleLayerWeight[iLayer];
                 result[c_it->first]["rate"] = result[c_it->first]["primary"] * \
                                               result[c_it->first]["efficiency"];
                 result[c_it->first]["secondary"] = 0.0;
                 //std::cout << c_it->first << "efficiency = " << result[c_it->first]["efficiency"] << std::endl;
                 //std::cout << c_it->first << "primary = " << result[c_it->first]["primary"] << std::endl;
-                //std::cout << c_it->first << "rate = " << result[c_it->first]["rate"] << std::endl;
                 //std::cout << c_it->first << "energy = " << result[c_it->first]["energy"] << std::endl;
                 //std::cout << c_it->first << "mu_1_i = " << result[c_it->first]["mu_1_i"] << std::endl;
             }
@@ -853,7 +852,6 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                 // calculate secondary
                 for (jLayer = 0; jLayer < sample.size(); jLayer++)
                 {
-                    //calculate secondary
                     if (iLayer == jLayer)
                     {
                         // intralayer secondary
@@ -863,24 +861,19 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                             tmpExcitationFactors = elementsLibrary.getExcitationFactors(elementName, \
                                         sampleLayerEnergies[iLayer][iLambda], \
                                         sampleLayerRates[iLayer][iLambda]);
-                            for (c_it = tmpExcitationFactors.begin(); c_it != tmpExcitationFactors.end(); ++c_it)
+                            for (c_it = result.begin(); c_it != result.end(); ++c_it)
                             {
-                                if (result.find(c_it->first) == result.end())
+                                if (tmpExcitationFactors.find(c_it->first) == tmpExcitationFactors.end())
                                 {
-                                    // This happens when we look for K lines, but obviously L lines are
-                                    // present
-                                    //std::cout << "Not considered " << c_it->first ;
-                                    //std::cout << " energy = " << sampleLayerEnergies[iLayer][iLambda] << std::endl;
                                     continue;
                                 }
-                                energyThreshold = result[c_it->first]["energy_threshold"];
-                                if (sampleLayerEnergies[iLayer][iLambda] < energyThreshold)
-                                {
-                                    mapIt = c_it->second.find("rate");
-                                    std::cout << " SKIPPING rate = " << mapIt->second << std::endl;
+                                // I could put a higher limit here
+                                if (tmpExcitationFactors[c_it->first]["rate"] <= 1.0e-30)
                                     continue;
-                                }
-                                mu_1_i = result[c_it->first]["mu_1_i"];
+                                mapIt = result[c_it->first].find("mu_1_i");
+                                if (mapIt == result[c_it->first].end())
+                                    throw std::runtime_error(" mu_1_i key. Mass attenuation noy present???");
+                                mu_1_i = mapIt->second;
                                 tmpDouble = Math::deBoerL0(mu_1_lambda / sinAlphaIn,
                                                            mu_1_i / sinAlphaOut,
                                                            sampleLayerMuTotal[iLayer][iLambda],
@@ -892,8 +885,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                                            density_1,
                                                            thickness_1);
                                 tmpDouble *= (0.5/sinAlphaIn);
-                                mapIt = c_it->second.find("rate");
-                                tmpDouble *= mapIt->second;
+                                tmpDouble *= tmpExcitationFactors[c_it->first]["rate"];
                                 tmpStringStream.str(std::string());
                                 tmpStringStream.clear();
                                 tmpStringStream << std::setfill('0') << std::setw(2) << iLayer;
@@ -931,16 +923,16 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                 */
                             }
                         }
-                     }
-                     else
+                    }
+                    else
                     {
+                        continue;
                         mu_2_lambda = muTotal[jLayer];
                         density_2 = sampleLayerDensity[jLayer];
                         thickness_2 = sampleLayerThickness[jLayer];
                         if (iLayer < jLayer)
                         {
                             // interlayer case a)
-                            continue;
                             for(iLambda = 0;
                                 iLambda < sampleLayerEnergies[jLayer].size(); \
                                 iLambda++)
