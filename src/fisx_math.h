@@ -15,13 +15,31 @@ class Math
 {
     public:
         /*!
-        Calculate the exponential integral of order 1 on x
+        Calculate the exponential integral of order 1 on x.
+
                    |inf
                   |          dy
         E1(x) =  |   exp(y) ----
                 |x            y
+
+        Only the real part is calculated
+
         */
         static double E1(const double & x);
+
+        /*!
+        Calculate the exponential integral of order n on x
+
+                   |inf
+                  |          dy
+        En(x) =  |   exp(y) ----
+                |x            y^n
+
+        Only the real part is calculated
+
+        */
+        static double En(const int & n, const double & x);
+
 
         /*!
         Calculates exp(x) * E1(x)

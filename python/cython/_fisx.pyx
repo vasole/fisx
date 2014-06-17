@@ -433,6 +433,9 @@ cdef class PyMath:
     def E1(self, double x):
         return self.thisptr.E1(x)
 
+    def En(self, int n, double x):
+        return self.thisptr.En(n, x)
+
     def deBoerD(self, double x):
         return self.thisptr.deBoerD(x)
 

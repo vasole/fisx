@@ -52,6 +52,36 @@ double Math::E1(const double & x)
     }
 }
 
+double Math::En(const int & n, const double & x)
+{
+    if (n < 1)
+    {
+        throw std::runtime_error("Math::En(n, x). n Must be greater or equal to 1");
+    }
+    if (n == 1)
+    {
+        return Math::E1(x);
+    }
+    else
+    {
+        if (x == 0)
+        {
+            // special value
+            return 1.0 / (n - 1);
+        }
+        else
+        {
+            // Use recurrence relation
+            //              1
+            // E(n+1, z) = ---- ( exp (-z) - z * E(n, z))
+            //              n
+            //
+            return (std::exp(-x) - x * Math::En(n - 1, x)) / (n - 1);
+        }
+    }
+}
+
+
 double Math::AS_5_1_53(const double & x)
 {
     // Returns E1(x) + log(x)
@@ -226,25 +256,47 @@ double Math::deBoerL0(const double & mu1, const double & mu2, const double & muj
 }
 
 double Math::deBoerX(const double & p, const double & q, const double & d1, const double & d2, \
-                     const double & mu_1_j, const double & mu_2_j, const double & mu_b_j_d_t)
+                     const double & mu1j, const double & mu2j, const double & mubj_dt)
 {
-    /*
-    double result;
-    result =  Math::deBoerV(p, q, d1, d2, mu_1_j, mu_2_j, mu_b_j_d_t) - \
-           Math::deBoerV(p, q, d1, 0.0, mu_1_j, mu_2_j, mu_b_j_d_t) - \
-           Math::deBoerV(p, q, 0.0, d2, mu_1_j, mu_2_j, mu_b_j_d_t) + \
-           Math::deBoerV(p, q, 0.0, 0.0, mu_1_j, mu_2_j, mu_b_j_d_t);
-    if (d1 < 0.01)
-    {
-        std::cout << " EXPECTED = " << (d1 / p) * std::log(1 + p / mu_2_j) << std::endl;
-        std::cout << " MEASURED = " << result << std::endl;
+     if(false)
+     {
+        double result;
+        result =  Math::deBoerV(p, q, d1, d2, mu1j, mu2j, mubj_dt) - \
+               Math::deBoerV(p, q, d1, 0.0, mu1j, mu2j, mubj_dt) - \
+               Math::deBoerV(p, q, 0.0, d2, mu1j, mu2j, mubj_dt) + \
+               Math::deBoerV(p, q, 0.0, 0.0, mu1j, mu2j, mubj_dt);
+        if (d1 < 0.01)
+        {
+            // VERY THIN CASE:
+            // std::cout << " EXPECTED = " << (d1 / p) * std::log(1 + p / mu_2_j) << std::endl;
+            // std::cout << " MEASURED = " << result << std::endl;
+            std::cout << " V(d1,inf) = " << Math::deBoerV(p, q, d1, d2, mu1j, mu2j, mubj_dt) << std::endl;
+            std::cout << " V(d1, 0) = " << Math::deBoerV(p, q, d1, 0.0, mu1j, mu2j, mubj_dt) << std::endl;
+            std::cout << " V(0, d2) = " << Math::deBoerV(p, q, 0.0, d2, mu1j, mu2j, mubj_dt) << std::endl;
+            std::cout << " V(0.0, 0) = " << Math::deBoerV(p, q, 0.0, 0.0, mu1j, mu2j, mubj_dt) << std::endl;
+        }
+        if (result < 0)
+        {
+            std::cout << "p    " << p << std::endl;
+            std::cout << "q    " << q << std::endl;
+            std::cout << "d1   " << d1 << std::endl;
+            std::cout << "d2   " << d2 << std::endl;
+            std::cout << "mu1j " << mu1j << std::endl;
+            std::cout << "mu2j " << mu2j << std::endl;
+            std::cout << "mubjdt " << mubj_dt << std::endl;
+            std::cout << " error  " << std::endl;
+            throw std::runtime_error("negative contribution");
+        }
+        return result;
+     }
+     else
+     {
+        return Math::deBoerV(p, q, d1, d2, mu1j, mu2j, mubj_dt) - \
+               Math::deBoerV(p, q, d1, 0.0, mu1j, mu2j, mubj_dt) - \
+               Math::deBoerV(p, q, 0.0, d2, mu1j, mu2j, mubj_dt) + \
+               Math::deBoerV(p, q, 0.0, 0.0, mu1j, mu2j, mubj_dt);
+
     }
-    return result;
-    */
-    return Math::deBoerV(p, q, d1, d2, mu_1_j, mu_2_j, mu_b_j_d_t) - \
-           Math::deBoerV(p, q, d1, 0.0, mu_1_j, mu_2_j, mu_b_j_d_t) - \
-           Math::deBoerV(p, q, 0.0, d2, mu_1_j, mu_2_j, mu_b_j_d_t) + \
-           Math::deBoerV(p, q, 0.0, 0.0, mu_1_j, mu_2_j, mu_b_j_d_t);
 }
 
 double Math::deBoerV(const double & p, const double & q, const double & d1, const double & d2, \
@@ -274,8 +326,8 @@ double Math::deBoerV(const double & p, const double & q, const double & d1, cons
     // X (p, q, d1, inf) = - V(d1, 0) + V(0,0)
     // and for small values of d1 (thin layer on thick substrate) that gives
     // X (p, q, d1, inf)X (p, q, d1, inf) is about (d1/p) * std::log(1.0 + (p/mu2j))
-
-    tmpDouble1 = Math::deBoerD((1.0 + (p / mu2j)) * (mu1j*d1 + mubjdt + mu2j*d2));
+    tmpDouble1 = (mu2j /(p * (p * mu1j + q * mu2j))) * \
+                 Math::deBoerD((1.0 + (p / mu2j)) * (mu1j*d1 + mubjdt + mu2j*d2));
     if (!Math::isFiniteNumber(tmpDouble1))
     {
         std::cout << "p    " << p << std::endl;
@@ -288,23 +340,10 @@ double Math::deBoerV(const double & p, const double & q, const double & d1, cons
         std::cout << " error 1 " << std::endl;
         throw std::runtime_error("error1");
     }
-    tmpDouble1 *= (mu2j /(p * (p * mu1j + q * mu2j)));
-    if (!Math::isFiniteNumber(tmpDouble1))
-    {
-        std::cout << "p    " << p << std::endl;
-        std::cout << "q    " << q << std::endl;
-        std::cout << "d1   " << d1 << std::endl;
-        std::cout << "d2   " << d2 << std::endl;
-        std::cout << "mu1j " << mu1j << std::endl;
-        std::cout << "mu2j " << mu2j << std::endl;
-        std::cout << "mubjdt " << mubjdt << std::endl;
-        std::cout << " error 2 " << std::endl;
-        throw std::runtime_error("error2");
-    }
-
 
     tmpHelp = mu1j * d1 + mubjdt + mu2j * d2;
-    tmpDouble2 = Math::deBoerD(( 1.0 - (q / mu1j)) * tmpHelp);
+    tmpDouble2 = (mu1j / (q * (p * mu1j + q * mu2j))) * \
+                  Math::deBoerD(( 1.0 - (q / mu1j)) * tmpHelp);
     if (!Math::isFiniteNumber(tmpDouble2))
     {
         std::cout << "p    " << p << std::endl;
@@ -318,7 +357,6 @@ double Math::deBoerV(const double & p, const double & q, const double & d1, cons
         throw std::runtime_error("error3");
     }
 
-    tmpDouble2 *= mu1j / (q * (p * mu1j + q * mu2j));
     tmpDouble2 -= Math::deBoerD(tmpHelp)/(p * q);
     if (!Math::isFiniteNumber(tmpDouble2))
     {
@@ -333,7 +371,7 @@ double Math::deBoerV(const double & p, const double & q, const double & d1, cons
         throw std::runtime_error("error4");
     }
 
-    return std::exp((q - mu1j) * d1 - (p + mu2j) * d2 - mubjdt)* (tmpDouble1 + tmpDouble2);
+    return std::exp((q - mu1j) * d1 - (p + mu2j) * d2 - mubjdt) * (tmpDouble1 + tmpDouble2);
 }
 
 bool Math::isNumber(const double & x)

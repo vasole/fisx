@@ -819,6 +819,19 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                 //std::cout << c_it->first << "primary = " << result[c_it->first]["primary"] << std::endl;
                 //std::cout << c_it->first << "energy = " << result[c_it->first]["energy"] << std::endl;
                 //std::cout << c_it->first << "mu_1_i = " << result[c_it->first]["mu_1_i"] << std::endl;
+                if ((c_it->first == "KL2") && (iLayer == 0))
+                {
+                    std::cout << c_it->first << "efficiency = " << result[c_it->first]["efficiency"] << std::endl;
+                    std::cout << c_it->first << "primary = " << result[c_it->first]["primary"] << std::endl;
+                    std::cout << c_it->first << "sampleLayerWeight = " << sampleLayerWeight[iLayer] << std::endl;
+                    std::cout << c_it->first << "Excitation E = " << energies[iRay] << std::endl;
+                    std::cout << c_it->first << "FLuoresnce E = " << result[c_it->first]["energy"] << std::endl;
+                    std::cout << c_it->first << "mu_1_i = " << mu_1_i << std::endl;
+                    std::cout << c_it->first << "mu_1_lambda = " << mu_1_lambda<< std::endl;
+                    std::cout << c_it->first << "d * t = " << density_1 * thickness_1 << std::endl;
+                    std::cout << c_it->first << "mu_1_lambda/sinALphain = " << mu_1_lambda / sinAlphaIn<< std::endl;
+                    std::cout << c_it->first << "mu_1_i/sinALphaOut = " << mu_1_i / sinAlphaOut<< std::endl;
+                }
             }
 
             /*
@@ -926,7 +939,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                     }
                     else
                     {
-                        //continue;
+                        // continue;
                         mu_2_lambda = muTotal[jLayer];
                         density_2 = sampleLayerDensity[jLayer];
                         thickness_2 = sampleLayerThickness[jLayer];
@@ -1009,8 +1022,8 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                 {
                                     if (tmpExcitationFactors.find(c_it->first) == tmpExcitationFactors.end())
                                     {
-                                        // This happens when we look for K lines, but obviously L lines are
-                                        // present
+                                        // This happens when, for instance, we look for K lines, but obviously
+                                        // L lines are present
                                         //std::cout << "Not considered " << c_it->first ;
                                         //std::cout << " energy = " << sampleLayerEnergies[iLayer][iLambda] << std::endl;
                                         continue;

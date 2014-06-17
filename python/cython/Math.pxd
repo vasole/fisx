@@ -9,6 +9,8 @@ cdef extern from "fisx_math.h":
         Math()
 
         double E1(double) except +
+        
+        double En(int, double) except +
 
         double deBoerD(double) except +
 
