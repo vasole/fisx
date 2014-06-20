@@ -2,6 +2,7 @@
 #include <math.h>
 #include <stdexcept>
 #include <cctype>
+#include <cmath>
 #include <sstream>
 #include <algorithm>
 #include "fisx_elements.h"
@@ -1580,4 +1581,60 @@ std::string Elements::toString(const double& number)
     ss << number;
     std::string s(ss.str());
     return s;
+}
+
+std::map<std::string,std::map<std::string, double> > Elements::getEscape( \
+                                        const std::map<std::string, double> & composition,
+                                        const double & energy, \
+                                        const double & energyThreshold, \
+                                        const double & intensityThreshold, \
+                                        const int & nThreshold , \
+                                        const double & alphaIn , \
+                                        const double & thickness) const
+{
+    std::map<std::string,  std::map<std::string, double> > result;
+    std::map<std::string, std::map<std::string, double> > excitationFactors;
+    std::map<std::string, double>::const_iterator c_it;
+    std::string element;
+    double massFraction;
+    double muIncident;
+    double muFluorescence;
+    double sinAlphaIn = std::sin(alphaIn * (3.141592653589793/180.));
+    double sinAlphaOut = 1.0;
+    double tmpDouble;
+    std::string tmpString;
+
+
+    muIncident = this->getMassAttenuationCoefficients(composition, energy)["total"];
+    result.clear();
+    for (c_it = composition.begin(); c_it != composition.end(); c_it++)
+    {
+        element = c_it->first;
+        massFraction = c_it->second;
+        excitationFactors = this->getExcitationFactors(element, energy, massFraction);
+        std::map<std::string, std::map<std::string, double> >::const_iterator it;
+        std::map<std::string, double>::const_iterator mapIt;
+        // factor uses mu["shell photoelectric"] / mu["total photoelectric"]
+        double factor;
+        // rate uses mu["shell photoelectric"]
+        // It is the product factor * mu["total photoelectric"]
+        double rate;
+        double fluorescentEnergy;
+        for ( it = excitationFactors.begin(); it != excitationFactors.end(); ++it)
+        {
+            mapIt = it->second.find("factor");
+            factor = mapIt->second;
+            mapIt = it->second.find("rate");
+            rate = mapIt->second;
+            mapIt = it->second.find("energy");
+            fluorescentEnergy = mapIt->second;
+            muFluorescence = this->getMassAttenuationCoefficients(composition, fluorescentEnergy)["total"];
+            tmpDouble = sinAlphaIn * (muFluorescence / muIncident);
+            tmpString = element + "_" + it->first + "esc";
+            result[tmpString] ["rate"] = rate * (0.5 /  muIncident) * \
+                                                        ( 1.0 - tmpDouble * std::log( 1 + 1.0 / tmpDouble));
+            result[tmpString] ["energy"] = fluorescentEnergy;
+        }
+    }
+    return result;
 }

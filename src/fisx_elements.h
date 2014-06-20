@@ -243,7 +243,7 @@ public:
 
     /*!
     Given a set of energies and (optional) weights, for the specfified element, this method returns
-    the emitted X-ray already corrected for cascade and fluorescence yield.
+    the emitted X-rays already corrected for cascade and fluorescence yield.
     It is the equivalent of the excitation factor in D.K.G. de Boer's paper.
     */
     std::vector<std::map<std::string, std::map<std::string, double> > > getExcitationFactors( \
@@ -280,6 +280,34 @@ public:
     Convenience function to simplify python use ...
     */
     const std::map<std::string, double> & getElementBindingEnergies(const std::string & name) const;
+
+    /*!
+    Given a detector composition and an incident energy in keV, gives back a map of the form:
+    result["element_transitionesc"]["energy"]
+    result["element_transitionesc"]["rate"]
+    For instance, if the incident energy is 5 keV and the composition is Si, the output
+    would have the form:
+
+    result["Si_KL3esc"] ["energy"] = 5.0 - Si KL3 transition energy
+    result["Si_KM3esc"] ["energy"] = 5.0 - Si KM3 transition energy
+    ...
+
+    The rest of (optional) parameters condition the output as follows:
+
+    energyThreshold - Separation between two lines to be considered together. Default 0.010 keV.
+    intensityThreshold - Minimum absolute peak intensity to consider. Default 1.0e-7
+    nThreshold - Maximum number of escape peaks to consider
+    alphaIn - Incoming beam angle with detector surface
+    thickness - Material thickness in g/cm2. Default is 0, infinite thickness
+
+    */
+    std::map<std::string, std::map<std::string, double> > getEscape(const std::map<std::string, double> & composition, \
+                                        const double & energy, \
+                                        const double & energyThreshold = 0.010, \
+                                        const double & intensityThreshold = 1.0e-7, \
+                                        const int & nThreshold = 4 , \
+                                        const double & alphaIn = 90.,\
+                                        const double & thickness = 0.0) const;
 
 
     /*!
