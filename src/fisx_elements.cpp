@@ -1633,7 +1633,7 @@ std::map<std::string,std::map<std::string, double> > Elements::getEscape( \
             tmpString = element + "_" + it->first + "esc";
             result[tmpString] ["rate"] = rate * (0.5 /  muIncident) * \
                                                         ( 1.0 - tmpDouble * std::log( 1 + 1.0 / tmpDouble));
-            result[tmpString] ["energy"] = fluorescentEnergy;
+            result[tmpString] ["energy"] = energy - fluorescentEnergy;
         }
     }
     return result;
