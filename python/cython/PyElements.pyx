@@ -153,3 +153,10 @@ cdef class PyElements:
     def getElementBindingEnergies(self, std_string name):
         return self.thisptr.getElementBindingEnergies(name)
 
+    def getEscape(self, std_map[std_string, double] composition, double energy, double energyThreshold=0.010,
+                                        double intensityThreshold=1.0e-7,
+                                        int nThreshold=4 ,
+                                        double alphaIn=90.,
+                                        double thickness=0.0):
+        return self.thisptr.getEscape(composition, energy, energyThreshold, intensityThreshold, nThreshold,
+                                      alphaIn, thickness)

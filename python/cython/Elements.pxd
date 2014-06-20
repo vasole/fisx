@@ -62,3 +62,6 @@ cdef extern from "fisx_elements.h":
         std_vector[std_pair[std_string, double]] getPeakFamilies(std_vector[std_string], double) except +
 
         std_map[std_string, double] getElementBindingEnergies(std_string) except +
+
+        std_map[std_string, std_map [std_string, double]] getEscape(std_map[std_string, double],\
+                                              double, double, double, int, double, double) except +
