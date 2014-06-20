@@ -70,6 +70,18 @@ std::map<std::string, double> Layer::getMassAttenuationCoefficients(const double
     }
 }
 
+std::map<std::string, double> Layer::getComposition(const Elements & elements)
+{
+    if (this->hasMaterial)
+    {
+        return this->material.getComposition();
+    }
+    else
+    {
+        return elements.getComposition(this->materialName);
+    }
+}
+
 std::map<std::string, std::vector<double> > Layer::getMassAttenuationCoefficients( \
                                                    const std::vector<double> & energy, \
                                                    const Elements & elements) const
