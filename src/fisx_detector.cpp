@@ -7,6 +7,11 @@ Detector::Detector(const std::string & name, const double & density, const doubl
 {
     this->diameter =  0.0;
     this->distance = 10.0;
+    this->escapePeakEnergyThreshold = 0.010,
+    this->escapePeakIntensityThreshold = 1.0e-7;
+    this->escapePeakNThreshold = 4;
+    this->escapePeakAlphaIn = 90.;
+    this->escapePeakCache.clear();
 }
 
 double Detector::getActiveArea() const
@@ -53,4 +58,36 @@ const double & Detector::getDiameter() const
 const double & Detector::getDistance() const
 {
     return this->distance;
+}
+
+std::map<std::string, std::map<std::string, double> > Detector::getEscape(const double & energy,
+                                                            const Elements & elementsLibrary,
+                                                            const std::string & label,
+                                                            const int & update)
+{
+    if (update != 0)
+        this->escapePeakCache.clear();
+    if (label.size())
+    {
+        if (this->escapePeakCache.find(label) == this->escapePeakCache.end())
+        {
+            // calculate it
+            this->escapePeakCache[label] = elementsLibrary.getEscape(this->getComposition(elementsLibrary), \
+                                                                     energy, \
+                                                                     this->escapePeakEnergyThreshold, \
+                                                                     this->escapePeakIntensityThreshold, \
+                                                                     this->escapePeakNThreshold, \
+                                                                     this->escapePeakAlphaIn);
+        }
+        return this->escapePeakCache[label];
+    }
+    else
+    {
+        return elementsLibrary.getEscape(this->getComposition(elementsLibrary), \
+                                         energy, \
+                                         this->escapePeakEnergyThreshold, \
+                                         this->escapePeakIntensityThreshold, \
+                                         this->escapePeakNThreshold, \
+                                         this->escapePeakAlphaIn);
+    }
 }

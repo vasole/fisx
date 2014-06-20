@@ -52,10 +52,29 @@ public:
     */
     const double & getDistance() const;
 
+    /*!
+    Returns escape peak energy and rate associated to given energy.
+
+    The optional arguments label and update serve for caching purposes.
+    */
+    std::map<std::string, std::map<std::string, double> > getEscape(const double & energy, \
+                                                            const Elements & elementsLibrary, \
+                                                            const std::string & label = "", \
+                                                            const int & update = 1);
+
+    void setMinimumEscapePeakEnergy(const double & energy);
+    void setMinimumEscapePeakIntensity(const double & intensity);
+    void setMaximumNumberOfEscapePeaks(const int & nPeaks);
 
 private:
     double diameter ;
     double distance ;
+    // Escape peak related parameters
+    double escapePeakEnergyThreshold;
+    double escapePeakIntensityThreshold;
+    int escapePeakNThreshold;
+    double escapePeakAlphaIn;
+    std::map< std::string, std::map<std::string, std::map<std::string, double> > > escapePeakCache;
     // TODO: Calibration, fano, noise, and so on.
 };
 
