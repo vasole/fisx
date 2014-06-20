@@ -25,3 +25,5 @@ cdef extern from "fisx_detector.h":
         void setDistance(double) except +
 
         double getDistance() except +
+
+        std_map[std_string, std_map[std_string, double]] getEscape(double, Elements, std_string, int) except +

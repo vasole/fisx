@@ -41,7 +41,12 @@ cdef class PyDetector:
 
     def getDistance(self):
         return self.thisptr.getDistance()
-#import numpy as np
+
+    def getEscape(self, double energy, PyElements elementsLib, std_string label="", int update=1):
+        if update:
+            return self.thisptr.getEscape(energy, deref(elementsLib.thisptr), label, 1)
+        else:
+            return self.thisptr.getEscape(energy, deref(elementsLib.thisptr), label, 0)#import numpy as np
 #cimport numpy as np
 cimport cython
 
@@ -150,9 +155,12 @@ from Material cimport *
 cdef class PyElements:
     cdef Elements *thisptr
 
-    def __cinit__(self, std_string directoryName, 
+    def __cinit__(self, std_string directoryName="",
                         std_string bindingEnergiesFile="",
                         std_string crossSectionsFile=""):
+        if len(directoryName) == 0:
+            from fisx import DataDir
+            directoryName = DataDir.DATA_DIR
         if len(bindingEnergiesFile):
             self.thisptr = new Elements(directoryName, bindingEnergiesFile)
         else:

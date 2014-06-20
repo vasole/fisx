@@ -9,19 +9,51 @@ from libcpp.map cimport map as std_map
 
 from Elements cimport *
 from Material cimport *
-    
+
+__doc__ = """
+
+Initialization with XCOM parameters from fisx:
+
+import os
+from fisx import DataDir
+dataDir = DataDir.DATA_DIR
+bindingEnergies = os.path.join(dataDir, "BindingEnergies.dat")
+xcomFile = os.path.join(dataDir, "XCOM_CrossSections.dat")
+xcom = Elements(dataDir, bindingEnergies, xcomFile)
+
+Initialization with XCOM parameters from PyMca:
+
+import os
+from PyMca5 import PyMcaDataDir
+dataDir = PyMcaDataDir.PYMCA_DATA_DIR
+bindingEnergies = os.path.join(dataDir, "BindingEnergies.dat")
+xcomFile = os.path.join(dataDir, "XCOM_CrossSections.dat")
+# This is needed because PyMca does not have the non-radiative rates
+from fisx import DataDir
+dataDir = DataDir.DATA_DIR
+xcom = Elements(dataDir, bindingEnergies, xcomFile)
+
+"""
 cdef class PyElements:
     cdef Elements *thisptr
 
-    def __cinit__(self, std_string directoryName, 
+    def __cinit__(self, std_string directoryName="",
                         std_string bindingEnergiesFile="",
                         std_string crossSectionsFile=""):
+        if len(directoryName) == 0:
+            from fisx import DataDir
+            directoryName = DataDir.DATA_DIR
         if len(bindingEnergiesFile):
             self.thisptr = new Elements(directoryName, bindingEnergiesFile)
         else:
             self.thisptr = new Elements(directoryName)
         if len(crossSectionsFile):
             self.thisptr.setMassAttenuationCoefficientsFile(crossSectionsFile)
+
+    def initializeAsPyMca(self):
+        from PyMca5 import PyMcaDataDir
+        del self.thisptr
+
 
     def __dealloc__(self):
         del self.thisptr

@@ -41,3 +41,9 @@ cdef class PyDetector:
 
     def getDistance(self):
         return self.thisptr.getDistance()
+
+    def getEscape(self, double energy, PyElements elementsLib, std_string label="", int update=1):
+        if update:
+            return self.thisptr.getEscape(energy, deref(elementsLib.thisptr), label, 1)
+        else:
+            return self.thisptr.getEscape(energy, deref(elementsLib.thisptr), label, 0)
