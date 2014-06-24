@@ -73,7 +73,26 @@ public:
     */
     std::vector<std::string> getElementNames();
 
+
+    /*!
+    Convenience method to simplify access to element properties from binding (ex. python)
+    */
+    const std::map<std::string, double> & getNonradiativeTransitions(const std::string & elementName, \
+                                                                     const std::string & subshell) const;
+
+    /*!
+    Convenience method to simplify access to element properties from binding (ex. python)
+    */
+    const std::map<std::string, double> & getRadiativeTransitions(const std::string & elementName, \
+                                                                  const std::string & subshell) const;
+
     // shell related functions
+    /*!
+    Convenience method to simplify access to element properties from binding (ex. python)
+    */
+    std::map<std::string, double> getShellConstants(const std::string & elementName, \
+                                                    const std::string & subshell) const;
+
     /*!
     Load main shell (K, L or M) constants from file (fluorescence and Coster-Kronig yields)
     */
@@ -279,7 +298,7 @@ public:
     /*!
     Convenience function to simplify python use ...
     */
-    const std::map<std::string, double> & getElementBindingEnergies(const std::string & name) const;
+    const std::map<std::string, double> & getBindingEnergies(const std::string & name) const;
 
     /*!
     Given a detector composition and an incident energy in keV, gives back a map of the form:
@@ -296,9 +315,9 @@ public:
 
     energyThreshold - Separation between two lines to be considered together. Default 0.010 keV.
     intensityThreshold - Minimum absolute peak intensity to consider. Default 1.0e-7
-    nThreshold - Maximum number of escape peaks to consider
-    alphaIn - Incoming beam angle with detector surface
-    thickness - Material thickness in g/cm2. Default is 0, infinite thickness
+    nThreshold - Maximum number of escape peaks to consider. Default is 4.
+    alphaIn - Incoming beam angle with detector surface. Default 90 degrees.
+    thickness - Material thickness in g/cm2. Default is 0 to indicate infinite thickness
 
     */
     std::map<std::string, std::map<std::string, double> > getEscape(const std::map<std::string, double> & composition, \

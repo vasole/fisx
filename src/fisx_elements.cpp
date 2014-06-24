@@ -1534,7 +1534,7 @@ std::vector<std::pair<std::string, double> > Elements::getPeakFamilies( \
 };
 
 
-const std::map<std::string, double> & Elements::getElementBindingEnergies(const std::string & element) const
+const std::map<std::string, double> & Elements::getBindingEnergies(const std::string & element) const
 {
     return getElement(element).getBindingEnergies();
 }
@@ -1582,6 +1582,26 @@ std::string Elements::toString(const double& number)
     std::string s(ss.str());
     return s;
 }
+
+const std::map<std::string, double> & Elements::getNonradiativeTransitions(const std::string & elementName, \
+                                                                     const std::string & subshell) const
+{
+    return this->getElement(elementName).getNonradiativeTransitions(subshell);
+}
+
+const std::map<std::string, double> & Elements::getRadiativeTransitions(const std::string & elementName, \
+                                                                  const std::string & subshell) const
+{
+    return this->getElement(elementName).getRadiativeTransitions(subshell);
+}
+
+std::map<std::string, double> Elements::getShellConstants(const std::string & elementName, \
+                                                    const std::string & subshell) const
+{
+    return this->getElement(elementName).getShellConstants(subshell);
+}
+
+
 
 std::map<std::string,std::map<std::string, double> > Elements::getEscape( \
                                         const std::map<std::string, double> & composition,
@@ -1631,9 +1651,12 @@ std::map<std::string,std::map<std::string, double> > Elements::getEscape( \
             muFluorescence = this->getMassAttenuationCoefficients(composition, fluorescentEnergy)["total"];
             tmpDouble = sinAlphaIn * (muFluorescence / muIncident);
             tmpString = element + "_" + it->first + "esc";
-            result[tmpString] ["rate"] = rate * (0.5 /  muIncident) * \
-                                                        ( 1.0 - tmpDouble * std::log( 1 + 1.0 / tmpDouble));
-            result[tmpString] ["energy"] = energy - fluorescentEnergy;
+            rate *= (0.5 /  muIncident) * ( 1.0 - tmpDouble * std::log( 1 + 1.0 / tmpDouble));
+            if (rate > intensityThreshold)
+            {
+                result[tmpString] ["rate"] = rate;
+                result[tmpString] ["energy"] = energy - fluorescentEnergy;
+            }
         }
     }
     return result;
