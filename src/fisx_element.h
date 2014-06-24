@@ -176,7 +176,7 @@ public:
     void setNonradiativeTransitions(std::string subshell,
                                     std::map<std::string, double> values);
 
-    const std::map<std::string, double> & getNonradiativeTransitions(const std::string & subshell);
+    const std::map<std::string, double> & getNonradiativeTransitions(const std::string & subshell) const;
 
     // Shell constants (fluorescence yield, Coster-Kronig yields)
     void setShellConstants(std::string subshell, std::map<std::string, double> constants);

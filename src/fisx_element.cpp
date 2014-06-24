@@ -897,9 +897,19 @@ void Element::setNonradiativeTransitions(std::string subshell, std::map<std::str
     this->shellInstance[subshell].setNonradiativeTransitions(values);
 }
 
-const std::map<std::string, double> & Element::getNonradiativeTransitions(const std::string & subshell)
+const std::map<std::string, double> & Element::getNonradiativeTransitions(const std::string & subshell) const
 {
-    return this->shellInstance[subshell].getNonradiativeTransitions();
+    std::map<std::string, Shell>::const_iterator c_it;
+    std::string msg;
+
+    c_it = this->shellInstance.find(subshell);
+    if ( c_it == this->shellInstance.end())
+    {
+        msg = "Requested shell <" + subshell + "> is not a defined K, L or M subshell";
+        throw std::invalid_argument(msg);
+    }
+
+    return c_it->second.getNonradiativeTransitions();
 }
 
 
