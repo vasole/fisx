@@ -14,6 +14,25 @@ Detector::Detector(const std::string & name, const double & density, const doubl
     this->escapePeakCache.clear();
 }
 
+void Detector::setMinimumEscapePeakEnergy(const double & energy)
+{
+    this->escapePeakEnergyThreshold = energy;
+    this->escapePeakCache.clear();
+}
+
+void Detector::setMinimumEscapePeakIntensity(const double & intensity)
+{
+    this->escapePeakIntensityThreshold = intensity;
+    this->escapePeakCache.clear();
+}
+
+void Detector::setMaximumNumberOfEscapePeaks(const int & nPeaks)
+{
+    this->escapePeakNThreshold = nPeaks;
+    this->escapePeakCache.clear();
+}
+
+
 double Detector::getActiveArea() const
 {
     double pi;
