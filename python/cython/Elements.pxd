@@ -61,7 +61,13 @@ cdef extern from "fisx_elements.h":
 
         std_vector[std_pair[std_string, double]] getPeakFamilies(std_vector[std_string], double) except +
 
-        std_map[std_string, double] getElementBindingEnergies(std_string) except +
+        std_map[std_string, double] getBindingEnergies(std_string) except +
 
         std_map[std_string, std_map [std_string, double]] getEscape(std_map[std_string, double],\
                                               double, double, double, int, double, double) except +
+
+        std_map[std_string, double] getRadiativeTransitions(std_string, std_string) except +
+
+        std_map[std_string, double] getNonradiativeTransitions(std_string, std_string) except +
+
+        std_map[std_string, double] getShellConstants(std_string, std_string) except +

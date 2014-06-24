@@ -51,9 +51,27 @@ cdef class PyElements:
             self.thisptr.setMassAttenuationCoefficientsFile(crossSectionsFile)
 
     def initializeAsPyMca(self):
-        from PyMca5 import PyMcaDataDir
+        import os
+        try:
+            from fisx import DataDir
+            directoryName = DataDir.DATA_DIR
+            from PyMca5 import PyMcaDataDir
+            dataDir = PyMcaDataDir.PYMCA_DATA_DIR
+        except ImportError:
+            from fisx import DataDir
+            directoryName = DataDir.DATA_DIR
+            dataDir = directoryName
+        bindingEnergies = os.path.join(dataDir, "BindingEnergies.dat")
+        xcomFile = os.path.join(dataDir, "XCOM_CrossSections.dat")
         del self.thisptr
+        self.thisptr = new Elements(directoryName, bindingEnergies, xcomFile)
+        for shell in ["K", "L", "M"]:
+            shellConstantsFile = os.path.join(dataDir, shell+"ShellConstants.dat")
+            self.thisptr.setShellConstantsFile(shell, shellConstantsFile)
 
+        for shell in ["K", "L", "M"]:
+            radiativeRatesFile = os.path.join(dataDir, shell+"ShellRates.dat")
+            self.thisptr.setShellRadiativeTransitionsFile(shell, radiativeRatesFile)
 
     def __dealloc__(self):
         del self.thisptr
@@ -182,8 +200,8 @@ cdef class PyElements:
     def _getPeakFamiliesFromVectorOfElements(self, std_vector[std_string] elementList, double energy):
         return self.thisptr.getPeakFamilies(elementList, energy)
 
-    def getElementBindingEnergies(self, std_string name):
-        return self.thisptr.getElementBindingEnergies(name)
+    def getBindingEnergies(self, std_string elementName):
+        return self.thisptr.getBindingEnergies(elementName)
 
     def getEscape(self, std_map[std_string, double] composition, double energy, double energyThreshold=0.010,
                                         double intensityThreshold=1.0e-7,
@@ -192,3 +210,12 @@ cdef class PyElements:
                                         double thickness=0.0):
         return self.thisptr.getEscape(composition, energy, energyThreshold, intensityThreshold, nThreshold,
                                       alphaIn, thickness)
+
+    def getShellConstants(self, std_string elementName, std_string subshell):
+        return self.thisptr.getShellConstants(elementName, subshell)
+
+    def getRadiativeTransitions(self, std_string elementName, std_string subshell):
+        return self.thisptr.getRadiativeTransitions(elementName, subshell)
+
+    def getNonradiativeTrnasitions(self, std_string elementName, std_string subshell):
+        return self.thisptr.getNonradiativeTransitions(elementName, subshell)
