@@ -301,6 +301,7 @@ public:
     const std::map<std::string, double> & getBindingEnergies(const std::string & name) const;
 
     /*!
+    Return escape peak energy and rate per detected photon of given energy.
     Given a detector composition and an incident energy in keV, gives back a map of the form:
     result["element_transitionesc"]["energy"]
     result["element_transitionesc"]["rate"]

@@ -14,6 +14,18 @@ Detector::Detector(const std::string & name, const double & density, const doubl
     this->escapePeakCache.clear();
 }
 
+void Detector::setMaterial(const std::string & materialName)
+{
+    this->escapePeakCache.clear();
+    this->Layer::setMaterial(materialName);
+}
+
+void Detector::setMaterial(const Material & material)
+{
+    this->escapePeakCache.clear();
+    this->Layer::setMaterial(material);
+}
+
 void Detector::setMinimumEscapePeakEnergy(const double & energy)
 {
     this->escapePeakEnergyThreshold = energy;

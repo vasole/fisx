@@ -104,6 +104,14 @@ public:
         return true;
     };
 
+    /*!
+    Utility function (from Kleist in stackoverflow) to check if a string starts with testString
+    */
+    static bool startsWith(const std::string& stringToCheck, const std::string& testString) {
+    return testString.length() <= stringToCheck.length()
+        && std::equal(testString.begin(), testString.end(), stringToCheck.begin());
+}
+
 private:
     std::string fileName;
     std::map<std::string, std::map<std::string, std::string> > sectionContents;

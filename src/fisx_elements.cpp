@@ -1619,14 +1619,27 @@ std::map<std::string,std::map<std::string, double> > Elements::getEscape( \
     double massFraction;
     double muIncident;
     double muFluorescence;
-    double sinAlphaIn = std::sin(alphaIn * (3.141592653589793/180.));
+    double sinAlphaIn;
     double sinAlphaOut = 1.0;
     double tmpDouble;
     std::string tmpString;
+    double intrinsicEfficiency;
 
-
+    if (alphaIn == 90.)
+        sinAlphaIn = 1.0;
+    else
+    {
+        sinAlphaIn = std::sin(alphaIn * (3.141592653589793/180.));
+        if (sinAlphaIn < 0.0)
+        {
+            sinAlphaIn = - sinAlphaIn;
+        }
+    }
     muIncident = this->getMassAttenuationCoefficients(composition, energy)["total"];
     result.clear();
+
+    if (thickness > 0.0)
+        intrinsicEfficiency = (1.0 - std::exp(-muIncident * thickness / sinAlphaIn));
     for (c_it = composition.begin(); c_it != composition.end(); c_it++)
     {
         element = c_it->first;
@@ -1654,6 +1667,14 @@ std::map<std::string,std::map<std::string, double> > Elements::getEscape( \
             rate *= (0.5 /  muIncident) * ( 1.0 - tmpDouble * std::log( 1 + 1.0 / tmpDouble));
             if (rate > intensityThreshold)
             {
+                if (thickness > 0.0)
+                {
+                    // This is to give the escape peak rate per detected photon
+                    // and not per incident photon.
+                    // It is not a correct approximation, but this avoids the calculation
+                    // of exponential integral functions.
+                    rate /= (1.0 - std::exp(-muIncident * thickness / sinAlphaIn));
+                }
                 result[tmpString] ["rate"] = rate;
                 result[tmpString] ["energy"] = energy - fluorescentEnergy;
             }

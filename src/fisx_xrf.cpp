@@ -480,7 +480,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
     std::vector<Layer>::size_type iLayer;
     std::vector<Layer>::size_type jLayer;
     std::vector<Layer>::size_type bLayer;
-    const Detector & detector = this->configuration.getDetector();
+    Detector detector = this->configuration.getDetector();
     const Element & element = elementsLibrary.getElement(elementName);
     std::string msg;
     const double PI = acos(-1.0);
@@ -549,6 +549,9 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
     std::vector<double> sampleLayerDensity;
     std::vector<double> sampleLayerThickness;
     std::vector<double> sampleLayerWeight;
+    std::map< std::string, std::map<std::string, double> > escapeRates;
+    int updateEscape;
+    updateEscape = 1;
 
     sampleLayerEnergies.resize(sample.size());
     sampleLayerEnergyNames.resize(sample.size());
@@ -559,6 +562,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
     sampleLayerDensity.resize(sample.size());
     sampleLayerThickness.resize(sample.size());
     sampleLayerWeight.resize(sample.size());
+    escapeRates.clear();
 
     iRay = energies.size();
     std::cout << "element name = " << elementName << " " << lineFamily << std::endl;;
@@ -716,15 +720,15 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                     result[c_it->first]["factor"] = mapIt->second;
                     if (c_it->first.size() == 4)
                     {
-                        energyThreshold = this->getEnergyThreshold(elementName,
-                                                                            c_it->first.substr(0, 2),
-                                                                            elementsLibrary);
+                        energyThreshold = this->getEnergyThreshold(elementName, \
+                                                                   c_it->first.substr(0, 2), \
+                                                                   elementsLibrary);
                     }
                     else
                     {
-                        energyThreshold = this->getEnergyThreshold(elementName,
-                                                                        c_it->first.substr(0, 1),
-                                                                        elementsLibrary);
+                        energyThreshold = this->getEnergyThreshold(elementName, \
+                                                                   c_it->first.substr(0, 1), \
+                                                                   elementsLibrary);
                     }
                     if (actualResult[key][iLayer].find(c_it->first) == actualResult[key][iLayer].end())
                     {
@@ -761,10 +765,19 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                         if (detector.hasMaterialComposition() || (detector.getMaterialName().size() > 0 ))
                         {
                             // calculate intrinsic efficiency
+                            // assuming normal incidence on detector surface
                             detectionEfficiency *= (1.0 - detector.getTransmission(energy, \
                                                                                    elementsLibrary, \
                                                                                    90.0));
+                            // calculate escape ratio assuming normal incidence on detector surface
+                            escapeRates = detector.getEscape(energy, \
+                                                             elementsLibrary, \
+                                                             c_it->first, \
+                                                             updateEscape);
+                            updateEscape = 0;
                         }
+
+
                         result[c_it->first]["energy_threshold"] = energyThreshold;
                         result[c_it->first]["efficiency"] = detectionEfficiency;
                         actualResult[key][iLayer][c_it->first]["efficiency"] = detectionEfficiency;
@@ -1070,16 +1083,56 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                     }
                 }
             }
+
             // here we are done for the element and the layer
             key = elementName + " " + lineFamily;
             for (c_it = result.begin(); c_it != result.end(); ++c_it)
             {
-                actualResult[key][iLayer][c_it->first]["rate"] += result[c_it->first]["rate"];
+                double totalEscape = 0.0;
+                if (detector.hasMaterialComposition() || (detector.getMaterialName().size() > 0 ))
+                {
+                    // calculate (if needed) escape ratio
+                    escapeRates = detector.getEscape(energy, \
+                                                     elementsLibrary, \
+                                                     c_it->first, \
+                                                     updateEscape);
+                    if (escapeRates.size())
+                    {
+                        updateEscape = 0;
+                        std::map<std::string, std::map<std::string, double> >::const_iterator c_it2;
+ //                       std::map<std::string, double>::const_iterator mapIt;
+                        for( c_it2 = escapeRates.begin(); c_it2!= escapeRates.end(); ++c_it2)
+                        {
+                            tmpString = c_it->first + " "+ c_it2->first;
+                            if (actualResult[key][iLayer].find(tmpString) == actualResult[key][iLayer].end())
+                            {
+                                mapIt = c_it2->second.find("energy");
+                                if (mapIt == c_it2->second.end())
+                                {
+                                    throw std::runtime_error("Missing energy key in escape peak information!");
+                                }
+                                actualResult[key][iLayer][tmpString]["energy"] = mapIt->second;
+                                actualResult[key][iLayer][tmpString]["rate"] = 0.0;
+                                actualResult[key][iLayer][tmpString]["primary"] = 0.0;
+                                actualResult[key][iLayer][tmpString]["secondary"] = 0.0;
+                            }
+                            mapIt = c_it2->second.find("rate");
+                            if (mapIt == c_it2->second.end())
+                            {
+                                throw std::runtime_error("Missing rate key in escape peak information!");
+                            }
+                            totalEscape += mapIt->second;
+                            actualResult[key][iLayer][tmpString]["rate"] += mapIt->second * result[c_it->first]["rate"];
+                        }
+                    }
+                }
+                actualResult[key][iLayer][c_it->first]["rate"] += (1.0 - totalEscape) * result[c_it->first]["rate"];
                 actualResult[key][iLayer][c_it->first]["primary"] += result[c_it->first]["primary"];
                 actualResult[key][iLayer][c_it->first]["secondary"] += result[c_it->first]["secondary"];
             }
         }
     }
+
     return actualResult;
 }
 
@@ -1087,7 +1140,7 @@ double XRF::getEnergyThreshold(const std::string & elementName, const std::strin
                                 const Elements & elementsLibrary) const
 {
     std::map<std::string, double> binding;
-    binding = elementsLibrary.getElementBindingEnergies(elementName);
+    binding = elementsLibrary.getBindingEnergies(elementName);
     if ((family == "K") || (family.size() == 2))
         return binding[family];
 

@@ -19,6 +19,11 @@ public:
                                            const double & thickness = 0.0,
                                            const double & funnyFactor = 1.0);
 
+    void setMaterial(const std::string & materialName);
+
+    void setMaterial(const Material & material);
+
+
 
     /*!
     Active area in cm2.
@@ -53,7 +58,7 @@ public:
     const double & getDistance() const;
 
     /*!
-    Returns escape peak energy and rate associated to given energy.
+    Returns escape peak energy and rate per detected photon of given energy.
 
     The optional arguments label and update serve for caching purposes.
     */
