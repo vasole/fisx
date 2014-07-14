@@ -389,7 +389,6 @@ void Shell::_updateNonradiativeRatios()
         totalCosterKronig = 0.0;
         subshellMax = 0;
         totalAuger = total;
-        total = total;
     }
     else
     {
