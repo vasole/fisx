@@ -1503,7 +1503,6 @@ std::vector<std::pair<std::string, double> > Elements::getPeakFamilies( \
     std::vector<std::string>::size_type i, j;
     std::vector<std::string> shells;
     std::vector<std::pair<std::string, double> >result;
-    const Element* element;
 
     result.clear();
     for (i = 0; i < elementList.size(); i++)
@@ -1620,7 +1619,6 @@ std::map<std::string,std::map<std::string, double> > Elements::getEscape( \
     double muIncident;
     double muFluorescence;
     double sinAlphaIn;
-    double sinAlphaOut = 1.0;
     double tmpDouble;
     std::string tmpString;
     double intrinsicEfficiency;
