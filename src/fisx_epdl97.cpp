@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "fisx_epdl97.h"
 #include "fisx_simplespecfile.h"
 #include <stdexcept>
