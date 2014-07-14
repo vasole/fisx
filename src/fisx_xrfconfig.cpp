@@ -28,7 +28,6 @@ void XRFConfig::readConfigurationFromFile(const std::string & fileName)
     std::vector<std::string> stringVector;
     std::vector<std::string>::size_type iStringVector;
     std::vector<double> doubleVector;
-    std::vector<double>::size_type iDoubleVector;
     std::vector<int> intVector, flagVector;
     std::vector<int>::size_type iIntVector;
     std::map<std::string, std::string>::const_iterator c_it;
