@@ -961,7 +961,7 @@ const std::map<std::string, double> & Element::getXRayLines(const std::string & 
     return this->getFluorescenceRatios(family);
 }
 
-const std::map<std::string, double> & Element::getEmittedXRayLines(const double & energy) const
+std::map<std::string, double> Element::getEmittedXRayLines(const double & energy) const
 {
     std::string keys[9] = {"K", "L1", "L2", "L3", "M1", "M2", "M3", "M4", "M5"};
     std::map<std::string, Shell>::const_iterator shell_it;

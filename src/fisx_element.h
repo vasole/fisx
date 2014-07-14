@@ -198,7 +198,7 @@ public:
     Given an excitation energy (in keV), return a map where the key is the line name and the content
     the energy.
     */
-    const std::map<std::string, double> & getEmittedXRayLines(const double & energy= 1000.) const;
+    std::map<std::string, double> getEmittedXRayLines(const double & energy= 1000.) const;
 
     /*!
     Given a set of energies, give the initial distribution of vacancies (before cascade) due to
