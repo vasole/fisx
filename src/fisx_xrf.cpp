@@ -1,5 +1,6 @@
 #include "fisx_xrf.h"
 #include "fisx_math.h"
+#include "fisx_simpleini.h"
 #include <cmath>
 #include <stdexcept>
 #include <iostream>
@@ -1132,7 +1133,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
             }
         }
     }
-
+    this->lastMultilayerFluorescence = actualResult;
     return actualResult;
 }
 
@@ -1167,3 +1168,175 @@ double XRF::getEnergyThreshold(const std::string & elementName, const std::strin
     }
     return 0.0;
 }
+
+std::map<std::string, std::vector<double> > XRF::getSpectrum(const std::vector<double> & channel, \
+                const std::map<std::string, double> & detectorParameters, \
+                const std::map<std::string, double> & shapeParameters, \
+                const std::map<std::string, double> & peakFamilyArea, \
+                const expectedLayerEmissionType & emissionRatios) const
+{
+    std::map<std::string, double>::const_iterator c_it;
+    std::map<std::string, std::vector<double> > result;
+    for (c_it = shapeParameters.begin(); c_it != shapeParameters.end(); ++c_it)
+    {
+        std::cout << "Key = " << c_it->first << " Value " << c_it->second << std::endl;
+    }
+    return result;
+}
+
+void XRF::getSpectrum(double * channel, double * energy, double *spectrum, int nChannels, \
+                const std::map<std::string, double> & detectorParameters, \
+                const std::map<std::string, double> & shapeParameters, \
+                const std::map<std::string, double> & peakFamilyArea, \
+                const expectedLayerEmissionType & emissionRatios) const
+{
+    int i;
+    std::string detectorKeys[5] = {"Zero", "Gain", "Noise", "Fano", "QuantumEnergy"};
+    std::string shapeKeys[6] = {"ShortTailArea", "ShortTailSlope", "LongTailArea", "LongTailSlope", "StepHeight", \
+                                "Eta"};
+    std::map<std::string, double>::const_iterator c_it;
+
+    std::string tmpString;
+    std::vector<std::string> tmpStringVector;
+    double zero, gain, noise, fano, quantum;
+    double area;
+    int layerIndex;
+    double shortTailArea = 0.0, shortTailSlope = -1.0;
+    double longTailArea = 0.0, longTailSlope = -1.0;
+    double stepHeight = 0.0;
+    double eta = 0.0;
+
+    for (c_it = detectorParameters.begin(); c_it != detectorParameters.end(); ++c_it)
+    {
+        tmpString = c_it->first;
+        SimpleIni::toUpper(tmpString);
+        if ( tmpString == "ZERO")
+        {
+            zero = c_it->second;
+            continue;
+        }
+        if (tmpString == "GAIN")
+        {
+            gain = c_it->second;
+            continue;
+        }
+        if (tmpString == "NOISE")
+        {
+            noise = c_it->second;
+            continue;
+        }
+        if (tmpString == "FANO")
+        {
+            fano = c_it->second;
+            continue;
+        }
+        if (tmpString == "QUANTUMENERGY")
+        {
+            quantum = c_it->second;
+            continue;
+        }
+        std::cout << "WARNING: Unused detector parameter "<< c_it->first << " with value " << c_it->second << std::endl;
+    }
+
+    for (i = 0; i < nChannels; i++)
+    {
+        energy[i] = zero + gain * channel[i];
+    }
+
+    for (c_it = peakFamilyArea.begin(); c_it != peakFamilyArea.end(); ++c_it)
+    {
+        std::map<int, std::map<std::string, std::map<std::string, double> > > ::const_iterator layerIterator;
+        std::map<std::string, std::map<std::string, double> >::const_iterator lineIterator;
+        std::map<std::string, double>::const_iterator ratePointer;
+        std::vector<double> layerTotalSignal;
+        double totalSignal;
+        iteratorExpectedLayerEmissionType emissionRatiosPointer;
+        emissionRatiosPointer = emissionRatios.find(c_it->first);
+        // check if the description of that peak multiplet is available
+        if (emissionRatiosPointer != emissionRatios.end())
+        {
+            // In this case emission ratios has the form "Cr K".
+            // Remmeber that peakFamily can have the form "Cr K 0"
+            // We have to sum all the signals, to normalize to unit area, and multiply by the supplied
+            // area. This could have been already done ...
+            // loop for each layer
+            layerTotalSignal.clear();
+            totalSignal = 0.0;
+            for (layerIterator = emissionRatiosPointer->second.begin();
+                 layerIterator != emissionRatiosPointer->second.end(); ++layerIterator)
+            {
+                layerTotalSignal.push_back(0.0);
+                for (lineIterator = layerIterator->second.begin(); \
+                     lineIterator != layerIterator->second.end(); ++lineIterator)
+                {
+                    ratePointer = lineIterator->second.find("rate");
+                    if (ratePointer == lineIterator->second.end())
+                    {
+                        tmpString = "Keyword <rate> not found!!!";
+                        std::cout << tmpString << std::cout;
+                        throw std::invalid_argument(tmpString);
+                    }
+                    layerTotalSignal[layerTotalSignal.size() - 1] += ratePointer->second;
+                }
+                totalSignal += layerTotalSignal[layerTotalSignal.size() - 1];
+            }
+        }
+        else
+        {
+            tmpString = "";
+            SimpleIni::parseStringAsMultipleValues(c_it->first, tmpStringVector, tmpString, ' ');
+            if(tmpStringVector.size() != 3)
+            {
+                tmpString = "Unsuccessul conversion to Element, Family, layer index: " + c_it->first;
+            }
+
+            // We should have a key of the form "Cr K 0"
+            if (!SimpleIni::stringConverter(tmpStringVector[2], layerIndex))
+            {
+                tmpString = "Unsuccessul conversion to layer integer: " + tmpStringVector[2];
+                std::cout << tmpString << std::cout;
+                throw std::invalid_argument(tmpString);
+            }
+            // TODO: Deal with Ka, Kb, L, L1, L2, L3, ...
+            tmpString = tmpStringVector[0] + " " + tmpStringVector[1];
+            emissionRatiosPointer = emissionRatios.find(tmpString);
+            if (emissionRatiosPointer == emissionRatios.end())
+            {
+                tmpString = "Undefined emission ratios for element " + tmpStringVector[0] +\
+                            " family " + tmpStringVector[1];
+                std::cout << tmpString << std::cout;
+                throw std::invalid_argument(tmpString);
+            }
+            // Emission ratios has the form "Cr K" but we have received peakFamily can have the form "Cr K index"
+            // We have to to normalize the signal from that element, family and layer to unit area,
+            // and multiply by the supplied area. This could have been already done ...
+            layerIterator = emissionRatiosPointer->second.find(layerIndex);
+            if (layerIterator == emissionRatiosPointer->second.end())
+            {
+                tmpString = "I do not have information for layer number " + tmpStringVector[2];
+                std::cout << tmpString << std::cout;
+                throw std::invalid_argument(tmpString);
+            }
+            layerTotalSignal.clear();
+            totalSignal = 0.0;
+            layerTotalSignal.push_back(0.0);
+            for (lineIterator = layerIterator->second.begin(); \
+                 lineIterator != layerIterator->second.end(); ++lineIterator)
+            {
+                ratePointer = lineIterator->second.find("rate");
+                if (ratePointer == lineIterator->second.end())
+                {
+                    tmpString = "Keyword <rate> not found!!!";
+                    std::cout << tmpString << std::cout;
+                    throw std::invalid_argument(tmpString);
+                }
+                layerTotalSignal[layerTotalSignal.size() - 1] += ratePointer->second;
+            }
+            totalSignal += layerTotalSignal[layerTotalSignal.size() - 1];
+        }
+        // Now we already have area (provided) and ratio (dividing by totalSignal).
+        // We can therefore calculate the signal keeping the proper ratios.
+    }
+}
+
+
