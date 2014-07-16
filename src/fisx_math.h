@@ -116,6 +116,12 @@ class Math
         */
         static double AS_5_1_56(const double & x);
 
+        /*!
+        Get FWHM from energy, noise, fano and average energy needed to create a signal
+        */
+        static double getFWHM(const double & energy, const double & noise, \
+                              const double & fano, const double & quantumEnergy = 0.00385);
+
     private:
         /*!
         Evaluate exp(x) * E1(x) for x > 1

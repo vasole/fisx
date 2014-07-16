@@ -437,3 +437,9 @@ double Math::_deBoerD(const double &x, const double & epsilon, const int & maxIt
     limit1 = log(1 + 1.0 /x);
     return 0.5 * (limit0 + limit1);
 }
+
+double Math::getFWHM(const double & energy, const double & noise, \
+                     const double & fano, const double & quantumEnergy)
+{
+    return sqrt(noise * noise + energy * fano * 2.3548 * 2.3548 * quantumEnergy);
+}
