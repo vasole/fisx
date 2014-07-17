@@ -122,6 +122,31 @@ class Math
         static double getFWHM(const double & energy, const double & noise, \
                               const double & fano, const double & quantumEnergy = 0.00385);
 
+        /*!
+        Error function
+        */
+        static double erf(const double & x);
+
+
+        /*!
+        Complementary error function
+        */
+        static double erfc(const double & x);
+
+        /*!
+        Evaluate HYPERMET function
+        */
+        static double hypermet(const double & x,
+                               const double & gaussArea, \
+                               const double & position, \
+                               const double & fwhm, \
+                               const double & shortTailArea = 0.0, \
+                               const double & shortTailSlope = 0.03, \
+                               const double & longTailArea = 0.0, \
+                               const double & longTailSlope = 1.0, \
+                               const double & stepHeight = 0.0);
+
+
     private:
         /*!
         Evaluate exp(x) * E1(x) for x > 1

@@ -36,7 +36,7 @@ double Math::E1(const double & x)
     }
     if(x < 1)
     {
-        return Math::AS_5_1_53(x) - log(x);
+        return Math::AS_5_1_53(x) - std::log(x);
     }
     else
     {
@@ -146,9 +146,9 @@ double Math::deBoerD(const double & x)
         //tmpResult = Math::AS_5_1_56(x) / x;
     }
     else
-        tmpResult = std::exp(x) * (Math::AS_5_1_53(x) - log(x));
-    limit0 = 0.5 * log(1 + 2.0/x);
-    limit1 = log(1 + 1.0 /x);
+        tmpResult = std::exp(x) * (Math::AS_5_1_53(x) - std::log(x));
+    limit0 = 0.5 * std::log(1 + 2.0/x);
+    limit1 = std::log(1 + 1.0 /x);
     if ((tmpResult < limit0) || (tmpResult > limit1))
     {
         std::cout << "deBoerD error with x = " << x << std::endl;
@@ -442,4 +442,119 @@ double Math::getFWHM(const double & energy, const double & noise, \
                      const double & fano, const double & quantumEnergy)
 {
     return sqrt(noise * noise + energy * fano * 2.3548 * 2.3548 * quantumEnergy);
+}
+
+
+double Math::erf(const double & x)
+{
+    double z;
+    double t;
+    double r;
+
+    z = std::fabs(x);
+    t = 1.0 / (1.0 + 0.5 * z);
+    r = t * std::exp(- z * z - 1.26551223 + t * (1.00002368 + t * (0.3740916 + \
+        t * (0.09678418 + t * (-0.18628806 + t * (0.27886807 + t * (-1.13520398 + \
+        t * (1.48851587 + t * (-0.82215223 + t * 0.17087277)))))))));
+    if (x < 0)
+    {
+       r = 2.0 - r;
+    }
+    return (1.0 - r);
+}
+
+double Math::erfc(const double & x)
+{
+    double z;
+    double t;
+    double r;
+
+    z = std::fabs(x);
+    t = 1.0 / (1.0 + 0.5 * z);
+    r = t * std::exp(- z * z - 1.26551223 + t * (1.00002368 + t * (0.3740916 + \
+        t * (0.09678418 + t * (-0.18628806 + t * (0.27886807 + t * (-1.13520398 + \
+        t * (1.48851587 + t * (-0.82215223 + t * 0.17087277)))))))));
+    if (x < 0)
+    {
+       r = 2.0 - r;
+    }
+    return (r);
+}
+
+double Math::hypermet(const double & x, \
+                      const double & gaussArea, const double & position, const double & fwhm, \
+                      const double & shortTailArea, const double & shortTailSlope, \
+                      const double & longTailArea, const double & longTailSlope, \
+                      const double & stepHeight)
+{
+    const double MY_PI = 3.141592653589793;
+    const double sqrtTwoPI = 2.5066282746310002;
+    const double log2 = 0.69314718055994529;
+    const double fwhmToSigma = 0.42466090014400953;
+    const double sigmaToFWHM = 2.3548200450309493;
+    const double sqrtTwo = 1.4142135623730950488;
+    double result;
+    double dHelp;
+    double sigma;
+    double z0, z1, z2;
+
+
+    result = 0.0;
+    // gaussian term
+    // use some intermediate variables
+    sigma = fwhm * fwhmToSigma;
+    z0 = x - position;
+    z1 =  sigma * sqrtTwo;
+    z2 = 0.5 * (z0 * z0) / (sigma * sigma);
+    if (fwhm <= 0.0)
+    {
+        std::cout << "FWHM = " << fwhm << std::endl;
+        std::runtime_error("FWHM should be strictly positive.");
+    }
+    if (z2 < 612)
+    {
+        result = std::exp(- z2) * (gaussArea / (sigma * sqrtTwoPI));
+    }
+
+    if (shortTailArea > 0.0)
+    {
+        if (shortTailSlope > 0.0)
+        {
+            std::runtime_error("Short tail slope should be strictly positive.");
+        }
+        dHelp = shortTailArea * 0.5 * Math::erfc((z0 / z1) + 0.5 * (z1 / shortTailSlope));
+        if (dHelp != 0.0)
+        {
+            if (std::fabs((z0 / shortTailSlope)) < 613)
+            {
+                result += ((gaussArea * dHelp) / shortTailSlope) * \
+                           std::exp(0.5 * (sigma / shortTailSlope) * (sigma / shortTailSlope) + \
+                                    (z0 / shortTailSlope));
+            }
+        }
+    }
+    if (longTailArea > 0.0)
+    {
+        if (longTailSlope > 0.0)
+        {
+            std::runtime_error("Long tail slope should be strictly positive.");
+        }
+        dHelp = longTailArea * 0.5 * Math::erfc((z0 / z1) + 0.5 * (z1 / longTailSlope));
+        if (dHelp != 0.0)
+        {
+            if (std::fabs((z0 / longTailSlope)) < 613)
+            {
+                result += ((gaussArea * dHelp) / longTailSlope) * \
+                           std::exp(0.5 * (sigma / longTailSlope) * (sigma / longTailSlope) + \
+                                    (z0 / longTailSlope));
+            }
+        }
+    }
+    if (stepHeight > 0.0)
+    {
+        result += stepHeight * (gaussArea / (sigma * sqrtTwoPI)) * 0.5  * \
+                    Math::erfc(z0 / z1);
+    }
+    return result;
+
 }

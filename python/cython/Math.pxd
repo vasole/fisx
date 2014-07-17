@@ -14,4 +14,11 @@ cdef extern from "fisx_math.h":
 
         double deBoerD(double) except +
 
-        double deBoerL0(double, double, double, double, double)
+        double deBoerL0(double, double, double, double, double) except +
+
+        double erf(double)
+
+        double erfc(double)
+
+        double hypermet(double, double, double, double, double, 
+                        double, double, double, double) except + 
