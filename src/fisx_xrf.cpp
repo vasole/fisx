@@ -1199,8 +1199,11 @@ void XRF::getSpectrum(double * channel, double * energy, double *spectrum, int n
     std::string tmpString;
     std::vector<std::string> tmpStringVector;
     double zero, gain, noise, fano, quantum;
-    double area;
     int layerIndex;
+
+    double area;
+    double position;
+    double fwhm;
     double shortTailArea = 0.0, shortTailSlope = -1.0;
     double longTailArea = 0.0, longTailSlope = -1.0;
     double stepHeight = 0.0;
@@ -1242,6 +1245,10 @@ void XRF::getSpectrum(double * channel, double * energy, double *spectrum, int n
     {
         energy[i] = zero + gain * channel[i];
     }
+    for (i = 0; i < nChannels; i++)
+    {
+        spectrum[i] = 0.0;
+    }
 
     for (c_it = peakFamilyArea.begin(); c_it != peakFamilyArea.end(); ++c_it)
     {
@@ -1279,6 +1286,34 @@ void XRF::getSpectrum(double * channel, double * energy, double *spectrum, int n
                     layerTotalSignal[layerTotalSignal.size() - 1] += ratePointer->second;
                 }
                 totalSignal += layerTotalSignal[layerTotalSignal.size() - 1];
+            }
+           // Now we already have area (provided) and ratio (dividing by totalSignal).
+           // We can therefore calculate the signal keeping the proper ratios.
+            for (layerIterator = emissionRatiosPointer->second.begin();
+                 layerIterator != emissionRatiosPointer->second.end(); ++layerIterator)
+            {
+                for (lineIterator = layerIterator->second.begin(); \
+                     lineIterator != layerIterator->second.end(); ++lineIterator)
+                {
+                    ratePointer = lineIterator->second.find("rate");
+                    area = c_it->second * (ratePointer->second / totalSignal);
+                    ratePointer = lineIterator->second.find("energy");
+                    if (ratePointer == lineIterator->second.end())
+                    {
+                        tmpString = "Keyword <energy> not found!!!";
+                        std::cout << tmpString << std::cout;
+                        throw std::invalid_argument(tmpString);
+                    }
+                    position = ratePointer->second;
+                    fwhm = Math::getFWHM(position, noise, fano, quantum);
+                    for (i = 0; i < nChannels; i++)
+                    {
+                        spectrum[i] += Math::hypermet(energy[i], \
+                                                      area, position, fwhm, \
+                                                      shortTailArea, shortTailSlope, \
+                                                      longTailArea, longTailSlope, stepHeight);
+                    }
+                }
             }
         }
         else
@@ -1333,10 +1368,30 @@ void XRF::getSpectrum(double * channel, double * energy, double *spectrum, int n
                 layerTotalSignal[layerTotalSignal.size() - 1] += ratePointer->second;
             }
             totalSignal += layerTotalSignal[layerTotalSignal.size() - 1];
+            // Now we already have area (provided) and ratio (dividing by totalSignal).
+            // We can therefore calculate the signal keeping the proper ratios.
+            for (lineIterator = layerIterator->second.begin(); \
+                 lineIterator != layerIterator->second.end(); ++lineIterator)
+            {
+                ratePointer = lineIterator->second.find("rate");
+                area = c_it->second * (ratePointer->second / totalSignal);
+                ratePointer = lineIterator->second.find("energy");
+                if (ratePointer == lineIterator->second.end())
+                {
+                    tmpString = "Keyword <energy> not found!!!";
+                    std::cout << tmpString << std::cout;
+                    throw std::invalid_argument(tmpString);
+                }
+                position = ratePointer->second;
+                fwhm = Math::getFWHM(position, noise, fano, quantum);
+                for (i = 0; i < nChannels; i++)
+                {
+                    spectrum[i] += Math::hypermet(energy[i], \
+                                                  area, position, fwhm, \
+                                                  shortTailArea, shortTailSlope, \
+                                                  longTailArea, longTailSlope, stepHeight);
+                }
+            }
         }
-        // Now we already have area (provided) and ratio (dividing by totalSignal).
-        // We can therefore calculate the signal keeping the proper ratios.
     }
 }
-
-
