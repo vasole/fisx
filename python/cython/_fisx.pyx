@@ -700,13 +700,18 @@ cdef class PyXRF:
         Unless you know what you are doing, the funny factors must be 1.0
         """
         cdef std_vector[Layer] container
-        for name, density, thickness, funny in layerList:
-            container.push_back(Layer(name, density, thickness, funny))
+        if len(layerList):
+            if len(layerList[0]) == 4:
+                for name, density, thickness, funny in layerList:
+                    container.push_back(Layer(name, density, thickness, funny))
+            else:
+                for name, density, thickness in layerList:
+                    container.push_back(Layer(name, density, thickness, 1.0))
         self.thisptr.setBeamFilters(container)
 
     def setSample(self, layerList, referenceLayer=0):
         """
-        Due to wrapping constraints, the filter list must have the form:
+        Due to wrapping constraints, the list must have the form:
         [[Material name or formula0, density0, thickness0, funny factor0],
          [Material name or formula1, density1, thickness1, funny factor1],
          ...
@@ -715,8 +720,12 @@ cdef class PyXRF:
         Unless you know what you are doing, the funny factors must be 1.0
         """
         cdef std_vector[Layer] container
-        for name, density, thickness, funny in layerList:
-            container.push_back(Layer(name, density, thickness, funny))
+        if len(layerList[0]) == 4:
+            for name, density, thickness, funny in layerList:
+                container.push_back(Layer(name, density, thickness, funny))
+        else:
+            for name, density, thickness in layerList:
+                container.push_back(Layer(name, density, thickness, 1.0))
         self.thisptr.setSample(container, referenceLayer)
 
 
