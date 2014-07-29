@@ -76,8 +76,8 @@ cdef class PyElements:
     def __dealloc__(self):
         del self.thisptr
 
-    def addMaterial(self, PyMaterial material):
-        self.thisptr.addMaterial(deref(material.thisptr))
+    def addMaterial(self, PyMaterial material, int errorOnReplace=1):
+        self.thisptr.addMaterial(deref(material.thisptr), errorOnReplace)
 
     def setShellConstantsFile(self, std_string mainShellName, std_string fileName):
         """
