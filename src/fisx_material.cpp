@@ -120,8 +120,12 @@ std::map<std::string, double> Material::getComposition() const
     return this->composition;
 }
 
-std::string Material::getName()
+std::string Material::getName() const
 {
     return this->name;
 }
 
+std::string Material::getComment() const
+{
+    return this->comment;
+}

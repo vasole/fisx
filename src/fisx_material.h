@@ -46,8 +46,8 @@ public:
     Return the material composition as normalized mass fractions
     */
     std::map<std::string, double> getComposition() const;
-    std::string getName();
-    std::string getComment();
+    std::string getName() const;
+    std::string getComment() const;
     double getDefaultDensity(){return this->defaultDensity;};
     double getDefaultThickness(){return this->defaultThickness;};
 

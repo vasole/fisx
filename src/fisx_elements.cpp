@@ -1016,22 +1016,27 @@ Material Elements::createMaterial(const std::string & name, const double & densi
 }
 
 void Elements::addMaterial(const std::string & name, const double & density, \
-                              const double & thickness, const std::string & comment)
+                              const double & thickness, const std::string & comment, \
+                              const int & errorOnReplace)
 {
     std::string msg;
     Material material;
     std::map<std::string, double> composition;
 
-
-    if (this->materialDict.find(name) != this->materialDict.end())
+    if (this->getMaterialIndexFromName(name) != this->materialList.size())
     {
-        msg = "Elements::createMaterial. Already existing material: " +  name;
-        throw std::invalid_argument(msg);
+        if (errorOnReplace)
+        {
+            msg = "Elements::createMaterial. Already existing material: " +  name;
+            throw std::invalid_argument(msg);
+        }
+        else
+        {
+            this->removeMaterial(name);
+        }
     }
     material.initialize(name, density, thickness, comment);
-    this->materialList.resize(this->materialDict.size() + 1);
-    this->materialList[this->materialDict.size()] = material;
-    this->materialDict[name] = this->materialList.size() - 1;
+    this->materialList.push_back(material);
 
     // Try to set the composition from the name
     composition = this->getCompositionFromFormula(name);
@@ -1046,63 +1051,84 @@ void Elements::setMaterialComposition(const std::string & materialName, \
                                       const std::vector<double> & amounts)
 {
     std::string msg;
-    if (this->materialDict.find(materialName) == this->materialDict.end())
+    std::vector<Material>::size_type i;
+
+    i = this->getMaterialIndexFromName(materialName);
+    if (i == this->materialList.size())
     {
         msg = "Elements::setMaterialComposition. Non existing material: " +  materialName;
         throw std::invalid_argument(msg);
     }
-    this->materialList[this->materialDict[materialName]].setComposition(names, amounts);
+    this->materialList[i].setComposition(names, amounts);
 }
 
 void Elements::setMaterialComposition(const std::string & materialName, \
                                 const std::map<std::string, double> & composition)
 {
     std::string msg;
-    if (this->materialDict.find(materialName) == this->materialDict.end())
+    std::vector<Material>::size_type i;
+
+    i = this->getMaterialIndexFromName(materialName);
+    if (i == this->materialList.size())
     {
         msg = "Elements::setMaterialComposition. Non existing material: " +  materialName;
         throw std::invalid_argument(msg);
     }
-    this->materialList[this->materialDict[materialName]].setComposition(composition);
+    this->materialList[i].setComposition(composition);
 }
 
 const Material & Elements::getMaterial(const std::string & materialName)
 {
     std::string msg;
-    if (this->materialDict.find(materialName) == this->materialDict.end())
+    std::vector<Material>::size_type i;
+
+    i = this->getMaterialIndexFromName(materialName);
+    if (i == this->materialList.size())
     {
         msg = "Elements::getMaterial. Non existing material: " +  materialName;
         throw std::invalid_argument(msg);
     }
-    return this->materialList[this->materialDict[materialName]];
+    return this->materialList[i];
 }
 
 Material Elements::getMaterialCopy(const std::string & materialName)
 {
     std::string msg;
-    if (this->materialDict.find(materialName) == this->materialDict.end())
+    std::vector<Material>::size_type i;
+
+    i = this->getMaterialIndexFromName(materialName);
+    if (i == this->materialList.size())
     {
         msg = "Elements::getMaterial. Non existing material: " +  materialName;
         throw std::invalid_argument(msg);
     }
-    return this->materialList[this->materialDict[materialName]];
+    return this->materialList[i];
 }
 
 
-void Elements::addMaterial(Material material)
+void Elements::addMaterial(Material material, const int & errorOnReplace)
 {
     std::string msg;
     std::string materialName;
+    std::vector<Material>::size_type i;
+
 
     materialName = material.getName();
 
-    if (this->materialDict.find(materialName) != this->materialDict.end())
+    i = this->getMaterialIndexFromName(materialName);
+    if (i != this->materialList.size())
     {
-        msg = "Elements::addMaterial. Already existing material: " +  materialName;
-        throw std::invalid_argument(msg);
+        if (errorOnReplace)
+        {
+            msg = "Elements::addMaterial. Already existing material: " +  materialName;
+            throw std::invalid_argument(msg);
+        }
+        else
+        {
+            this->removeMaterial(materialName);
+        }
     }
 
-    this->materialDict[materialName] = this->materialList.size();
     // TODO: Make sure the material can be interpreted in terms of the supplied composition
     // because the composition can include other materials.
     // If made that way, the internal list of materials will be "clean" of references from
@@ -1118,6 +1144,7 @@ std::map<std::string, double> Elements::getComposition(const std::string & name)
     std::map<std::string, double> composition;
     std::map<std::string, double>::const_iterator c_it, c_it2;
     std::map<std::string , int>::const_iterator matIterator;
+    std::vector<Material>::size_type i;
     double total;
 
     // check if name is a valid element or formula
@@ -1128,15 +1155,15 @@ std::map<std::string, double> Elements::getComposition(const std::string & name)
     }
 
     // check if it is a material
-    matIterator = this->materialDict.find(name);
-    if (matIterator == this->materialDict.end())
+    i = this->getMaterialIndexFromName(name);
+    if (i == this->materialList.size())
     {
         // result at this point must be empty, we can send it back.
         return result;
     }
 
     // make sure we give back the elemental material composition
-    tmpResult = this->materialList[matIterator->second].getComposition();
+    tmpResult = this->materialList[i].getComposition();
     if (tmpResult.size() < 1)
     {
         // throw an exception because we have an undefined material in the list of materials
@@ -1679,4 +1706,33 @@ std::map<std::string,std::map<std::string, double> > Elements::getEscape( \
         }
     }
     return result;
+}
+
+const std::vector<Material>::size_type Elements::getMaterialIndexFromName(const std::string & name) const
+{
+    std::vector<Material>::size_type i;
+
+    this->materialList.begin();
+    for (i = 0; i < this->materialList.size(); i++)
+    {
+        if(this->materialList[i].getName() == name)
+        {
+            break;
+        }
+    }
+    return i;
+}
+
+
+void Elements::removeMaterial(const std::string & name)
+{
+    std::string msg;
+    std::vector<Material>::size_type i;
+    i = this->getMaterialIndexFromName(name);
+    if ( i == this->materialList.size())
+    {
+        msg = "Elements::setMaterialComposition. Non existing material: " +  name;
+        throw std::invalid_argument(msg);
+    }
+    this->materialList.erase(this->materialList.begin() + i);
 }

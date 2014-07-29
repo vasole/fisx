@@ -232,13 +232,19 @@ public:
     /*!
     Copy a material into the set of defined materials.
     */
-    void addMaterial(Material materialInstance);
+    void addMaterial(Material materialInstance, const int & errorOnReplace = 1);
 
     /*!
     Create and add Material instance to the set of defined materials.
     */
-    void addMaterial(const std::string & name, const double & density = 1.0,
-                        const double & thickness = 1.0, const std::string  & comment = "");
+    void addMaterial(const std::string & name, const double & density = 1.0, \
+                        const double & thickness = 1.0, const std::string  & comment = "", \
+                        const int & errorOnReplace = 1);
+
+    /*!
+    Remove a material (if present) from the set of defined materials
+    */
+    void removeMaterial(const std::string & name);
 
     /*!
     Try to interpret a given string as a formula, returning the associated mass fractions
@@ -356,8 +362,8 @@ private:
     // The vector of defined Materials
     std::vector<Material> materialList;
 
-    // The map Material name, index
-    std::map<std::string , int> materialDict;
+    // Utility function
+    const std::vector<Material>::size_type getMaterialIndexFromName(const std::string & name) const;
 
     // The files used for configuring the library
     std::map<std::string, std::string> shellConstantsFile;
