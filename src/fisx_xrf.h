@@ -169,6 +169,48 @@ public:
                 const std::string & lineFamily = "", const int & secondary = 0, \
                 const int & useGeometricEfficiency = 1);
 
+    /*!
+    Input
+    elementFamilyLayer - Vector of strings. Each string represents the information we are interested on.
+    "Cr"     - We want the information for Cr, for all line families and sample layers
+    "Cr K"   - We want the information for Cr, for the family of K-shell emission lines, in all layers.
+    "Cr K 0" - We want the information for Cr, for the family of K-shell emission lines, in layer 0.
+    elementsLibrary - Instance of library to be used for all the Physical constants
+    secondary - Flag to indicate different levels of secondary excitation to be considered.
+                0 Means not considered
+                1 Consider only intralayer secondary excitation
+                2 Consider intralayer and interlayer secondary excitation
+    useGeometricEfficiency - Take into account solid angle or not. Default is 1 (yes)
+
+    useMassFractions - If 0 (default) the output corresponds to the requested information if the mass
+    fraction of the element would be one on each calculated sample layer. To get the actual signal, one
+    has to multiply bthe rates by the actual mass fraction of the element on each sample layer.
+                       If set to 1, only elements present in the sample will be calculated.
+                       If set to 2, the rate will be already corrected by the actual mass fraction.
+
+    Return a complete output of the form
+    [Element Family][Layer][line]["energy"] - Energy in keV of the emission line
+    [Element Family][Layer][line]["primary"] - Primary rate prior to correct for detection efficiency
+    [Element Family][Layer][line]["secondary"] - Secondary rate prior to correct for detection efficiency
+    [Element Family][Layer][line]["rate"] - Overall rate
+    [Element Family][Layer][line]["efficiency"] - Detection efficiency
+    [Element Family][Layer][line][element line layer] - Secondary rate (prior to correct for detection efficiency)
+    due to the fluorescence from the given element, line and layer index composing the map key.
+    */
+    std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, double> > > > \
+                getMultilayerFluorescence(const std::vector<std::string> & elementFamilyLayer, \
+                const Elements & elementsLibrary, const int & secondary = 0, \
+                const int & useGeometricEfficiency = 1);
+
+
+    std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, double> > > > \
+                getMultilayerFluorescence(const std::vector<std::string> & elementList,
+                                          const Elements & elementsLibrary, \
+                                          const std::vector<int> & layerList, \
+                                          const std::vector<std::string> &  familyList, \
+                                          const int & secondary = 0, \
+                                          const int & useGeometricEfficiency = 1);
+
 
     double getEnergyThreshold(const std::string & elementName, const std::string & family, \
                                 const Elements & elementsLibrary) const;
