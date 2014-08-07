@@ -15,6 +15,10 @@ cdef extern from "fisx_elements.h":
         Elements(std_string, std_string) except +
         Elements(std_string, std_string, std_string) except +
 
+        std_vector[std_string] getElementNames()
+
+        std_map[std_string, double] getComposition(std_string) except +
+
         void addMaterial(Material, int) except +
 
         void setShellConstantsFile(std_string, std_string) except +

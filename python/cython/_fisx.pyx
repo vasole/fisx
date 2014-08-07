@@ -215,6 +215,12 @@ cdef class PyElements:
             radiativeRatesFile = os.path.join(dataDir, shell+"ShellRates.dat")
             self.thisptr.setShellRadiativeTransitionsFile(shell, radiativeRatesFile)
 
+    def getElementNames(self):
+        return self.thisptr.getElementNames()
+
+    def getComposition(self, std_string materialOrFormula):
+        return self.thisptr.getComposition(materialOrFormula)
+
     def __dealloc__(self):
         del self.thisptr
 

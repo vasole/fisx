@@ -693,6 +693,8 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                             }
                             totalEscape += mapIt->second;
                             actualResult[key][iLayer][tmpString]["rate"] += mapIt->second * result[c_it->first]["rate"];
+                            actualResult[key][iLayer][tmpString]["primary"] += mapIt->second * result[c_it->first]["primary"];
+                            actualResult[key][iLayer][tmpString]["secondary"] += mapIt->second * result[c_it->first]["secondary"];
                         }
                     }
                 }
