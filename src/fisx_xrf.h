@@ -254,19 +254,19 @@ public:
 
     */
     std::map<std::string, std::vector<double> > getSpectrum(const std::vector<double> & channel, \
-                const std::map<std::string, double> & detectorParameters = std::map<std::string, double> (), \
-                const std::map<std::string, double> & shapeParameters = std::map<std::string, double> (), \
-                const std::map<std::string, double> & peakFamilyArea = std::map<std::string, double> (), \
-                const expectedLayerEmissionType & emissionRatios = expectedLayerEmissionType()) const;
+                const std::map<std::string, double> & detectorParameters = (std::map<std::string, double> ()), \
+                const std::map<std::string, double> & shapeParameters = (std::map<std::string, double> ()), \
+                const std::map<std::string, double> & peakFamilyArea = (std::map<std::string, double> ()), \
+                const expectedLayerEmissionType & emissionRatios = (expectedLayerEmissionType())) const;
 
     /*!
     Alternative method in a more traditional way.
     */
     void getSpectrum(double * channel, double * energy, double *spectrum, int nChannels, \
-                const std::map<std::string, double> & detectorParameters = std::map<std::string, double> (), \
-                const std::map<std::string, double> & shapeParameters = std::map<std::string, double> (), \
-                const std::map<std::string, double> & peakFamilyArea = std::map<std::string, double> (), \
-                const expectedLayerEmissionType & emissionRatios = expectedLayerEmissionType()) const;
+                const std::map<std::string, double> & detectorParameters = (std::map<std::string, double> ()), \
+                const std::map<std::string, double> & shapeParameters = (std::map<std::string, double> ()), \
+                const std::map<std::string, double> & peakFamilyArea = (std::map<std::string, double> ()), \
+                const expectedLayerEmissionType & emissionRatios = (expectedLayerEmissionType())) const;
 
 private:
     /*!
