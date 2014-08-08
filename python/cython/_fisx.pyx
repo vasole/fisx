@@ -746,8 +746,13 @@ cdef class PyXRF:
         Unless you know what you are doing, the funny factors must be 1.0
         """
         cdef std_vector[Layer] container
-        for name, density, thickness, funny in layerList:
-            container.push_back(Layer(name, density, thickness, funny))
+        print "layerList = ", layerList
+        if len(layerList[0]) == 4:
+            for name, density, thickness, funny in layerList:
+                container.push_back(Layer(name, density, thickness, funny))
+        else:
+            for name, density, thickness in layerList:
+                container.push_back(Layer(name, density, thickness, 1.0))
         self.thisptr.setAttenuators(container)
 
     def setDetector(self, PyDetector detector):
@@ -760,7 +765,7 @@ cdef class PyXRF:
             self.thisptr.setGeometry(alphaIn, alphaOut, scatteringAngle)
 
     def getMultilayerFluorescence(self, std_vector[std_string] elementFamilyLayer, PyElements elementsLibrary, \
-                            int secondary = 0, int useGeometricEfficiency = 1):
+                            int secondary = 0, int useGeometricEfficiency = 1, useMassFractions = 0):
         """
         Input
         elementFamilyLayer - Vector of strings. Each string represents the information we are interested on.
@@ -777,8 +782,7 @@ cdef class PyXRF:
         useMassFractions - If 0 (default) the output corresponds to the requested information if the mass
         fraction of the element would be one on each calculated sample layer. To get the actual signal, one
         has to multiply bthe rates by the actual mass fraction of the element on each sample layer.
-                           If set to 1, only elements present in the sample will be calculated.
-                           If set to 2, the rate will be already corrected by the actual mass fraction.
+                           If set to 1 the rate will be already corrected by the actual mass fraction.
 
         Return a complete output of the form
         [Element Family][Layer][line]["energy"] - Energy in keV of the emission line
@@ -790,13 +794,13 @@ cdef class PyXRF:
         due to the fluorescence from the given element, line and layer index composing the map key.
         """
         return self.thisptr.getMultilayerFluorescence(elementFamilyLayer, deref(elementsLibrary.thisptr), \
-                            secondary, useGeometricEfficiency)
+                            secondary, useGeometricEfficiency, useMassFractions)
 
     def getFluorescence(self, std_string elementName, PyElements elementsLibrary, \
                             int sampleLayer = 0, std_string lineFamily="K", int secondary = 0, \
-                            int useGeometricEfficiency = 1):
+                            int useGeometricEfficiency = 1, int useMassFractions = 0):
         return self.thisptr.getMultilayerFluorescence(elementName, deref(elementsLibrary.thisptr), \
-                            sampleLayer, lineFamily, secondary, useGeometricEfficiency)
+                            sampleLayer, lineFamily, secondary, useGeometricEfficiency, useMassFractions)
 
     def getGeometricEfficiency(self, int layerIndex = 0):
         return self.thisptr.getGeometricEfficiency(layerIndex)

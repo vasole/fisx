@@ -468,7 +468,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                 const std::string & elementName, \
                 const Elements & elementsLibrary, const int & sampleLayerIndex, \
                 const std::string & lineFamily, const int & secondary, \
-                const int & useGeometricEfficiency)
+                const int & useGeometricEfficiency, const int & useMassFractions)
 {
     std::vector<std::string> elementList;
     std::vector<std::string> familyList;
@@ -491,7 +491,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
     }
     layerList.push_back(sampleLayerIndex);
     return this->getMultilayerFluorescence(elementList, elementsLibrary, layerList, familyList, \
-                                           secondary, useGeometricEfficiency);
+                                           secondary, useGeometricEfficiency, useMassFractions);
 }
 
 double XRF::getEnergyThreshold(const std::string & elementName, const std::string & family, \
@@ -757,7 +757,7 @@ void XRF::getSpectrum(double * channel, double * energy, double *spectrum, int n
 std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, double> > > > \
                 XRF::getMultilayerFluorescence(const std::vector<std::string> & elementFamilyLayer, \
                 const Elements & elementsLibrary, const int & secondary, \
-                const int & useGeometricEfficiency)
+                const int & useGeometricEfficiency, const int & useMassFractions)
 {
     std::vector<std::string> elementList;
     std::vector<std::string> familyList;
@@ -802,5 +802,6 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
         }
     }
     return this->getMultilayerFluorescence(elementList, elementsLibrary, \
-                                           layerList, familyList, secondary, useGeometricEfficiency);
+                                           layerList, familyList, secondary, useGeometricEfficiency, \
+                                           useMassFractions);
 }

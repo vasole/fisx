@@ -167,8 +167,7 @@ public:
                 getMultilayerFluorescence(const std::string & element, \
                 const Elements & elementsLibrary, const int & sampleLayerIndex = 0, \
                 const std::string & lineFamily = "", const int & secondary = 0, \
-                const int & useGeometricEfficiency = 1);
-
+                const int & useGeometricEfficiency = 1, const int & useMassFractions = 0);
     /*!
     Input
     elementFamilyLayer - Vector of strings. Each string represents the information we are interested on.
@@ -185,8 +184,7 @@ public:
     useMassFractions - If 0 (default) the output corresponds to the requested information if the mass
     fraction of the element would be one on each calculated sample layer. To get the actual signal, one
     has to multiply bthe rates by the actual mass fraction of the element on each sample layer.
-                       If set to 1, only elements present in the sample will be calculated.
-                       If set to 2, the rate will be already corrected by the actual mass fraction.
+                       If set to 1, the rate will be already corrected by the actual mass fraction.
 
     Return a complete output of the form
     [Element Family][Layer][line]["energy"] - Energy in keV of the emission line
@@ -200,8 +198,8 @@ public:
     std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, double> > > > \
                 getMultilayerFluorescence(const std::vector<std::string> & elementFamilyLayer, \
                 const Elements & elementsLibrary, const int & secondary = 0, \
-                const int & useGeometricEfficiency = 1);
-
+                const int & useGeometricEfficiency = 1, \
+                const int & useMassFractions = 0);
 
     std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, double> > > > \
                 getMultilayerFluorescence(const std::vector<std::string> & elementList,
@@ -209,7 +207,8 @@ public:
                                           const std::vector<int> & layerList, \
                                           const std::vector<std::string> &  familyList, \
                                           const int & secondary = 0, \
-                                          const int & useGeometricEfficiency = 1);
+                                          const int & useGeometricEfficiency = 1, \
+                                          const int & useMassFractions = 0);
 
 
     double getEnergyThreshold(const std::string & elementName, const std::string & family, \
