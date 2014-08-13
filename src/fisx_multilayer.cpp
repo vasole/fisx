@@ -110,7 +110,6 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
     escapeRates.clear();
 
     iRay = energies.size();
-    std::cout << "iRAY = " << iRay << std::endl;
     muTotal.resize(sample.size());
     weights.resize(actualRays[1].size());
     while (iRay > 0)
