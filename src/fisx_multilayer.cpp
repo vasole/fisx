@@ -254,6 +254,13 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
             {
                 throw std::runtime_error("All line families case not implemented yet!!!");
             }
+            energyThreshold = this->getEnergyThreshold(elementName, \
+                                                       actualLineFamily.substr(0, 1), \
+                                                       elementsLibrary);
+            if (energyThreshold > energies[iRay])
+            {
+                continue;
+            }
             primaryExcitationFactors = elementsLibrary.getExcitationFactors(elementName, \
                                                                         energies[iRay], \
                                                                         weights[iRay]);

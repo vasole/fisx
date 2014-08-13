@@ -746,7 +746,6 @@ cdef class PyXRF:
         Unless you know what you are doing, the funny factors must be 1.0
         """
         cdef std_vector[Layer] container
-        print "layerList = ", layerList
         if len(layerList[0]) == 4:
             for name, density, thickness, funny in layerList:
                 container.push_back(Layer(name, density, thickness, funny))
@@ -765,7 +764,7 @@ cdef class PyXRF:
             self.thisptr.setGeometry(alphaIn, alphaOut, scatteringAngle)
 
     def getMultilayerFluorescence(self, std_vector[std_string] elementFamilyLayer, PyElements elementsLibrary, \
-                            int secondary = 0, int useGeometricEfficiency = 1, useMassFractions = 0):
+                            int secondary = 0, int useGeometricEfficiency = 1, int useMassFractions = 0):
         """
         Input
         elementFamilyLayer - Vector of strings. Each string represents the information we are interested on.

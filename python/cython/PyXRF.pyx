@@ -118,7 +118,7 @@ cdef class PyXRF:
             self.thisptr.setGeometry(alphaIn, alphaOut, scatteringAngle)
 
     def getMultilayerFluorescence(self, std_vector[std_string] elementFamilyLayer, PyElements elementsLibrary, \
-                            int secondary = 0, int useGeometricEfficiency = 1, useMassFractions = 0):
+                            int secondary = 0, int useGeometricEfficiency = 1, int useMassFractions = 0):
         """
         Input
         elementFamilyLayer - Vector of strings. Each string represents the information we are interested on.
