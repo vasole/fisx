@@ -336,6 +336,16 @@ public:
                                         const double & thickness = 0.0) const;
 
 
+
+    /*!
+    Optimization methods to keep the complete emission cascade following a single vacancy in a shell
+    into cache.
+    */
+    void setElementCascadeCacheEnabled(const std::string & elementName, const int & flag = 1);
+    int isElementCascadeCacheFilled(const std::string & elementName) const;
+    void fillElementCascadeCache(const std::string & elementName);
+    void emptyElementCascadeCache(const std::string & elementName);
+
     /*!
     Utility to convert from string to double.
     */

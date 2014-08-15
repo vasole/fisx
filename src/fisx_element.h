@@ -220,10 +220,22 @@ public:
     std::map<std::string, double> getCascadeModifiedVacancyDistribution(const std::map<std::string, \
                                                                         double> & distribution) const;
 
+    /*!
+    Given an initial vacancy distribution, returns the emitted X-rays.
+
+    Input:
+    distribution - Map[key, double] of the form [(sub)shell][amount of vacancies]
+    cascade - Consider de-excitation cascade (default is 1 = true)
+    useFluorescenceYield - Correct by fluorescence yield (default is 1 = true)
+
+    Output:
+    map[key]["rate"] - emission rate where key is the transition line (ex. KL3)
+    map[key]["energy"] - emission energy where key is the transition line (ex. KL3)
+    */
     std::map<std::string, std::map<std::string, double> >\
         getXRayLinesFromVacancyDistribution(const std::map<std::string, double> & distribution, \
                                             const int & cascade = 1,
-                                            const bool & useFluorescenceYield = true) const;
+                                            const int & useFluorescenceYield = 1) const;
 
     /*!
     Given a set of energies and (optional) weights returns the emitted X-ray already
@@ -260,6 +272,20 @@ public:
     */
     std::pair<long, long> getInterpolationIndices(const std::vector<double> &,  const double &) const;
 
+    /*!
+    Keep a cache for speed up de-excitation cascade calculation.
+    It is expected to speed up things when having to calculate the de-excitation cascade for many energies.
+    WARNING:
+        - With less excitation energies than element shells it may be slower
+        - For the time being is the responsibility of the user to reset the cache (due to a change of
+        fluorescence, auger or CosterKronig yields,  of emission ratios or binding energies.
+    */
+    void setCascadeCacheEnabled(const int & flag = 1);
+    int isCascadeCacheFilled() const;
+
+    void fillCascadeCache();
+    void emptyCascadeCache();
+
 private:
     std::string name;
     int    atomicNumber;
@@ -291,6 +317,14 @@ private:
     // map of the form {"KL3":{"energy": bindingEnergy["K"] - bindingEnergy["L3"],
     //                         "rate": shellInstance["K"].getFluorescenceRatios()["KL3"]}
     std::map<std::string, std::map<std::string, double> > shellXRayLines;
+
+    bool cascadeCacheEnabledFlag;
+    // Map of the form
+    // map[(sub)shell][emission_line]["rate"]
+    // map[(sub)shell][emission_line]["energy"]
+    // Providing the emitted X-rays following a single vacancy on a particular (sub)shell considering
+    // cascade and fluorescence yields
+    std::map<std::string, std::map<std::string, std::map<std::string, double> > > cascadeCache;
 };
 #endif
 // FISX_ELEMENT_H

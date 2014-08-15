@@ -75,3 +75,7 @@ cdef extern from "fisx_elements.h":
         std_map[std_string, double] getNonradiativeTransitions(std_string, std_string) except +
 
         std_map[std_string, double] getShellConstants(std_string, std_string) except +
+
+        void setElementCascadeCacheEnabled(std_string, int) except +
+
+        void emptyElementCascadeCache(std_string) except +

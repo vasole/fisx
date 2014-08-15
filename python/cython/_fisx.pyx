@@ -366,7 +366,14 @@ cdef class PyElements:
         return self.thisptr.getRadiativeTransitions(elementName, subshell)
 
     def getNonradiativeTrnasitions(self, std_string elementName, std_string subshell):
-        return self.thisptr.getNonradiativeTransitions(elementName, subshell)#import numpy as np
+        return self.thisptr.getNonradiativeTransitions(elementName, subshell)
+
+    def setElementCascadeCacheEnabled(self, std_string elementName, int flag = 1):
+        self.thisptr.setElementCascadeCacheEnabled(elementName, flag)
+
+    def emptyElementCascadeCache(self, std_string elementName):
+        self.thisptr.emptyElementCascadeCache(elementName)
+#import numpy as np
 #cimport numpy as np
 cimport cython
 

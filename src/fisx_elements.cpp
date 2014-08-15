@@ -1736,3 +1736,56 @@ void Elements::removeMaterial(const std::string & name)
     }
     this->materialList.erase(this->materialList.begin() + i);
 }
+
+void Elements::setElementCascadeCacheEnabled(const std::string & elementName, const int & flag)
+{
+    std::map<std::string, int>::const_iterator it;
+    int i;
+    if (this->isElementNameDefined(elementName))
+    {
+        it = this->elementDict.find(elementName);
+        i = it->second;
+        this->elementList[i].setCascadeCacheEnabled(flag);
+    }
+    else
+        throw std::invalid_argument("Invalid element: " + elementName);
+}
+int Elements::isElementCascadeCacheFilled(const std::string & elementName) const
+{
+    std::map<std::string, int>::const_iterator it;
+    int i;
+    if (this->isElementNameDefined(elementName))
+    {
+        it = this->elementDict.find(elementName);
+        i = it->second;
+        return this->elementList[i].isCascadeCacheFilled();
+    }
+    else
+        throw std::invalid_argument("Invalid element: " + elementName);
+}
+void Elements::fillElementCascadeCache(const std::string & elementName)
+{
+    std::map<std::string, int>::const_iterator it;
+    int i;
+    if (this->isElementNameDefined(elementName))
+    {
+        it = this->elementDict.find(elementName);
+        i = it->second;
+        return this->elementList[i].fillCascadeCache();
+    }
+    else
+        throw std::invalid_argument("Invalid element: " + elementName);
+}
+void Elements::emptyElementCascadeCache(const std::string & elementName)
+{
+    std::map<std::string, int>::const_iterator it;
+    int i;
+    if (this->isElementNameDefined(elementName))
+    {
+        it = this->elementDict.find(elementName);
+        i = it->second;
+        return this->elementList[i].emptyCascadeCache();
+    }
+    else
+        throw std::invalid_argument("Invalid element: " + elementName);
+}

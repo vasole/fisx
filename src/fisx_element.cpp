@@ -17,6 +17,9 @@ Element::Element()
 
     // initialize keys
     this->initPartialPhotoelectricCoefficients();
+
+    // cascade cache
+    this->cascadeCacheEnabledFlag = false;
 }
 
 Element::Element(std::string name, int z = 0)
@@ -28,7 +31,7 @@ Element::Element(std::string name, int z = 0)
     // Unset density
     this->density = 1.0;
     this->initPartialPhotoelectricCoefficients();
-
+    this->cascadeCacheEnabledFlag = false;
 }
 
 void Element::setName(const std::string & name)
@@ -1139,7 +1142,7 @@ Element::getCascadeModifiedVacancyDistribution(const std::map<std::string, doubl
 std::map<std::string, std::map<std::string, double> >\
 Element::getXRayLinesFromVacancyDistribution(const std::map<std::string, double> & distribution, \
                                              const int & cascade, \
-                                             const bool & useFluorescenceYield) const
+                                             const int & useFluorescenceYield) const
 {
     std::map<std::string, double>::const_iterator c_it;
     std::string keys[9] = {"K", "L1", "L2", "L3", "M1", "M2", "M3", "M4", "M5"};
@@ -1157,6 +1160,47 @@ Element::getXRayLinesFromVacancyDistribution(const std::map<std::string, double>
 
     if (cascade != 0)
     {
+        if (this->cascadeCacheEnabledFlag &&  useFluorescenceYield && (this->cascadeCache.size() > 0))
+        {
+            // we are in conditions to use the cached emission
+            std::map<std::string, std::map<std::string, \
+                                std::map<std::string, double> > >::const_iterator cacheKey;
+            result.clear();
+            for (std::map<std::string, double>::const_iterator c_it = distribution.begin();
+                c_it != distribution.end(); ++c_it)
+            {
+                if ((c_it->second <= 0.0) || (c_it->first == "all other"))
+                {
+                    // no vacancies created in that shell
+                    continue;
+                }
+                cacheKey = cascadeCache.find(c_it->first);
+                if (cacheKey == cascadeCache.end())
+                {
+                    std::cout << this->name << " Error processing vacancy on shell " << c_it->first << std::endl;
+                    throw std::runtime_error("Vacancy on a shell not present in the cache!");
+                    // the above is not good, there can be no emission following a vacancy (rate too low)
+                    // it seems to be triggered by As L1 vacancies
+                    continue;
+                }
+                for(std::map<std::string, std::map<std::string, double> >::const_iterator rayIt = \
+                    cacheKey->second.begin(); rayIt != cacheKey->second.end(); ++rayIt)
+                {
+                    if (result.find(rayIt->first) == result.end())
+                    {
+                        result[rayIt->first] = rayIt->second;
+                        result[rayIt->first]["rate"] *= c_it->second;
+                    }
+                    else
+                    {
+                        std::map<std::string, double>::const_iterator tmpIterator;
+                        tmpIterator = rayIt->second.find("rate");
+                        result[rayIt->first] ["rate"] += tmpIterator->second * c_it->second;
+                    }
+                }
+            }
+            return result;
+        }
         finalDistribution = this->getCascadeModifiedVacancyDistribution(distribution);
     }
     else
@@ -1188,7 +1232,7 @@ Element::getXRayLinesFromVacancyDistribution(const std::map<std::string, double>
         for (c_it = fluorescenceRatios.begin(); c_it != fluorescenceRatios.end(); c_it++)
         {
             rate = c_it->second * finalDistribution[keys[i]];
-            if (useFluorescenceYield)
+            if (useFluorescenceYield != 0)
             {
                 rate *= shell_it->second.getFluorescenceYield();
             }
@@ -1314,17 +1358,76 @@ std::vector<std::map<std::string, std::map<std::string, double> > >Element::getP
     else
         weight = 1.0 / energy.size();
     result.clear();
-    for(i = 0; i < energy.size(); i++)
+    if ((energy.size() > this->shellInstance.size()) && (this->cascadeCacheEnabledFlag == false) )
     {
-        if (weights.size() > 1)
-            weight = weights[i];
-        vacancyDistribution = this->getInitialPhotoelectricVacancyDistribution(energy[i]);
-        result.push_back(this->getXRayLinesFromVacancyDistribution(vacancyDistribution, 1, true));
-        for(it = result[i].begin(); it != result[i].end(); ++it)
+        std::cout << "USING TEMPORARY CACHE " << std::endl;
+        std::map<std::string, std::map<std::string, std::map<std::string, double> > > cache;
+        std::map<std::string, std::map<std::string, std::map<std::string, double> > >::const_iterator cacheKey;
+        // calculate cascade for a single vacancy on each shell
+        for(i = 0; i < energy.size(); i++)
         {
-            it->second["factor"] = it->second["rate"] * weight;
-            it->second["rate"] = it->second["factor"] *\
-                            this->getMassAttenuationCoefficients(energy[i])["photoelectric"];
+            if (weights.size() > 1)
+            {
+                weight = weights[i];
+            }
+            std::map<std::string, std::map<std::string, double> > singleResult;
+            singleResult.clear();
+            vacancyDistribution = this->getInitialPhotoelectricVacancyDistribution(energy[i]);
+            for (std::map<std::string, double>::const_iterator c_it = vacancyDistribution.begin();
+                c_it != vacancyDistribution.end(); ++c_it)
+            {
+                if (c_it->second <= 0.0)
+                {
+                    // no vacancies created in that shell
+                    continue;
+                }
+                cacheKey = cache.find(c_it->first);
+                if (cacheKey == cache.end())
+                {
+                    // key to be added to the cache
+                    std::map<std::string, double> tmpDistribution;
+                    tmpDistribution.clear();
+                    tmpDistribution[c_it->first] = 1.0;
+                    cache[c_it->first] = this->getXRayLinesFromVacancyDistribution(tmpDistribution, 1, 1);
+                }
+                for(std::map<std::string, std::map<std::string, double> >::const_iterator rayIt = \
+                    cache[c_it->first].begin(); rayIt != cache[c_it->first].end(); ++rayIt)
+                {
+                    if (singleResult.find(rayIt->first) == singleResult.end())
+                    {
+                        singleResult[rayIt->first] = cache[c_it->first][rayIt->first];
+                        singleResult[rayIt->first]["rate"] *= vacancyDistribution[c_it->first];
+                    }
+                    else
+                    {
+                        singleResult[rayIt->first] ["rate"] += (cache[c_it->first][rayIt->first]["rate"]) * \
+                                                               vacancyDistribution[c_it->first];
+                    }
+                }
+            }
+            result.push_back(singleResult);
+            for(it = result[i].begin(); it != result[i].end(); ++it)
+            {
+                it->second["factor"] = it->second["rate"] * weight;
+                it->second["rate"] = it->second["factor"] *\
+                                this->getMassAttenuationCoefficients(energy[i])["photoelectric"];
+            }
+        }
+    }
+    else
+    {
+        for(i = 0; i < energy.size(); i++)
+        {
+            if (weights.size() > 1)
+                weight = weights[i];
+            vacancyDistribution = this->getInitialPhotoelectricVacancyDistribution(energy[i]);
+            result.push_back(this->getXRayLinesFromVacancyDistribution(vacancyDistribution, 1, 1));
+            for(it = result[i].begin(); it != result[i].end(); ++it)
+            {
+                it->second["factor"] = it->second["rate"] * weight;
+                it->second["rate"] = it->second["factor"] *\
+                                this->getMassAttenuationCoefficients(energy[i])["photoelectric"];
+            }
         }
     }
     return result;
@@ -1405,4 +1508,62 @@ std::pair<long, long> Element::getInterpolationIndices(const std::vector<double>
     result.first = (long) iMin;
     result.second = (long) iMax;
     return result;
+}
+
+
+void Element::setCascadeCacheEnabled(const int & flag)
+{
+    if (flag == 0)
+    {
+        this->cascadeCacheEnabledFlag = false;
+    }
+    else
+    {
+        if (this->cascadeCache.size() < 1)
+        {
+            this->fillCascadeCache();
+        }
+        this->cascadeCacheEnabledFlag = true;
+    }
+}
+
+void Element::fillCascadeCache()
+{
+    std::map<std::string, Shell>::const_iterator shellIterator;
+    bool oldFlag;
+    this->cascadeCache.clear();
+    std::cout << "filling cache for element " << this->name << std::endl;
+    for (shellIterator = shellInstance.begin(); shellIterator != shellInstance.end(); ++shellIterator)
+    {
+        std::string subshell = shellIterator->first;
+        std::map<std::string, double> tmpDistribution;
+        tmpDistribution.clear();
+        tmpDistribution[subshell] = 1.0;
+        oldFlag = this->cascadeCacheEnabledFlag;
+        if (oldFlag)
+        {
+            // this is needed because otherways it uses the cache when filling the cache :-)
+            this->cascadeCacheEnabledFlag = false;
+        }
+        this->cascadeCache[subshell] = this->getXRayLinesFromVacancyDistribution(tmpDistribution, 1, 1);
+        this->cascadeCacheEnabledFlag = oldFlag;
+    }
+    std::cout << "cache filled for element " << this->name << std::endl;
+}
+
+void Element::emptyCascadeCache()
+{
+    this->cascadeCache.clear();
+}
+
+int Element::isCascadeCacheFilled() const
+{
+    if (this->cascadeCache.size() > 0)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
 }
