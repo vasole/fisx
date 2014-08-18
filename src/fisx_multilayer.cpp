@@ -291,6 +291,8 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                 key = elementName + " " + lineFamily;
                 // we need to calculate the layer mass attenuation coefficients at the fluorescent energies
                 result.clear();
+                if (elementMassFraction == 0.0)
+                    continue;
                 for (c_it = primaryExcitationFactors.begin(); c_it != primaryExcitationFactors.end(); ++c_it)
                 {
                     if (c_it->first.compare(0, actualLineFamily.length(), actualLineFamily) == 0)
@@ -312,18 +314,6 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                         result[c_it->first]["rate"] = mapIt->second;
                         mapIt = c_it->second.find("factor");
                         result[c_it->first]["factor"] = mapIt->second;
-                        if (c_it->first.size() == 4)
-                        {
-                            energyThreshold = this->getEnergyThreshold(elementName, \
-                                                                       c_it->first.substr(0, 2), \
-                                                                       elementsLibrary);
-                        }
-                        else
-                        {
-                            energyThreshold = this->getEnergyThreshold(elementName, \
-                                                                       c_it->first.substr(0, 1), \
-                                                                       elementsLibrary);
-                        }
                         if (actualResult[key][iLayer].find(c_it->first) == actualResult[key][iLayer].end())
                         {
                             // calculate layer mu total at fluorescent energy
@@ -479,6 +469,8 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                             for(iLambda = 0; iLambda < sampleLayerEnergies[jLayer].size(); iLambda++)
                             {
                                 // analogous to incident beam
+                                if (energyThreshold > sampleLayerEnergies[jLayer][iLambda])
+                                    continue;
                                 tmpExcitationFactors = elementsLibrary.getExcitationFactors(elementName, \
                                             sampleLayerEnergies[jLayer][iLambda], \
                                             sampleLayerRates[jLayer][iLambda]);
