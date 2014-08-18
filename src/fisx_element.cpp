@@ -1532,7 +1532,7 @@ void Element::fillCascadeCache()
     std::map<std::string, Shell>::const_iterator shellIterator;
     bool oldFlag;
     this->cascadeCache.clear();
-    std::cout << "filling cache for element " << this->name << std::endl;
+    // std::cout << "filling cache for element " << this->name << std::endl;
     for (shellIterator = shellInstance.begin(); shellIterator != shellInstance.end(); ++shellIterator)
     {
         std::string subshell = shellIterator->first;
