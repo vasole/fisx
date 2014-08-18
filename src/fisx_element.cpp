@@ -1548,7 +1548,7 @@ void Element::fillCascadeCache()
         this->cascadeCache[subshell] = this->getXRayLinesFromVacancyDistribution(tmpDistribution, 1, 1);
         this->cascadeCacheEnabledFlag = oldFlag;
     }
-    std::cout << "cache filled for element " << this->name << std::endl;
+    //std::cout << "cache filled for element " << this->name << std::endl;
 }
 
 void Element::emptyCascadeCache()
