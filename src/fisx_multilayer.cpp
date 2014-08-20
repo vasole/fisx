@@ -182,11 +182,20 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                         }
                     }
                 }
+                // We have to add the contribution of coherent scattering
+                // We do so by assuming an isotropic emission of the same energy as the
+                // incident beam
+                sampleLayerEnergyNames[iLayer].push_back("coherent scattering");
+                sampleLayerEnergies[iLayer].push_back(energies[iRay]);
                 // calculate sample mu total at all those energies
-                // Doubtfull. It has to be calculated for intermediate layers too.
-                sampleLayerMuTotal[iLayer] = (*layerPtr).getMassAttenuationCoefficients( \
+                std::map<std::string, std::vector<double> > tmpStringDoubleVecMap;
+                tmpStringDoubleVecMap = (*layerPtr).getMassAttenuationCoefficients( \
                                                                 sampleLayerEnergies[iLayer], \
-                                                                elementsLibrary)["total"];
+                                                                elementsLibrary);
+                sampleLayerMuTotal[iLayer] = tmpStringDoubleVecMap["total"];
+
+                sampleLayerRates[iLayer].push_back((weights[iRay] * sampleLayerWeight[iLayer])*\
+                      tmpStringDoubleVecMap["coherent"].back() / tmpStringDoubleVecMap["total"].back());
             }
         }
         // we start calculation
@@ -552,6 +561,8 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                 {
                                     // analogous to incident beam
                                     energy = sampleLayerEnergies[jLayer][iLambda];
+                                    if (energyThreshold > energy)
+                                        continue;
                                     tmpExcitationFactors = elementsLibrary.getExcitationFactors( \
                                                             elementName, \
                                                             energy, \
@@ -614,6 +625,8 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                 {
                                     // analogous to incident beam
                                     energy = sampleLayerEnergies[jLayer][iLambda];
+                                    if (energyThreshold > energy)
+                                        continue;
                                     tmpExcitationFactors = elementsLibrary.getExcitationFactors( \
                                                             elementName, \
                                                             energy, \
