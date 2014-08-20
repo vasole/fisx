@@ -6,6 +6,10 @@
 #include <sstream>
 #include <iomanip>
 
+// TODO: When calculating secondary excitation contributions, currently the cascade of the
+// secondary contribution is neglected. When we calculate the K and L lines of an element,
+// we need to add to the L secondary, the L secondary coming from the cascade of the K lines
+
 std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, double> > > > \
                 XRF::getMultilayerFluorescence(const std::vector<std::string> & elementList,
                                                const Elements & elementsLibrary, \
