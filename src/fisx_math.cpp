@@ -268,12 +268,17 @@ double Math::deBoerX(const double & p, const double & q, const double & d1, cons
         if (d1 < 0.01)
         {
             // VERY THIN CASE:
-            // std::cout << " EXPECTED = " << (d1 / p) * std::log(1 + p / mu_2_j) << std::endl;
-            // std::cout << " MEASURED = " << result << std::endl;
+            std::cout << " THIN CASE " << std::endl;
+            std::cout << " EXPECTED = " << (d1 / p) * std::log(1 + p / mu2j) << std::endl;
+            std::cout << " MEASURED = " << result << std::endl;
             std::cout << " V(d1,inf) = " << Math::deBoerV(p, q, d1, d2, mu1j, mu2j, mubj_dt) << std::endl;
             std::cout << " V(d1, 0) = " << Math::deBoerV(p, q, d1, 0.0, mu1j, mu2j, mubj_dt) << std::endl;
             std::cout << " V(0, d2) = " << Math::deBoerV(p, q, 0.0, d2, mu1j, mu2j, mubj_dt) << std::endl;
             std::cout << " V(0.0, 0) = " << Math::deBoerV(p, q, 0.0, 0.0, mu1j, mu2j, mubj_dt) << std::endl;
+        }
+        else
+        {
+            std::cout << "NOT THIN CASE " << std::endl;
         }
         if (result < 0)
         {
@@ -286,6 +291,26 @@ double Math::deBoerX(const double & p, const double & q, const double & d1, cons
             std::cout << "mubjdt " << mubj_dt << std::endl;
             std::cout << " error  " << std::endl;
             throw std::runtime_error("negative contribution");
+        }
+        if (!Math::isFiniteNumber(result))
+        {
+            std::cout << "p    " << p << std::endl;
+            std::cout << "q    " << q << std::endl;
+            std::cout << "d1   " << d1 << std::endl;
+            std::cout << "d2   " << d2 << std::endl;
+            std::cout << "mu1j " << mu1j << std::endl;
+            std::cout << "mu2j " << mu2j << std::endl;
+            std::cout << "mubjdt " << mubj_dt << std::endl;
+            std::cout << " error  " << std::endl;
+            std::cout << "Math::deBoerV(p, q, d1, d2, mu1j, mu2j, mubj_dt) = ";
+            std::cout << Math::deBoerV(p, q, d1, d2, mu1j, mu2j, mubj_dt) << std::endl;
+            std::cout << "Math::deBoerV(p, q, d1, 0.0, mu1j, mu2j, mubj_dt) = ";
+            std::cout << Math::deBoerV(p, q, d1, 0.0, mu1j, mu2j, mubj_dt) << std::endl;
+            std::cout << "Math::deBoerV(p, q, 0.0, d2, mu1j, mu2j, mubj_dt) = ";
+            std::cout << Math::deBoerV(p, q, 0.0, d2, mu1j, mu2j, mubj_dt) << std::endl;
+            std::cout << "Math::deBoerV(p, q, 0.0, 0.0, mu1j, mu2j, mubj_dt) = ";
+            std::cout << Math::deBoerV(p, q, 0.0, 0.0, mu1j, mu2j, mubj_dt)<< std::endl;
+            throw std::runtime_error("Not finite contribution");
         }
         return result;
      }
@@ -311,12 +336,31 @@ double Math::deBoerV(const double & p, const double & q, const double & d1, cons
     if ((mubjdt == 0) && (d1 == 0) && (d2 == 0))
     {
         // V(0, 0) with db = 0;
-        tmpDouble1 =  1.0 - (q / mu1j);
+        tmpDouble1 = 1.0 - (q / mu1j);
+        tmpDouble2 = 1.0 + (p / mu2j);
         if (tmpDouble1 < 0)
-            tmpDouble2 = (mu2j / p) * std::log(1.0 + (p / mu2j)) + (mu1j/q) * std::log(-tmpDouble1);
-        else
-            tmpDouble2 = (mu2j / p) * std::log(1.0 + (p / mu2j)) + (mu1j/q) * std::log(tmpDouble1);
-        return -tmpDouble2 / (p * mu1j + q * mu2j);
+            tmpDouble1 = - tmpDouble1;
+        if (tmpDouble2 < 0)
+            tmpDouble2 = - tmpDouble2;
+        tmpHelp = (mu2j / p) * std::log(tmpDouble2) + (mu1j/q) * std::log(tmpDouble1);
+        tmpHelp = -tmpHelp / (p * mu1j + q * mu2j);
+        if (!Math::isFiniteNumber(tmpHelp))
+        {
+            std::cout << "p    " << p << std::endl;
+            std::cout << "q    " << q << std::endl;
+            std::cout << "d1   " << d1 << std::endl;
+            std::cout << "d2   " << d2 << std::endl;
+            std::cout << "mu1j " << mu1j << std::endl;
+            std::cout << "mu2j " << mu2j << std::endl;
+            std::cout << "mubjdt " << mubjdt << std::endl;
+            std::cout << "1.0 + (p / mu2j) = " << 1.0 + (p / mu2j) << std::endl;
+            std::cout << "tmpDouble1 = " << tmpDouble1 << std::endl;
+            std::cout << "tmpDouble2 = " << tmpDouble2 << std::endl;
+            std::cout << "p * mu1j + q * mu2j = " << p * mu1j + q * mu2j << std::endl;
+            std::cout << "Error 0" << std::endl;
+            throw std::runtime_error("Error 0: Error on V(0,0) with no intermediate layer");
+        }
+        return tmpHelp;
     }
 
     // X(p, q, d1, d2) = V(d1, d2) - V(d1, 0) - V(0, d2) + V(0, 0)
@@ -370,8 +414,24 @@ double Math::deBoerV(const double & p, const double & q, const double & d1, cons
         std::cout << " error 4 " << std::endl;
         throw std::runtime_error("error4");
     }
-
-    return std::exp((q - mu1j) * d1 - (p + mu2j) * d2 - mubjdt) * (tmpDouble1 + tmpDouble2);
+    tmpHelp = std::exp((q - mu1j) * d1 - (p + mu2j) * d2 - mubjdt) * (tmpDouble1 + tmpDouble2);
+    if (!Math::isFiniteNumber(tmpHelp))
+    {
+        std::cout << "p    " << p << std::endl;
+        std::cout << "q    " << q << std::endl;
+        std::cout << "d1   " << d1 << std::endl;
+        std::cout << "d2   " << d2 << std::endl;
+        std::cout << "mu1j " << mu1j << std::endl;
+        std::cout << "mu2j " << mu2j << std::endl;
+        std::cout << "mubjdt " << mubjdt << std::endl;
+        std::cout << "(q - mu1j) * d1 - (p + mu2j) * d2 - mubjdt = " ;
+        std::cout << (q - mu1j) * d1 - (p + mu2j) * d2 - mubjdt << std::endl;
+        std::cout << "exp((q - mu1j) * d1 - (p + mu2j) * d2 - mubjdt) = " ;
+        std::cout << exp((q - mu1j) * d1 - (p + mu2j) * d2 - mubjdt) << std::endl;
+        std::cout << " error 5 " << std::endl;
+        throw std::runtime_error("error5");
+    }
+    return tmpHelp;
 }
 
 bool Math::isNumber(const double & x)
