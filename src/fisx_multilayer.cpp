@@ -274,21 +274,21 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                                                         weights[iRay]);
             for (iLayer = 0; iLayer < sample.size(); iLayer++)
             {
+                double elementMassFractionFactor;
                 double elementMassFraction;
                 if ((calculationLayer > 0) && (iLayer != calculationLayer))
                 {
                     // no need to calculate this layer
                     continue;
                 }
-                elementMassFraction = 1.0;
-                if (useMassFractions)
+                elementMassFractionFactor = 1.0;
+                if(true)
                 {
                     std::map<std::string, double> sampleLayerComposition;
                     layerPtr = &sample[iLayer];
                     sampleLayerComposition = (*layerPtr).getComposition(elementsLibrary);
                     if (sampleLayerComposition.find(elementName) == sampleLayerComposition.end())
                     {
-                        // no need to calculate this layer
                         elementMassFraction = 0.0;
                     }
                     else
@@ -296,11 +296,15 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                         elementMassFraction = sampleLayerComposition[elementName];
                     }
                 }
+                if (useMassFractions)
+                {
+                    elementMassFractionFactor = elementMassFraction;
+                }
                 // here I should loop for all elements and families
                 key = elementName + " " + lineFamily;
                 // we need to calculate the layer mass attenuation coefficients at the fluorescent energies
                 result.clear();
-                if (elementMassFraction == 0.0)
+                if (elementMassFractionFactor == 0.0)
                     continue;
                 for (c_it = primaryExcitationFactors.begin(); c_it != primaryExcitationFactors.end(); ++c_it)
                 {
@@ -414,7 +418,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                     }
                     mu_1_i = mapIt->second;
                     tmpDouble = (mu_1_lambda / sinAlphaIn) + (mu_1_i / sinAlphaOut);
-                    tmpDouble = elementMassFraction * \
+                    tmpDouble = elementMassFractionFactor * \
                         (1.0 - exp( - tmpDouble * density_1 * thickness_1)) / (tmpDouble * sinAlphaIn);
                     result[c_it->first]["primary"] = tmpDouble * \
                                                      primaryExcitationFactors[c_it->first]["rate"] * \
@@ -506,7 +510,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                                                sampleLayerMuTotal[jLayer][iLambda],
                                                                density_1,
                                                                thickness_1);
-                                    tmpDouble *= elementMassFraction * (0.5/sinAlphaIn);
+                                    tmpDouble *= elementMassFractionFactor * (0.5/sinAlphaIn);
                                     tmpDouble *= tmpExcitationFactors[c_it->first]["rate"];
                                     tmpStringStream.str(std::string());
                                     tmpStringStream.clear();
@@ -602,7 +606,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                                                   mu_1_j, \
                                                                   mu_2_j, \
                                                                   mu_b_j_d_t);
-                                        tmpDouble *= elementMassFraction * (0.5/sinAlphaIn);
+                                        tmpDouble *= elementMassFractionFactor * (0.5/sinAlphaIn);
                                         tmpDouble *= tmpExcitationFactors[c_it->first]["rate"];
                                         tmpStringStream.str(std::string());
                                         tmpStringStream.clear();
@@ -666,11 +670,11 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                                                   mu_1_j, \
                                                                   mu_2_j, \
                                                                   mu_b_j_d_t);
-                                        tmpDouble *= elementMassFraction * (0.5/sinAlphaIn);
+                                        tmpDouble *= elementMassFractionFactor * (0.5/sinAlphaIn);
                                         tmpDouble *= tmpExcitationFactors[c_it->first]["rate"];
                                         tmpStringStream.str(std::string());
                                         tmpStringStream.clear();
-                                        tmpStringStream << std::setfill('0') << std::setw(2) << iLayer;
+                                        tmpStringStream << std::setfill('0') << std::setw(2) << jLayer;
                                         tmpString = sampleLayerEnergyNames[jLayer][iLambda] + " " + tmpStringStream.str();
                                         actualResult[elementName + " " + lineFamily][iLayer][c_it->first][tmpString] = \
                                                                                                         tmpDouble;
@@ -729,8 +733,102 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                         }
                     }
                     actualResult[key][iLayer][c_it->first]["rate"] += (1.0 - totalEscape) * result[c_it->first]["rate"];
+                    // primart and secondary are the same independently of having escape or not.
                     actualResult[key][iLayer][c_it->first]["primary"] += result[c_it->first]["primary"];
                     actualResult[key][iLayer][c_it->first]["secondary"] += result[c_it->first]["secondary"];
+                    actualResult[key][iLayer][c_it->first]["massFraction"] = elementMassFraction;
+                }
+            }
+        }
+    }
+    if (secondary > 1)
+    {
+        std::cout << "WARNING: Tertiary excitation under development " << std::endl;
+        // approximate tertiary excitation
+        // we ignore the case of excitation after double rayleigh/coherent scattering
+        std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, double> > > >::iterator actualResultIt;
+        std::map<std::string, std::map<std::string, double> >::iterator c_it;
+        std::map<std::string, std::map<std::string, double> >::iterator it;
+        std::map<std::string, std::map<std::string, double> >::iterator it2;
+        std::map<std::string, double> contributingKeys;
+        std::map<std::string, double>::iterator contributingKeysIt;
+        std::string key;
+        std::ostringstream tmpStringStream;
+        double factorFirst;
+        double factorSecond;
+        double tertiary;
+        std::string ele;
+        for (actualResultIt = actualResult.begin(); actualResultIt != actualResult.end(); ++actualResultIt)
+        {
+            ele = actualResultIt->first.substr(0, actualResultIt->first.find(' '));
+            for (iLayer = 0; iLayer < actualResultIt->second.size(); iLayer++)
+            {
+                for (it = actualResultIt->second[iLayer].begin(); \
+                     it != actualResultIt->second[iLayer].end(); ++it)
+                {
+                    //std::cout << it->first << std::endl;
+                    if (it->first.find("esc") != std::string::npos)
+                    {
+                        // this is a escape line
+                        continue;
+                    }
+                    if (it->second["massFraction"] < 1.0E-2)
+                    {
+                        // one should be able to neglect tertiary with less than 1 % concentration
+                        break;
+                    }
+                    factorFirst = 1.0;
+                    if (it->second["primary"] > 0.0)
+                    {
+                        factorFirst = (it->second["primary"] + it->second["secondary"]) / \
+                                     it->second["primary"];
+                    }
+                    if (factorFirst < 1.01)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        tmpStringStream.str(std::string());
+                        tmpStringStream.clear();
+                        tmpStringStream << std::setfill('0') << std::setw(2) << iLayer;
+                        key = ele + " " + it->first + " " + tmpStringStream.str();
+                        contributingKeys[key] = factorFirst;
+                        // the factor will be the same for all lines starting by KL2, beign escape or not
+                    }
+                }
+            }
+        }
+
+        for (actualResultIt = actualResult.begin(); actualResultIt != actualResult.end(); ++actualResultIt)
+        {
+            for (iLayer = 0; iLayer < actualResultIt->second.size(); iLayer++)
+            {
+                for (it = actualResultIt->second[iLayer].begin(); \
+                     it != actualResultIt->second[iLayer].end(); ++it)
+                {
+                    factorFirst = 1.0;
+                    tertiary = 0.0;
+                    if (it->second["primary"] > 0.0)
+                    {
+                        factorFirst = (it->second["primary"] + it->second["secondary"]) / \
+                                     it->second["primary"];
+                    }
+                    if (factorFirst < 1.01)
+                    {
+                        it->second["tertiary"] = 0.0;
+                        continue;
+                    }
+                    for (contributingKeysIt = contributingKeys.begin(); \
+                         contributingKeysIt != contributingKeys.end(); ++contributingKeysIt)
+                    {
+                        if (it->second.find(contributingKeysIt->first) != it->second.end())
+                        {
+                            tertiary += it->second[contributingKeysIt->first] * \
+                                        (contributingKeysIt->second - 1.0);
+                        }
+                    }
+                    it->second["tertiary"] = tertiary;
                 }
             }
         }
