@@ -361,11 +361,14 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
 
                             if (detector.hasMaterialComposition() || (detector.getMaterialName().size() > 0 ))
                             {
-                                // calculate intrinsic efficiency
-                                // assuming normal incidence on detector surface
-                                detectionEfficiency *= (1.0 - detector.getTransmission(energy, \
-                                                                                       elementsLibrary, \
-                                                                                       90.0));
+                                if ((detector.getDensity() > 0.0) && (detector.getThickness() > 0.0))
+                                {
+                                    // calculate intrinsic efficiency
+                                    // assuming normal incidence on detector surface
+                                    detectionEfficiency *= (1.0 - detector.getTransmission(energy, \
+                                                                                elementsLibrary, \
+                                                                                90.0));
+                                }
                                 // calculate escape ratio assuming normal incidence on detector surface
                                 escapeRates = detector.getEscape(energy, \
                                                                  elementsLibrary, \
@@ -521,32 +524,6 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                     result[c_it->first]["secondary"] += tmpDouble;
                                     result[c_it->first]["rate"] += tmpDouble * \
                                                                    result[c_it->first]["efficiency"];
-                                    /*
-                                    if ((sampleLayerEnergyNames[iLayer][iLambda] == "Fe KL2") || \
-                                        (sampleLayerEnergyNames[iLayer][iLambda] == "Fe KL3"))
-                                    {
-                                        std::cout << c_it->first << " FROM ";
-                                        std::cout << sampleLayerEnergyNames[iLayer][iLambda] << std::endl;
-                                        std::cout << "Enhancement = ";
-                                        std::cout << tmpDouble/result[c_it->first]["primary"] << std::endl;
-                                        std::cout << "mu1 " << mu_1_lambda / sinAlphaIn << std::endl;
-                                        std::cout << "mu2 " << mu_1_i / sinAlphaOut << std::endl;
-                                        std::cout << "muj " << sampleLayerMuTotal[iLayer][iLambda] << std::endl;
-                                        std::cout << "L0 = " << Math::deBoerL0(mu_1_lambda / sinAlphaIn,
-                                                               mu_1_i / sinAlphaOut,
-                                                               sampleLayerMuTotal[iLayer][iLambda],
-                                                               density_1,
-                                                               thickness_1) << std::endl;
-                                        std::cout << "mu1 " << mu_1_i / sinAlphaOut << std::endl;
-                                        std::cout << "mu2 " << mu_1_lambda / sinAlphaIn << std::endl;
-                                        std::cout << "muj " << sampleLayerMuTotal[iLayer][iLambda] << std::endl;
-                                        std::cout << "L0 = " << Math::deBoerL0(mu_1_i / sinAlphaOut,
-                                                               mu_1_lambda / sinAlphaIn,
-                                                               sampleLayerMuTotal[iLayer][iLambda],
-                                                               density_1,
-                                                               thickness_1) << std::endl;
-                                    }
-                                    */
                                 }
                             }
                         }
@@ -727,13 +704,15 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                 }
                                 totalEscape += mapIt->second;
                                 actualResult[key][iLayer][tmpString]["rate"] += mapIt->second * result[c_it->first]["rate"];
+                                // The only meaning of filling "primary" and "secondary" for a escape peak is in order to
+                                // be able to evaluate the ratio without having to refer to the actual parent line.
                                 actualResult[key][iLayer][tmpString]["primary"] += mapIt->second * result[c_it->first]["primary"];
                                 actualResult[key][iLayer][tmpString]["secondary"] += mapIt->second * result[c_it->first]["secondary"];
                             }
                         }
                     }
                     actualResult[key][iLayer][c_it->first]["rate"] += (1.0 - totalEscape) * result[c_it->first]["rate"];
-                    // primart and secondary are the same independently of having escape or not.
+                    // primary and secondary are the same independently of having escape or not.
                     actualResult[key][iLayer][c_it->first]["primary"] += result[c_it->first]["primary"];
                     actualResult[key][iLayer][c_it->first]["secondary"] += result[c_it->first]["secondary"];
                     actualResult[key][iLayer][c_it->first]["massFraction"] = elementMassFraction;
@@ -769,12 +748,13 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                     //std::cout << it->first << std::endl;
                     if (it->first.find("esc") != std::string::npos)
                     {
-                        // this is a escape line
+                        // this is a escape line -> Ignore it
                         continue;
                     }
                     if (it->second["massFraction"] < 1.0E-2)
                     {
-                        // one should be able to neglect tertiary with less than 1 % concentration
+                        // one should be able to neglect tertiary excitation from elements
+                        // with less than 1 % concentration
                         break;
                     }
                     factorFirst = 1.0;
@@ -785,6 +765,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                     }
                     if (factorFirst < 1.01)
                     {
+                        // tertiary contribution should already be less than 1 % -> Ignore it
                         continue;
                     }
                     else
@@ -794,7 +775,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                         tmpStringStream << std::setfill('0') << std::setw(2) << iLayer;
                         key = ele + " " + it->first + " " + tmpStringStream.str();
                         contributingKeys[key] = factorFirst;
-                        // the factor will be the same for all lines starting by KL2, beign escape or not
+                        // the factor will be the same for all lines starting by KL2, being escape or not
                     }
                 }
             }
@@ -816,6 +797,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                     }
                     if (factorFirst < 1.01)
                     {
+                        // It had less than 1 % secondary, we assume tertiary will be even less
                         it->second["tertiary"] = 0.0;
                         continue;
                     }
@@ -829,6 +811,11 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                         }
                     }
                     it->second["tertiary"] = tertiary;
+                    // update the total rate to account for primary, secondary and tertiary
+                    // rate was equal to (primary + secondary) times a certain efficiency factor
+                    // rate = A * (primary + secondary) therefore  now we must update the rate to
+                    // account for tertiary rate = A * (primary + secondary + tertiary)
+                    it->second["rate"] += tertiary / (it->second["primary"] + it->second["secondary"]);
                 }
             }
         }
