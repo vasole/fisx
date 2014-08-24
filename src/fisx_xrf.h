@@ -183,7 +183,7 @@ public:
 
     useMassFractions - If 0 (default) the output corresponds to the requested information if the mass
     fraction of the element would be one on each calculated sample layer. To get the actual signal, one
-    has to multiply bthe rates by the actual mass fraction of the element on each sample layer.
+    has to multiply the rates by the actual mass fraction of the element on each sample layer.
                        If set to 1, the rate will be already corrected by the actual mass fraction.
 
     Return a complete output of the form
@@ -194,6 +194,7 @@ public:
     [Element Family][Layer][line]["efficiency"] - Detection efficiency
     [Element Family][Layer][line][element line layer] - Secondary rate (prior to correct for detection efficiency)
     due to the fluorescence from the given element, line and layer index composing the map key.
+    [Element Family][Layer][line]["massFraction"] - Mass fraction of the element in the considered layer
     */
     std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, double> > > > \
                 getMultilayerFluorescence(const std::vector<std::string> & elementFamilyLayer, \
