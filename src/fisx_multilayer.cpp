@@ -121,7 +121,10 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
         {
             // get muTotal at the incident energy
             layerPtr = &sample[iLayer];
-            sampleLayerWeight[iLayer] = exp(-tmpDouble);
+            if (iLayer == 0)
+                sampleLayerWeight[iLayer] = 1.0;
+            else
+                sampleLayerWeight[iLayer] = exp(-tmpDouble);
             muTotal[iLayer] = (*layerPtr).getMassAttenuationCoefficients( \
                                                             energies[iRay], \
                                                             elementsLibrary)["total"];
@@ -256,6 +259,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
             }
             if (lineFamily == "Kb")
             {
+                // carefull, the actual condition is to start by K and not to be followed by L
                 actualLineFamily = "KM";
             }
             if (actualLineFamily == "")
@@ -276,7 +280,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
             {
                 double elementMassFractionFactor;
                 double elementMassFraction;
-                if ((calculationLayer > 0) && (iLayer != calculationLayer))
+                if ((calculationLayer >= 0) && (iLayer != calculationLayer))
                 {
                     // no need to calculate this layer
                     continue;
@@ -308,7 +312,8 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                     continue;
                 for (c_it = primaryExcitationFactors.begin(); c_it != primaryExcitationFactors.end(); ++c_it)
                 {
-                    if (c_it->first.compare(0, actualLineFamily.length(), actualLineFamily) == 0)
+                    if ((c_it->first.compare(0, actualLineFamily.length(), actualLineFamily) == 0) || \
+                        ((lineFamily == "Kb") && (c_it->first[0] == 'K') && (c_it->first[1] != 'L')))
                     {
                         mapIt = c_it->second.find("factor");
                         if (mapIt == c_it->second.end())
@@ -448,32 +453,6 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                     }
                 }
 
-                /*
-                // initialize output in case nothing comes out (element not excited)
-                // this is to be done at the very end
-                if (actualResult[key].find(iLayer) == actualResult[key].end())
-                {
-                    // element family was not excited;
-                    continue;
-                }
-                if (actualResult[key].find(iLayer) == actualResult.end())
-                {
-                    // element family has not been excited (and it will never will) because
-                    // we start by the highest energy
-                    // we need to fill some defaults
-                    std::map<std::string, double> tmpMap;
-                    tmpMap = elementsLibrary.getElement(elementName).getEmittedXRayLines(1000.);
-                    for (mapIt = tmpMap.begin(); mapIt != tmpMap.end(); ++mapIt)
-                    {
-                        if (mapIt->first.compare(0, actualLineFamily.length(), actualLineFamily) == 0)
-                        {
-                            actualResult[key][iLayer][mapIt->first]["energy"] = mapIt->second;
-                            actualResult[key][iLayer][mapIt->first]["primary"] = 0.0;
-                            actualResult[key][iLayer][mapIt->first]["rate"] = 0.0;
-                        }
-                    }
-                }
-                */
                 if (secondary > 0)
                 {
                     // calculate secondary
@@ -501,7 +480,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                         continue;
                                     mapIt = result[c_it->first].find("mu_1_i");
                                     if (mapIt == result[c_it->first].end())
-                                        throw std::runtime_error(" mu_1_i key. Mass attenuation noy present???");
+                                        throw std::runtime_error(" mu_1_i key. Mass attenuation not present???");
                                     mu_1_i = mapIt->second;
                                     tmpDouble = Math::deBoerL0(mu_1_lambda / sinAlphaIn,
                                                                mu_1_i / sinAlphaOut,
@@ -562,6 +541,10 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                         {
                                             continue;
                                         }
+                                        mapIt = result[c_it->first].find("mu_1_i");
+                                        if (mapIt == result[c_it->first].end())
+                                            throw std::runtime_error(" mu_1_i key. Mass attenuation not present???");
+                                        mu_1_i = mapIt->second;
                                         mu_1_j = \
                                             sample[iLayer].getMassAttenuationCoefficients(energy, \
                                                                                 elementsLibrary)["total"];
@@ -583,6 +566,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                                                   mu_1_j, \
                                                                   mu_2_j, \
                                                                   mu_b_j_d_t);
+                                        tmpDouble *= std::exp(-mu_1_i * density_1 * thickness_1/sinAlphaOut);
                                         tmpDouble *= elementMassFractionFactor * (0.5/sinAlphaIn);
                                         tmpDouble *= tmpExcitationFactors[c_it->first]["rate"];
                                         tmpStringStream.str(std::string());
@@ -626,6 +610,10 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                         {
                                             continue;
                                         }
+                                        mapIt = result[c_it->first].find("mu_1_i");
+                                        if (mapIt == result[c_it->first].end())
+                                            throw std::runtime_error(" mu_1_i key. Mass attenuation not present???");
+                                        mu_1_i = mapIt->second;
                                         mu_1_j = \
                                             sample[iLayer].getMassAttenuationCoefficients(energy, \
                                                                                 elementsLibrary)["total"];
@@ -647,6 +635,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                                                   mu_1_j, \
                                                                   mu_2_j, \
                                                                   mu_b_j_d_t);
+                                        tmpDouble *= std::exp(-mu_2_lambda * density_2 * thickness_2/sinAlphaIn);
                                         tmpDouble *= elementMassFractionFactor * (0.5/sinAlphaIn);
                                         tmpDouble *= tmpExcitationFactors[c_it->first]["rate"];
                                         tmpStringStream.str(std::string());
