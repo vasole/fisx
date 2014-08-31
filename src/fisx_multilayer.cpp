@@ -711,7 +711,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
     }
     if (secondary > 1)
     {
-        std::cout << "WARNING: Tertiary excitation under development " << std::endl;
+        // std::cout << "WARNING: Tertiary excitation under development " << std::endl;
         // approximate tertiary excitation
         // we ignore the case of excitation after double rayleigh/coherent scattering
         std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, double> > > >::iterator actualResultIt;
@@ -804,7 +804,8 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                     // rate was equal to (primary + secondary) times a certain efficiency factor
                     // rate = A * (primary + secondary) therefore  now we must update the rate to
                     // account for tertiary rate = A * (primary + secondary + tertiary)
-                    it->second["rate"] += tertiary / (it->second["primary"] + it->second["secondary"]);
+                    it->second["rate"] *= (tertiary + it->second["primary"] + it->second["secondary"]) \
+                                          / (it->second["primary"] + it->second["secondary"]);
                 }
             }
         }
