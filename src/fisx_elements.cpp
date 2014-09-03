@@ -1023,7 +1023,7 @@ void Elements::addMaterial(const std::string & name, const double & density, \
     Material material;
     std::map<std::string, double> composition;
 
-    if (this->getMaterialIndexFromName(name) != this->materialList.size())
+    if (this->getMaterialIndexFromName(name) < this->materialList.size())
     {
         if (errorOnReplace)
         {
@@ -1116,7 +1116,7 @@ void Elements::addMaterial(Material material, const int & errorOnReplace)
     materialName = material.getName();
 
     i = this->getMaterialIndexFromName(materialName);
-    if (i != this->materialList.size())
+    if (i < this->materialList.size())
     {
         if (errorOnReplace)
         {
@@ -1717,10 +1717,10 @@ const std::vector<Material>::size_type Elements::getMaterialIndexFromName(const 
     {
         if(this->materialList[i].getName() == name)
         {
-            break;
+            return i;
         }
     }
-    return i;
+    return this->materialList.size();
 }
 
 
@@ -1729,7 +1729,7 @@ void Elements::removeMaterial(const std::string & name)
     std::string msg;
     std::vector<Material>::size_type i;
     i = this->getMaterialIndexFromName(name);
-    if ( i == this->materialList.size())
+    if ( i >= this->materialList.size())
     {
         msg = "Elements::setMaterialComposition. Non existing material: " +  name;
         throw std::invalid_argument(msg);
