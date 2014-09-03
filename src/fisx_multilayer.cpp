@@ -559,14 +559,16 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                                                                     elementsLibrary)["total"];
                                             bLayer++;
                                         }
-                                        tmpDouble = Math::deBoerX(mu_2_lambda/sinAlphaIn, \
+                                        tmpDouble = std::exp(-mu_1_i * density_1 * thickness_1/sinAlphaOut);
+                                        if (tmpDouble < 0.001)
+                                            continue;
+                                        tmpDouble *= Math::deBoerX(mu_2_lambda/sinAlphaIn, \
                                                                   mu_1_i/sinAlphaOut, \
                                                                   density_1 * thickness_1, \
                                                                   density_2 * thickness_2, \
                                                                   mu_1_j, \
                                                                   mu_2_j, \
                                                                   mu_b_j_d_t);
-                                        tmpDouble *= std::exp(-mu_1_i * density_1 * thickness_1/sinAlphaOut);
                                         tmpDouble *= elementMassFractionFactor * (0.5/sinAlphaIn);
                                         tmpDouble *= tmpExcitationFactors[c_it->first]["rate"];
                                         tmpStringStream.str(std::string());
@@ -584,6 +586,14 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                             if (iLayer > jLayer)
                             {
                                 // interlayer case b)
+                                double layerFactor;
+                                layerFactor = std::exp(-mu_2_lambda * density_2 * thickness_2/sinAlphaIn);
+                                if (layerFactor < 0.001)
+                                {
+                                    // No need to calculate anything, the top layer attenuates too much the
+                                    // incoming beam
+                                    continue;
+                                }
                                 for(iLambda = 0;
                                     iLambda < sampleLayerEnergies[jLayer].size(); \
                                     iLambda++)
@@ -628,14 +638,14 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                                                                     elementsLibrary)["total"];
                                             bLayer++;
                                         }
-                                        tmpDouble = Math::deBoerX(-mu_2_lambda/sinAlphaIn, \
+                                        tmpDouble = layerFactor;
+                                        tmpDouble *= Math::deBoerX(-mu_2_lambda/sinAlphaIn, \
                                                                   -mu_1_i/sinAlphaOut, \
                                                                   density_1 * thickness_1, \
                                                                   density_2 * thickness_2, \
                                                                   mu_1_j, \
                                                                   mu_2_j, \
                                                                   mu_b_j_d_t);
-                                        tmpDouble *= std::exp(-mu_2_lambda * density_2 * thickness_2/sinAlphaIn);
                                         tmpDouble *= elementMassFractionFactor * (0.5/sinAlphaIn);
                                         tmpDouble *= tmpExcitationFactors[c_it->first]["rate"];
                                         tmpStringStream.str(std::string());
