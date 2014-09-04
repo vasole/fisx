@@ -1069,7 +1069,7 @@ void Elements::setMaterialComposition(const std::string & materialName, \
     std::vector<Material>::size_type i;
 
     i = this->getMaterialIndexFromName(materialName);
-    if (i == this->materialList.size())
+    if (i >= this->materialList.size())
     {
         msg = "Elements::setMaterialComposition. Non existing material: " +  materialName;
         throw std::invalid_argument(msg);
@@ -1083,7 +1083,7 @@ const Material & Elements::getMaterial(const std::string & materialName)
     std::vector<Material>::size_type i;
 
     i = this->getMaterialIndexFromName(materialName);
-    if (i == this->materialList.size())
+    if (i >= this->materialList.size())
     {
         msg = "Elements::getMaterial. Non existing material: " +  materialName;
         throw std::invalid_argument(msg);
@@ -1097,7 +1097,7 @@ Material Elements::getMaterialCopy(const std::string & materialName)
     std::vector<Material>::size_type i;
 
     i = this->getMaterialIndexFromName(materialName);
-    if (i == this->materialList.size())
+    if (i >= this->materialList.size())
     {
         msg = "Elements::getMaterial. Non existing material: " +  materialName;
         throw std::invalid_argument(msg);
@@ -1125,15 +1125,18 @@ void Elements::addMaterial(Material material, const int & errorOnReplace)
         }
         else
         {
-            this->removeMaterial(materialName);
+            // try to use the same position
+            this->materialList[i] = material;
         }
     }
-
+    else
+    {
+        this->materialList.push_back(material);
+    }
     // TODO: Make sure the material can be interpreted in terms of the supplied composition
     // because the composition can include other materials.
     // If made that way, the internal list of materials will be "clean" of references from
     // one material to another. Is it needed?
-    this->materialList.push_back(material);
 }
 
 std::map<std::string, double> Elements::getComposition(const std::string & name) const
