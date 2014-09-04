@@ -375,7 +375,9 @@ cdef class PyElements:
 
     def emptyElementCascadeCache(self, std_string elementName):
         self.thisptr.emptyElementCascadeCache(elementName)
-#import numpy as np
+
+    def removeMaterials(self):
+        self.thisptr.removeMaterials()#import numpy as np
 #cimport numpy as np
 cimport cython
 
