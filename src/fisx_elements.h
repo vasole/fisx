@@ -247,6 +247,11 @@ public:
     void removeMaterial(const std::string & name);
 
     /*!
+    Empty the list of defined materials
+    */
+    void removeMaterials();
+
+    /*!
     Try to interpret a given string as a formula, returning the associated mass fractions
     as a map of elements and mass fractions. In case of failure, it returns an empty map.
     */

@@ -1139,6 +1139,11 @@ void Elements::addMaterial(Material material, const int & errorOnReplace)
     // one material to another. Is it needed?
 }
 
+void Elements::removeMaterials()
+{
+    this->materialList.clear();
+}
+
 std::map<std::string, double> Elements::getComposition(const std::string & name) const
 {
     std::string msg;

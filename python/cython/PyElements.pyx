@@ -231,3 +231,6 @@ cdef class PyElements:
 
     def emptyElementCascadeCache(self, std_string elementName):
         self.thisptr.emptyElementCascadeCache(elementName)
+
+    def removeMaterials(self):
+        self.thisptr.removeMaterials()

@@ -79,3 +79,5 @@ cdef extern from "fisx_elements.h":
         void setElementCascadeCacheEnabled(std_string, int) except +
 
         void emptyElementCascadeCache(std_string) except +
+
+        void removeMaterials()
