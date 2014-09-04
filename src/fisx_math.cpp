@@ -156,6 +156,7 @@ double Math::deBoerD(const double & x)
         std::cout << "new result = " << Math::_deBoerD(x, 1.0e-5) << std::endl;
         std::cout << "limit0 = " << limit0 << std::endl;
         std::cout << "limit1 = " << limit1 << std::endl;
+        return Math::_deBoerD(x, 1.0e-5);
     }
     return tmpResult;
 #else
