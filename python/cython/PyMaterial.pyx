@@ -1,4 +1,3 @@
-#cimport numpy as np
 cimport cython
 
 from cython.operator cimport dereference as deref

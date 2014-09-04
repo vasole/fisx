@@ -49,8 +49,7 @@ cdef class PyDetector:
         if update:
             return self.thisptr.getEscape(energy, deref(elementsLib.thisptr), label, 1)
         else:
-            return self.thisptr.getEscape(energy, deref(elementsLib.thisptr), label, 0)#import numpy as np
-#cimport numpy as np
+            return self.thisptr.getEscape(energy, deref(elementsLib.thisptr), label, 0)
 cimport cython
 
 from libcpp.string cimport string as std_string
@@ -468,8 +467,6 @@ cdef class PyLayer:
         tmpResult = self.thisptr.getPeakFamilies(energy, deref(elementsLib.thisptr))
         return sorted(tmpResult, key=itemgetter(1))
 
-import numpy
-#cimport numpy as np
 cimport cython
 
 from cython.operator cimport dereference as deref
