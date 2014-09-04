@@ -45,7 +45,9 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
     double maxEnergy;
     std::map<std::string, std::map<std::string, double> > result;
     std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, double> > > > actualResult;
+    std::vector<double> energyThresholdList;
 
+    energyThresholdList.clear();
     // beam is ordered
     maxEnergy = energies[energies.size() - 1];
 
@@ -112,9 +114,26 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
     iRay = energies.size();
     muTotal.resize(sample.size());
     weights.resize(actualRays[1].size());
+    double minimumExcitationEnergy = -1.0;
     while (iRay > 0)
     {
+        if (minimumExcitationEnergy < 0.0)
+        {
+            for (std::vector<std::string>::size_type iElement = 0; iElement < energyThresholdList.size(); iElement++)
+            {
+                if ((energyThresholdList[iElement] < minimumExcitationEnergy) ||
+                    (minimumExcitationEnergy < 0.0))
+                {
+                    minimumExcitationEnergy = energyThresholdList[iElement];
+                }
+            }
+        }
         --iRay;
+        if (energies[iRay] < minimumExcitationEnergy)
+        {
+            // std::cout << "Stopped at Ray " << iRay << std::endl;
+            continue;
+        }
         weights[iRay] = actualRays[1][iRay];
         tmpDouble = 0.0;
         for(iLayer = 0; iLayer < sample.size(); iLayer++)
@@ -174,6 +193,10 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                         if (c_it->first.compare(0, family.length(), family) == 0)
                         {
                             mapIt2 = c_it->second.find("energy");
+                            if (mapIt2->second < minimumExcitationEnergy)
+                            {
+                                continue;
+                            }
                             sampleLayerEnergies[iLayer].push_back(mapIt2->second);
                             mapIt2 = c_it->second.find("rate");
                             sampleLayerRates[iLayer].push_back(mapIt2->second *
@@ -266,9 +289,18 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
             {
                 throw std::runtime_error("All line families case not implemented yet!!!");
             }
-            energyThreshold = this->getEnergyThreshold(elementName, \
+            if (iElement < energyThresholdList.size())
+            {
+                energyThreshold = energyThresholdList[iElement];
+            }
+            else
+            {
+                energyThreshold = this->getEnergyThreshold(elementName, \
                                                        actualLineFamily.substr(0, 1), \
                                                        elementsLibrary);
+                energyThresholdList.push_back(energyThreshold);
+            }
+
             if (energyThreshold > energies[iRay])
             {
                 continue;
