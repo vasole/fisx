@@ -112,7 +112,7 @@ double Layer::getTransmission(const double & energy, const Elements & elements, 
 {
     // The material might not have been defined in the  current Elements instance.
     // However, its composition might be fine.
-    const double PI = acos(-1.0);
+    const double PI = std::acos(-1.0);
     double muTotal;
     double tmpDouble;
     if (this->hasMaterial)
@@ -131,11 +131,11 @@ double Layer::getTransmission(const double & energy, const Elements & elements, 
     {
         if (angle < 0)
         {
-            tmpDouble = sin(-angle * PI / 180.);
+            tmpDouble = std::sin(-angle * PI / 180.);
         }
         else
         {
-            tmpDouble = sin(angle * PI / 180.);
+            tmpDouble = std::sin(angle * PI / 180.);
         }
         tmpDouble = (this->density * this->thickness) / tmpDouble;
     }
@@ -146,13 +146,13 @@ double Layer::getTransmission(const double & energy, const Elements & elements, 
         throw std::runtime_error( msg );
     }
 
-    return (1.0 - this->funnyFactor) + (this->funnyFactor * exp(-(tmpDouble * muTotal)));
+    return (1.0 - this->funnyFactor) + (this->funnyFactor * std::exp(-(tmpDouble * muTotal)));
 }
 
 std::vector<double> Layer::getTransmission(const std::vector<double> & energy, const Elements & elements, \
                                            const double & angle) const
 {
-    const double PI = acos(-1.0);
+    const double PI = std::acos(-1.0);
     std::vector<double>::size_type i;
     std::vector<double> tmpDoubleVector;
     double tmpDouble;
@@ -164,9 +164,9 @@ std::vector<double> Layer::getTransmission(const std::vector<double> & energy, c
     else
     {
         if (angle < 0)
-            tmpDouble = sin(-angle * PI / 180.);
+            tmpDouble = std::sin(-angle * PI / 180.);
         else
-            tmpDouble = sin(angle * PI / 180.);
+            tmpDouble = std::sin(angle * PI / 180.);
         tmpDouble = this->density * this->thickness / tmpDouble;
     }
 

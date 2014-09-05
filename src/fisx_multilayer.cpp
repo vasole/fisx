@@ -60,7 +60,22 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
     for (iLayer = 0; iLayer < filters.size(); iLayer++)
     {
         layerPtr = &filters[iLayer];
-        doubleVector = (*layerPtr).getTransmission(energies, elementsLibrary);
+        try
+        {
+            doubleVector = (*layerPtr).getTransmission(energies, elementsLibrary);
+        }
+        catch(...)
+        {
+            std::cout << "Error on filter " << iLayer << " calculating transmission " << std::endl;
+            for (iRay = 0; iRay < energies.size(); iRay++)
+            {
+                if (energies[iRay] <= 0.0)
+                {
+                    std::cout << " Energy index " << iRay << " =  " << energies[iRay] << std::endl;
+                }
+            }
+            throw;
+        }
         for (iRay = 0; iRay < energies.size(); iRay++)
         {
             actualRays[1][iRay] *= doubleVector[iRay];

@@ -191,7 +191,7 @@ std::vector<std::vector<double> > Beam::getBeamAsDoubleVectors() const
     //{
     //    this->normalizeBeam();
     //}
-    nItems = rays.size();
+    nItems = this->rays.size();
     returnValue.resize(4);
     if (nItems > 0)
     {
