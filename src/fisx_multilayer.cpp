@@ -513,6 +513,12 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                 // analogous to incident beam
                                 if (energyThreshold > sampleLayerEnergies[jLayer][iLambda])
                                     continue;
+                                // TODO: Make the intensity threshold accessible to the user
+                                if (sampleLayerRates[jLayer][iLambda] < (0.0001 * sampleLayerWeight[iLayer]))
+                                {
+                                    //std::cout << "Skipping due to weight " << std::endl;
+                                    continue;
+                                }
                                 tmpExcitationFactors = elementsLibrary.getExcitationFactors(elementName, \
                                             sampleLayerEnergies[jLayer][iLambda], \
                                             sampleLayerRates[jLayer][iLambda]);
@@ -570,6 +576,12 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                     energy = sampleLayerEnergies[jLayer][iLambda];
                                     if (energyThreshold > energy)
                                         continue;
+                                    // TODO: Make the intensity threshold accessible to the user
+                                    if (sampleLayerRates[jLayer][iLambda] < (0.0001 * sampleLayerWeight[iLayer]))
+                                    {
+                                        //std::cout << "Skipping due to weight " << std::endl;
+                                        continue;
+                                    }
                                     tmpExcitationFactors = elementsLibrary.getExcitationFactors( \
                                                             elementName, \
                                                             energy, \
@@ -649,6 +661,12 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                     energy = sampleLayerEnergies[jLayer][iLambda];
                                     if (energyThreshold > energy)
                                         continue;
+                                    // TODO: Make the intensity threshold accessible to the user
+                                    if (sampleLayerRates[jLayer][iLambda] < (0.0001 * sampleLayerWeight[iLayer]))
+                                    {
+                                        //std::cout << "Skipping due to weight " << std::endl;
+                                        continue;
+                                    }
                                     tmpExcitationFactors = elementsLibrary.getExcitationFactors( \
                                                             elementName, \
                                                             energy, \
