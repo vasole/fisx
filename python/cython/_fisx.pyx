@@ -773,7 +773,8 @@ cdef class PyXRF:
             self.thisptr.setGeometry(alphaIn, alphaOut, scatteringAngle)
 
     def getMultilayerFluorescence(self, std_vector[std_string] elementFamilyLayer, PyElements elementsLibrary, \
-                            int secondary = 0, int useGeometricEfficiency = 1, int useMassFractions = 0):
+                            int secondary = 0, int useGeometricEfficiency = 1, int useMassFractions = 0, \
+                            secondaryCalculationLimit = 0.0):
         """
         Input
         elementFamilyLayer - Vector of strings. Each string represents the information we are interested on.
@@ -802,13 +803,15 @@ cdef class PyXRF:
         due to the fluorescence from the given element, line and layer index composing the map key.
         """
         return self.thisptr.getMultilayerFluorescence(elementFamilyLayer, deref(elementsLibrary.thisptr), \
-                            secondary, useGeometricEfficiency, useMassFractions)
+                            secondary, useGeometricEfficiency, useMassFractions, secondaryCalculationLimit)
 
     def getFluorescence(self, std_string elementName, PyElements elementsLibrary, \
                             int sampleLayer = 0, std_string lineFamily="K", int secondary = 0, \
-                            int useGeometricEfficiency = 1, int useMassFractions = 0):
+                            int useGeometricEfficiency = 1, int useMassFractions = 0, \
+                            double secondaryCalculationLimit = 0.0):
         return self.thisptr.getMultilayerFluorescence(elementName, deref(elementsLibrary.thisptr), \
-                            sampleLayer, lineFamily, secondary, useGeometricEfficiency, useMassFractions)
+                            sampleLayer, lineFamily, secondary, useGeometricEfficiency, useMassFractions, \
+                            secondaryCalculationLimit)
 
     def getGeometricEfficiency(self, int layerIndex = 0):
         return self.thisptr.getGeometricEfficiency(layerIndex)

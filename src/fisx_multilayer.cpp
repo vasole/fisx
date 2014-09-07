@@ -13,7 +13,8 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                                const std::vector<std::string> &  familyList, \
                                                const int & secondary, \
                                                const int & useGeometricEfficiency,
-                                               const int & useMassFractions)
+                                               const int & useMassFractions, \
+                                               const double & secondaryCalculationLimit)
 {
     // get all the needed configuration
     const Beam & beam = this->configuration.getBeam();
@@ -112,6 +113,11 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
     std::vector<double> sampleLayerThickness;
     std::vector<double> sampleLayerWeight;
     std::map< std::string, std::map<std::string, double> > escapeRates;
+
+    // * implement a cache
+    std::map< std::string, std::map< double, std::map<std::string, std::map<std::string, double> > > > \
+                                        excitationFactorsCache;
+
     int updateEscape;
     updateEscape = 1;
 
@@ -473,8 +479,10 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                     }
                     mu_1_i = mapIt->second;
                     tmpDouble = (mu_1_lambda / sinAlphaIn) + (mu_1_i / sinAlphaOut);
-                    tmpDouble = elementMassFractionFactor * \
-                        (1.0 - exp( - tmpDouble * density_1 * thickness_1)) / (tmpDouble * sinAlphaIn);
+                    // keep factor for deciding if secondary excitation is to be considered or not
+                    tmpDouble = (1.0 - exp( - tmpDouble * density_1 * thickness_1)) / tmpDouble;
+                    //result[c_it->first]["criterium"] = tmpDouble;
+                    tmpDouble *= (elementMassFractionFactor / sinAlphaIn);
                     result[c_it->first]["primary"] = tmpDouble * \
                                                      primaryExcitationFactors[c_it->first]["rate"] * \
                                                      sampleLayerWeight[iLayer];
@@ -514,23 +522,47 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                 if (energyThreshold > sampleLayerEnergies[jLayer][iLambda])
                                     continue;
                                 // TODO: Make the intensity threshold accessible to the user
-                                if (sampleLayerRates[jLayer][iLambda] < (0.0001 * sampleLayerWeight[iLayer]))
+                                if (sampleLayerRates[jLayer][iLambda] < (secondaryCalculationLimit * sampleLayerWeight[iLayer]))
                                 {
                                     //std::cout << "Skipping due to weight " << std::endl;
                                     continue;
                                 }
-                                tmpExcitationFactors = elementsLibrary.getExcitationFactors(elementName, \
-                                            sampleLayerEnergies[jLayer][iLambda], \
-                                            sampleLayerRates[jLayer][iLambda]);
+                                bool calculate;
+                                calculate = true;
+                                if (excitationFactorsCache.find(elementName) != excitationFactorsCache.end())
+                                {
+                                    if (excitationFactorsCache[elementName].find(sampleLayerEnergies[jLayer][iLambda]) \
+                                            != excitationFactorsCache[elementName].end())
+                                    {
+                                        calculate = false;
+                                    }
+                                }
+                                if (calculate)
+                                {
+                                    excitationFactorsCache[elementName] \
+                                                [sampleLayerEnergies[jLayer][iLambda]] = \
+                                                        elementsLibrary.getExcitationFactors(elementName, \
+                                                        sampleLayerEnergies[jLayer][iLambda], \
+                                                        1.0);
+                                }
+                                tmpExcitationFactors = excitationFactorsCache[elementName] \
+                                                        [sampleLayerEnergies[jLayer][iLambda]];
+                                double decissionRate;
                                 for (c_it = result.begin(); c_it != result.end(); ++c_it)
                                 {
                                     if (tmpExcitationFactors.find(c_it->first) == tmpExcitationFactors.end())
                                     {
                                         continue;
                                     }
-                                    // I could put a higher limit here
-                                    if (tmpExcitationFactors[c_it->first]["rate"] <= 1.0e-30)
+                                    /*
+                                    decissionRate = 0.5 * tmpExcitationFactors[c_it->first]["rate"] * \
+                                                    result[c_it->first]["criterium"] / \
+                                                    primaryExcitationFactors[c_it->first]["rate"];
+                                    // One could put a limit based on the maximum contribution
+                                    // for thick target
+                                    if (decissionRate < 0.1)
                                         continue;
+                                    */
                                     mapIt = result[c_it->first].find("mu_1_i");
                                     if (mapIt == result[c_it->first].end())
                                         throw std::runtime_error(" mu_1_i key. Mass attenuation not present???");
@@ -546,7 +578,8 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                                                density_1,
                                                                thickness_1);
                                     tmpDouble *= elementMassFractionFactor * (0.5/sinAlphaIn);
-                                    tmpDouble *= tmpExcitationFactors[c_it->first]["rate"];
+                                    tmpDouble *= tmpExcitationFactors[c_it->first]["rate"] * \
+                                                    sampleLayerRates[jLayer][iLambda];
                                     tmpStringStream.str(std::string());
                                     tmpStringStream.clear();
                                     tmpStringStream << std::setfill('0') << std::setw(2) << jLayer;
@@ -577,15 +610,31 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                     if (energyThreshold > energy)
                                         continue;
                                     // TODO: Make the intensity threshold accessible to the user
-                                    if (sampleLayerRates[jLayer][iLambda] < (0.0001 * sampleLayerWeight[iLayer]))
+                                    if (sampleLayerRates[jLayer][iLambda] < (secondaryCalculationLimit * sampleLayerWeight[iLayer]))
                                     {
                                         //std::cout << "Skipping due to weight " << std::endl;
                                         continue;
                                     }
-                                    tmpExcitationFactors = elementsLibrary.getExcitationFactors( \
-                                                            elementName, \
-                                                            energy, \
-                                                            sampleLayerRates[jLayer][iLambda]);
+                                    bool calculate;
+                                    calculate = true;
+                                    if (excitationFactorsCache.find(elementName) != excitationFactorsCache.end())
+                                    {
+                                        if (excitationFactorsCache[elementName].find(sampleLayerEnergies[jLayer][iLambda]) \
+                                                != excitationFactorsCache[elementName].end())
+                                        {
+                                            calculate = false;
+                                        }
+                                    }
+                                    if (calculate)
+                                    {
+                                        excitationFactorsCache[elementName] \
+                                                    [sampleLayerEnergies[jLayer][iLambda]] = \
+                                                            elementsLibrary.getExcitationFactors(elementName, \
+                                                            sampleLayerEnergies[jLayer][iLambda], \
+                                                            1.0);
+                                    }
+                                    tmpExcitationFactors = excitationFactorsCache[elementName] \
+                                                            [sampleLayerEnergies[jLayer][iLambda]];
                                     for (c_it = result.begin(); c_it != result.end(); ++c_it)
                                     {
                                         if (tmpExcitationFactors.find(c_it->first) == tmpExcitationFactors.end())
@@ -621,6 +670,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                         tmpDouble = std::exp(-mu_1_i * density_1 * thickness_1/sinAlphaOut);
                                         if (tmpDouble < 0.001)
                                             continue;
+                                        tmpDouble *= sampleLayerRates[jLayer][iLambda];
                                         tmpDouble *= Math::deBoerX(mu_2_lambda/sinAlphaIn, \
                                                                   mu_1_i/sinAlphaOut, \
                                                                   density_1 * thickness_1, \
@@ -662,15 +712,31 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                     if (energyThreshold > energy)
                                         continue;
                                     // TODO: Make the intensity threshold accessible to the user
-                                    if (sampleLayerRates[jLayer][iLambda] < (0.0001 * sampleLayerWeight[iLayer]))
+                                    if (sampleLayerRates[jLayer][iLambda] < (secondaryCalculationLimit * sampleLayerWeight[iLayer]))
                                     {
                                         //std::cout << "Skipping due to weight " << std::endl;
                                         continue;
                                     }
-                                    tmpExcitationFactors = elementsLibrary.getExcitationFactors( \
-                                                            elementName, \
-                                                            energy, \
-                                                            sampleLayerRates[jLayer][iLambda]);
+                                    bool calculate;
+                                    calculate = true;
+                                    if (excitationFactorsCache.find(elementName) != excitationFactorsCache.end())
+                                    {
+                                        if (excitationFactorsCache[elementName].find(sampleLayerEnergies[jLayer][iLambda]) \
+                                                != excitationFactorsCache[elementName].end())
+                                        {
+                                            calculate = false;
+                                        }
+                                    }
+                                    if (calculate)
+                                    {
+                                        excitationFactorsCache[elementName] \
+                                                    [sampleLayerEnergies[jLayer][iLambda]] = \
+                                                            elementsLibrary.getExcitationFactors(elementName, \
+                                                            sampleLayerEnergies[jLayer][iLambda], \
+                                                            1.0);
+                                    }
+                                    tmpExcitationFactors = excitationFactorsCache[elementName] \
+                                                            [sampleLayerEnergies[jLayer][iLambda]];
                                     for (c_it = result.begin(); c_it != result.end(); ++c_it)
                                     {
                                         if (tmpExcitationFactors.find(c_it->first) == tmpExcitationFactors.end())
@@ -703,7 +769,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                                                                     elementsLibrary)["total"];
                                             bLayer++;
                                         }
-                                        tmpDouble = layerFactor;
+                                        tmpDouble = layerFactor * sampleLayerRates[jLayer][iLambda];
                                         tmpDouble *= Math::deBoerX(-mu_2_lambda/sinAlphaIn, \
                                                                   -mu_1_i/sinAlphaOut, \
                                                                   density_1 * thickness_1, \

@@ -167,7 +167,8 @@ public:
                 getMultilayerFluorescence(const std::string & element, \
                 const Elements & elementsLibrary, const int & sampleLayerIndex = 0, \
                 const std::string & lineFamily = "", const int & secondary = 0, \
-                const int & useGeometricEfficiency = 1, const int & useMassFractions = 0);
+                const int & useGeometricEfficiency = 1, const int & useMassFractions = 0, \
+                const double & secondaryCalculationLimit = 0.0);
     /*!
     Input
     elementFamilyLayer - Vector of strings. Each string represents the information we are interested on.
@@ -200,7 +201,8 @@ public:
                 getMultilayerFluorescence(const std::vector<std::string> & elementFamilyLayer, \
                 const Elements & elementsLibrary, const int & secondary = 0, \
                 const int & useGeometricEfficiency = 1, \
-                const int & useMassFractions = 0);
+                const int & useMassFractions = 0, \
+                const double & secondaryCalculationLimit = 0.0);
 
     std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, double> > > > \
                 getMultilayerFluorescence(const std::vector<std::string> & elementList,
@@ -209,7 +211,8 @@ public:
                                           const std::vector<std::string> &  familyList, \
                                           const int & secondary = 0, \
                                           const int & useGeometricEfficiency = 1, \
-                                          const int & useMassFractions = 0);
+                                          const int & useMassFractions = 0, \
+                                          const double & secondaryCalculationLimit = 0.0);
 
 
     double getEnergyThreshold(const std::string & elementName, const std::string & family, \
