@@ -33,7 +33,7 @@ public:
     /*!
     Retrieves the given element name.
     */
-    std::string getName();
+    std::string getName() const;
 
     /*!
     Set atomic number. It has to be a positive integer. WARNING: An element atomic number not be

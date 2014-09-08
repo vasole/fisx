@@ -39,7 +39,7 @@ void Element::setName(const std::string & name)
     this->name = name;
 }
 
-std::string Element::getName()
+std::string Element::getName() const
 {
     return  this->name;
 }

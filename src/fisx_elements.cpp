@@ -199,7 +199,7 @@ Element Elements::getElementCopy(const std::string & elementName)
         throw std::invalid_argument("Invalid element: " + elementName);
 }
 
-void Elements::addElement(Element & element)
+void Elements::addElement(const Element & element)
 {
     std::string name;
     name = element.getName();
@@ -1106,7 +1106,7 @@ Material Elements::getMaterialCopy(const std::string & materialName)
 }
 
 
-void Elements::addMaterial(Material material, const int & errorOnReplace)
+void Elements::addMaterial(const Material & material, const int & errorOnReplace)
 {
     std::string msg;
     std::string materialName;

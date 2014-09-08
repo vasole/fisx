@@ -66,7 +66,7 @@ public:
     /*!
     Add an element instance to the library.
     */
-    void addElement(Element & elementInstance);
+    void addElement(const Element & elementInstance);
 
     /*!
     Retrieve the names of the elements already defined in the library.
@@ -232,7 +232,7 @@ public:
     /*!
     Copy a material into the set of defined materials.
     */
-    void addMaterial(Material materialInstance, const int & errorOnReplace = 1);
+    void addMaterial(const Material & materialInstance, const int & errorOnReplace = 1);
 
     /*!
     Create and add Material instance to the set of defined materials.
