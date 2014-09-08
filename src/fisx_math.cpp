@@ -270,7 +270,7 @@ double Math::deBoerL0(const double & mu1, const double & mu2, const double & muj
         std::cout << " d = " << d << std::endl;
         throw std::runtime_error("Math::deBoerL0. Negative result");
     }
-    if (! Math::isFiniteNumber(tmpDouble < 0))
+    if (!Math::isFiniteNumber(tmpDouble))
     {
         std::cout << " Math::deBoerL0 CALCULATED = " << tmpDouble << std::endl;
         std::cout << " mu1 = " << mu1 << std::endl;
