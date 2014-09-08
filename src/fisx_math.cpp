@@ -180,7 +180,6 @@ double Math::deBoerL0(const double & mu1, const double & mu2, const double & muj
     double d;
     double tmpDouble;
 
-    /*
     if (!Math::isFiniteNumber(mu1))
     {
         std::cout << "mu1 = " << mu1 << std::endl;
@@ -196,7 +195,13 @@ double Math::deBoerL0(const double & mu1, const double & mu2, const double & muj
         std::cout << "muj = " << muj << std::endl;
         throw std::runtime_error("Math::deBoerL0. Received non finite muj < 0");
     }
-    */
+    if ((mu1 <= 0.0) || (mu2 <= 0.0) || (muj <= 0.0))
+    {
+        std::cout << "mu1 = " << mu1 << std::endl;
+        std::cout << "mu2 = " << mu2 << std::endl;
+        std::cout << "muj = " << muj << std::endl;
+        throw std::runtime_error("Math::deBoerL0 received negative input");
+    }
 
     // express the thickness in g/cm2
     d = thickness * density;
@@ -205,6 +210,17 @@ double Math::deBoerL0(const double & mu1, const double & mu2, const double & muj
         // thick target
         tmpDouble = (muj/mu1) * std::log(1 + mu1/muj) / ((mu1 + mu2) * muj);
         //std::cout << "THICK TARGET = " << tmpDouble << std::endl;
+        if (!Math::isFiniteNumber(tmpDouble))
+        {
+            std::cout << "Math::deBoerL0. Not a finite result" << std::endl;
+            std::cout << "Received parameters " << std::endl;
+            std::cout << "mu1 = " << mu1 << std::endl;
+            std::cout << "mu2 = " << mu2 << std::endl;
+            std::cout << "muj = " << muj << std::endl;
+            std::cout << "thickness = " << thickness << std::endl;
+            std::cout << "density = " << density << std::endl;
+            throw std::runtime_error("Math::deBoerL0. Non-finite result");
+        }
         return tmpDouble;
     }
     // std::cout << " (mu1 + mu2) * d = " << (mu1 + mu2) * d << std::endl;
@@ -247,11 +263,21 @@ double Math::deBoerL0(const double & mu1, const double & mu2, const double & muj
     }
     if (tmpDouble < 0)
     {
-        std::cout << "CALCULATED = " << tmpDouble << std::endl;
+        std::cout << " Math::deBoerL0 CALCULATED = " << tmpDouble << std::endl;
         std::cout << " mu1 = " << mu1 << std::endl;
         std::cout << " mu2 = " << mu2 << std::endl;
         std::cout << " muj = " << muj << std::endl;
         std::cout << " d = " << d << std::endl;
+        throw std::runtime_error("Math::deBoerL0. Negative result");
+    }
+    if (! Math::isFiniteNumber(tmpDouble < 0))
+    {
+        std::cout << " Math::deBoerL0 CALCULATED = " << tmpDouble << std::endl;
+        std::cout << " mu1 = " << mu1 << std::endl;
+        std::cout << " mu2 = " << mu2 << std::endl;
+        std::cout << " muj = " << muj << std::endl;
+        std::cout << " d = " << d << std::endl;
+        throw std::runtime_error("Math::deBoerL0. Non-finite result");
     }
     return tmpDouble;
 }
