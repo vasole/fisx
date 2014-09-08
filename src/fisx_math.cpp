@@ -212,14 +212,14 @@ double Math::deBoerL0(const double & mu1, const double & mu2, const double & muj
         //std::cout << "THICK TARGET = " << tmpDouble << std::endl;
         if (!Math::isFiniteNumber(tmpDouble))
         {
-            std::cout << "Math::deBoerL0. Not a finite result" << std::endl;
+            std::cout << "Math::deBoerL0. Thick target. Not a finite result" << std::endl;
             std::cout << "Received parameters " << std::endl;
             std::cout << "mu1 = " << mu1 << std::endl;
             std::cout << "mu2 = " << mu2 << std::endl;
             std::cout << "muj = " << muj << std::endl;
             std::cout << "thickness = " << thickness << std::endl;
             std::cout << "density = " << density << std::endl;
-            throw std::runtime_error("Math::deBoerL0. Non-finite result");
+            throw std::runtime_error("Math::deBoerL0. Thick target. Non-finite result");
         }
         return tmpDouble;
     }
