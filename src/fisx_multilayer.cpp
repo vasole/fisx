@@ -36,7 +36,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
     double sinAlphaIn = sin(alphaIn*(PI/180.));
     double sinAlphaOut = sin(alphaOut*(PI/180.));
     double tmpDouble;
-    std::vector<double> & energies = actualRays[0];
+    std::vector<double> energies = actualRays[0];
     std::vector<double> weights;
     std::vector<double> doubleVector;
     std::map<std::string, std::map<std::string, double> > result;
@@ -63,7 +63,12 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
         */
         for (iRay = 0; iRay < energies.size(); iRay++)
         {
-            actualRays[1][iRay] *= filters[iLayer].getTransmission(energies, elementsLibrary)[iRay];
+            if (energies[iRay] <= 0.0)
+            {
+                std::cout << "Invalid input energy " << energies[iRay] << " index = " << iRay << std::endl;
+                throw std::invalid_argument("Invalid input energy");
+            }
+            actualRays[1][iRay] *= filters[iLayer].getTransmission(energies[iRay], elementsLibrary);
         }
     }
 
