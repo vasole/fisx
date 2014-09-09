@@ -362,6 +362,7 @@ public:
     static std::string toString(const double& number);
 
 private:
+
     void initialize(std::string, std::string);
 
     // The EPDL97 library

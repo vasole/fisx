@@ -887,7 +887,8 @@ std::map<std::string, std::vector<double> > Elements::getMassAttenuationCoeffici
     }
     else
     {
-        return this->elementList[c_it->second].getMassAttenuationCoefficients(energy);
+        const Element & elementReference = this->getElement(name);
+        return elementReference.getMassAttenuationCoefficients(energy);
     }
 }
 
