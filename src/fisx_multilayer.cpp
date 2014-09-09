@@ -32,25 +32,20 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
     const double PI = acos(-1.0);
     const double & alphaIn = this->configuration.getAlphaIn();
     const double & alphaOut = this->configuration.getAlphaOut();
-    const double & detectorDistance = detector.getDistance();
-    const double & detectorDiameter = detector.getDiameter();
-    double distance;
     std::vector<double> geometricEfficiency;
-    const int & referenceLayerIndex = this->configuration.getReferenceLayer();
     double sinAlphaIn = sin(alphaIn*(PI/180.));
     double sinAlphaOut = sin(alphaOut*(PI/180.));
     double tmpDouble;
     std::vector<double> & energies = actualRays[0];
     std::vector<double> weights;
     std::vector<double> doubleVector;
-    double maxEnergy;
     std::map<std::string, std::map<std::string, double> > result;
     std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, double> > > > actualResult;
     std::vector<double> energyThresholdList;
 
     energyThresholdList.clear();
     // beam is ordered
-    maxEnergy = energies[energies.size() - 1];
+    // maxEnergy = energies[energies.size() - 1];
 
     // get the beam after the beam filters
     std::vector<double> muTotal;
@@ -72,13 +67,23 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                 if (!Math::isFiniteNumber(energies[iRay]))
                 {
                     std::cout << " Energy index " << iRay << "is not finite" << std::endl;
+                    throw std::runtime_error("Invalid beam energy");
                 }
                 if (energies[iRay] <= 0.0)
                 {
                     std::cout << " Energy index " << iRay << " =  " << energies[iRay] << std::endl;
+                    throw std::runtime_error("Negative beam energy");
+                }
+                try
+                {
+                    doubleVector[iRay] = filters[iLayer].getTransmission(energies[iRay], elementsLibrary);
+                }
+                catch(...)
+                {
+                    std::cout << "ERROR with Energy index " << iRay << " energy = " << energies[iRay] << std::endl;
+                    throw;
                 }
             }
-            throw;
         }
         for (iRay = 0; iRay < energies.size(); iRay++)
         {
@@ -256,9 +261,6 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
         // density and thickness of fluorescent layer
         double density_1;
         double thickness_1;
-        // density and thickness of intermediate layers
-        double density_b;
-        double thickness_b;
         // density and thickness of second layer
         double density_2;
         double thickness_2;
@@ -336,7 +338,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
             {
                 double elementMassFractionFactor;
                 double elementMassFraction;
-                if ((calculationLayer >= 0) && (iLayer != calculationLayer))
+                if ((calculationLayer >= 0) && ((iLayer - calculationLayer) != 0))
                 {
                     // no need to calculate this layer
                     continue;
@@ -550,22 +552,12 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                 }
                                 tmpExcitationFactors = excitationFactorsCache[elementName] \
                                                         [sampleLayerEnergies[jLayer][iLambda]];
-                                double decissionRate;
                                 for (c_it = result.begin(); c_it != result.end(); ++c_it)
                                 {
                                     if (tmpExcitationFactors.find(c_it->first) == tmpExcitationFactors.end())
                                     {
                                         continue;
                                     }
-                                    /*
-                                    decissionRate = 0.5 * tmpExcitationFactors[c_it->first]["rate"] * \
-                                                    result[c_it->first]["criterium"] / \
-                                                    primaryExcitationFactors[c_it->first]["rate"];
-                                    // One could put a limit based on the maximum contribution
-                                    // for thick target
-                                    if (decissionRate < 0.1)
-                                        continue;
-                                    */
                                     mapIt = result[c_it->first].find("mu_1_i");
                                     if (mapIt == result[c_it->first].end())
                                         throw std::runtime_error(" mu_1_i key. Mass attenuation not present???");
@@ -867,7 +859,6 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
         std::string key;
         std::ostringstream tmpStringStream;
         double factorFirst;
-        double factorSecond;
         double tertiary;
         std::string ele;
         for (actualResultIt = actualResult.begin(); actualResultIt != actualResult.end(); ++actualResultIt)

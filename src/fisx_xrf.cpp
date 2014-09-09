@@ -119,11 +119,8 @@ std::map<std::string, std::map<std::string, double> > XRF::getFluorescence(const
     const double PI = acos(-1.0);
     const double & alphaIn = this->configuration.getAlphaIn();
     const double & alphaOut = this->configuration.getAlphaOut();
-    const double & detectorDistance = detector.getDistance();
     const double & detectorDiameter = detector.getDiameter();
-    double distance;
     double geometricEfficiency;
-    const int & referenceLayerIndex = this->configuration.getReferenceLayer();
     double sinAlphaIn = sin(alphaIn*(PI/180.));
     double sinAlphaOut = sin(alphaOut*(PI/180.));
     double tmpDouble;
@@ -171,10 +168,9 @@ std::map<std::string, std::map<std::string, double> > XRF::getFluorescence(const
     }
     std::vector<double> & energies = actualRays[0];
     std::vector<double> doubleVector;
-    double maxEnergy;
 
     // beam is ordered
-    maxEnergy = energies[energies.size() - 1];
+    //maxEnergy = energies[energies.size() - 1];
 
     // get the beam after the beam filters
     std::vector<double> muTotal;
@@ -421,7 +417,6 @@ double XRF::getGeometricEfficiency(const int & sampleLayerIndex) const
     const double & detectorDistance = detector.getDistance();
     const double & detectorDiameter = detector.getDiameter();
     double distance;
-    double geometricEfficiency;
     const std::vector<Layer> & sample = this->configuration.getSample();
     std::vector<Layer>::size_type iLayer;
     const int & referenceLayerIndex = this->configuration.getReferenceLayer();
@@ -475,7 +470,6 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
     std::vector<std::string> familyList;
     std::vector<int> layerList;
     std::vector<std::string>::size_type i;
-    int layerIndex;
     std::string tmpString;
     std::vector<std::string> tmpStringVector;
 
