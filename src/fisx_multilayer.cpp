@@ -60,16 +60,19 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
     std::fill(doubleVector.begin(), doubleVector.end(), 1.0);
     for (iLayer = 0; iLayer < filters.size(); iLayer++)
     {
-        layerPtr = &filters[iLayer];
         try
         {
-            doubleVector = (*layerPtr).getTransmission(energies, elementsLibrary);
+            doubleVector = filters[iLayer].getTransmission(energies, elementsLibrary);
         }
         catch(...)
         {
             std::cout << "Error on filter " << iLayer << " calculating transmission " << std::endl;
             for (iRay = 0; iRay < energies.size(); iRay++)
             {
+                if (!Math::isFiniteNumber(energies[iRay]))
+                {
+                    std::cout << " Energy index " << iRay << "is not finite" << std::endl;
+                }
                 if (energies[iRay] <= 0.0)
                 {
                     std::cout << " Energy index " << iRay << " =  " << energies[iRay] << std::endl;
