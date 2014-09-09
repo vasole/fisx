@@ -327,7 +327,7 @@ const std::map<std::string, double> & EPDL97::getBindingEnergies(const int & z)
 }
 
 
-std::map<std::string, double> EPDL97::getMassAttenuationCoefficients(const int & z, const double & energy)
+std::map<std::string, double> EPDL97::getMassAttenuationCoefficients(const int & z, const double & energy) const
 {
     std::pair<long, long> indices;
     long i1, i2, i1w, i2w;
@@ -336,6 +336,7 @@ std::map<std::string, double> EPDL97::getMassAttenuationCoefficients(const int &
     std::string key;
     int zHelp, idx;
     std::map<std::string, double> result;
+    std::map<std::string, double>::const_iterator cStrDoubleIt;
     const std::vector<std::vector<double> > *pVector;
 
     if(!this->initialized)
@@ -407,8 +408,14 @@ std::map<std::string, double> EPDL97::getMassAttenuationCoefficients(const int &
                 {
                     // we are dealing with a shell
                     result[key] = 0.0;
-                    if ((energy >=  this->bindingEnergy[zHelp][key]) && \
-                       (this->bindingEnergy[zHelp][key] > 0.0))
+                    cStrDoubleIt = this->bindingEnergy[zHelp].find(key);
+                    if (cStrDoubleIt == this->bindingEnergy[zHelp].end())
+                    {
+                        std::cout << "Key not found " << key << std::endl;
+                        throw std::runtime_error("Key not found");
+                    }
+                    if ((energy >=  cStrDoubleIt->second) && \
+                       (cStrDoubleIt->second > 0.0))
                     {
                         // the shell is excited
                         if ((*pVector)[i1][idx] > 0.0)
@@ -489,8 +496,14 @@ std::map<std::string, double> EPDL97::getMassAttenuationCoefficients(const int &
             {
                 // we are dealing with a shell
                 result[key] = 0.0;
-                if ((energy >= this->bindingEnergy[zHelp][key]) && \
-                    (this->bindingEnergy[zHelp][key] > 0.0))
+                cStrDoubleIt = this->bindingEnergy[zHelp].find(key);
+                if (cStrDoubleIt == this->bindingEnergy[zHelp].end())
+                {
+                    std::cout << "Key not found " << key << std::endl;
+                    throw std::runtime_error("Key not found");
+                }
+                if ((energy >= cStrDoubleIt->second) && \
+                    (cStrDoubleIt->second > 0.0))
                 {
                     if ((*pVector)[i1][idx] > 0.0)
                     {
@@ -535,7 +548,7 @@ std::map<std::string, double> EPDL97::getMassAttenuationCoefficients(const int &
 }
 
 std::map<std::string, std::vector<double> > EPDL97::getMassAttenuationCoefficients(const int & z, \
-                                                const std::vector<double> & energy)
+                                                const std::vector<double> & energy) const
 {
     std::vector<double>::size_type length, i;
     std::map<std::string, double> tmpResult;
@@ -563,7 +576,7 @@ std::map<std::string, std::vector<double> > EPDL97::getMassAttenuationCoefficien
 }
 
 
-std::map< std::string, std::vector<double> > EPDL97::getMassAttenuationCoefficients(const int & z)
+std::map< std::string, std::vector<double> > EPDL97::getMassAttenuationCoefficients(const int & z) const
 {
 
     int i, idx, iMu, nValues, j;
@@ -707,7 +720,7 @@ std::map<std::string, std::vector<double> > EPDL97::getPhotoelectricWeights(cons
 }
 
 
-std::string EPDL97::toUpperCaseString(const std::string & str)
+std::string EPDL97::toUpperCaseString(const std::string & str) const
 {
     std::string::size_type i;
     std::string converted;
@@ -716,7 +729,7 @@ std::string EPDL97::toUpperCaseString(const std::string & str)
     return converted;
 }
 
-std::pair<long, long> EPDL97::getInterpolationIndices(const std::vector<double> & vec, const double & x)
+std::pair<long, long> EPDL97::getInterpolationIndices(const std::vector<double> & vec, const double & x) const
 {
     static long lastI0 = 0L;
     std::vector<double>::size_type length, iMin, iMax, distance;

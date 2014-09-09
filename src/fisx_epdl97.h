@@ -18,11 +18,11 @@ public:
     const std::map<std::string, double> & getBindingEnergies(const int & z);
 
     // the actual mass attenuation related functions
-    std::map<std::string, double> getMassAttenuationCoefficients(const int & z, const double & energy);
+    std::map<std::string, double> getMassAttenuationCoefficients(const int & z, const double & energy) const;
     std::map<std::string, std::vector<double> > getMassAttenuationCoefficients(const int & z,\
-                                                const std::vector<double> & energy);
+                                                const std::vector<double> & energy) const;
 
-    std::map<std::string, std::vector<double> > getMassAttenuationCoefficients(const int & z);
+    std::map<std::string, std::vector<double> > getMassAttenuationCoefficients(const int & z) const;
 
     // the vacancy distribution related functions
     std::map<std::string, double> getPhotoelectricWeights(const int & z, \
@@ -32,8 +32,8 @@ public:
                                                 const std::vector<double> & energy);
 
     // utility functions
-    std::string toUpperCaseString(const std::string &);
-    std::pair<long, long> getInterpolationIndices(const std::vector<double> &,  const double &);
+    std::string toUpperCaseString(const std::string &) const;
+    std::pair<long, long> getInterpolationIndices(const std::vector<double> &,  const double &) const;
 
 private:
     // internal function to load the data
