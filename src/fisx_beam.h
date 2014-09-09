@@ -4,30 +4,25 @@
 #include <vector>
 #include <iostream>
 
-class Ray
+struct Ray
 {
-public:
-    Ray()
-    {
-        this->energy = 0.0;
-        this->weight = 0.0;
-        this->characteristic = 0;
-        this->divergency = 0.0;
-    }
     double energy;
     double weight;
     int characteristic;
     double divergency;
+
+    Ray()
+    {
+        energy = 0.0;
+        weight = 0.0;
+        characteristic = 0.0;
+        divergency = 0.0;
+    }
+
     bool operator < (const Ray &b) const
     {
-        if (characteristic < b.characteristic)
-            return true;
-        if (energy < b.energy)
-            return true;
-        if (weight < b.weight)
-            return true;
-        return false;
-    };
+        return (energy < b.energy);
+    }
 };
 
 /*!
