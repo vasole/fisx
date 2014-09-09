@@ -1352,12 +1352,20 @@ std::vector<std::map<std::string, std::map<std::string, double> > >Element::getP
     std::vector<double>::size_type i;
     std::vector<std::map<std::string, std::map<std::string, double> > > result;
     std::map<std::string, std::map<std::string, double> >::iterator it;
+    static std::map<std::string, double> lastEnergy = std::map<std::string, double>() ;
+    static std::map<std::string, std::map<std::string, std::map<std::string, double> > >lastPhotoelectricExcitationFactors;
+    bool useCache;
 
     if (weights.size() == 1)
         weight = weights[0];
     else
         weight = 1.0 / energy.size();
     result.clear();
+    if ((lastEnergy.size() == 0) || (this->cascadeCacheEnabledFlag == 0))
+    {
+        lastPhotoelectricExcitationFactors.clear();
+        lastEnergy.clear();
+    }
     if ((energy.size() > this->shellInstance.size()) && (this->cascadeCacheEnabledFlag == false) )
     {
         std::cout << "USING TEMPORARY CACHE " << std::endl;
@@ -1420,8 +1428,49 @@ std::vector<std::map<std::string, std::map<std::string, double> > >Element::getP
         {
             if (weights.size() > 1)
                 weight = weights[i];
-            vacancyDistribution = this->getInitialPhotoelectricVacancyDistribution(energy[i]);
-            result.push_back(this->getXRayLinesFromVacancyDistribution(vacancyDistribution, 1, 1));
+            useCache = false;
+            if (this->cascadeCacheEnabledFlag)
+            {
+                if ((lastEnergy.find(this->name) != lastEnergy.end()) && \
+                    (lastPhotoelectricExcitationFactors.find(this->name) != lastPhotoelectricExcitationFactors.end()))
+                {
+                    if (energy[i] == lastEnergy[this->name])
+                    {
+                        useCache = true;
+                    }
+                }
+            }
+            if (useCache)
+            {
+                // recalculating
+                //result.push_back(lastPhotoelectricExcitationFactors);
+                if (false)
+                {
+                    //test
+                    vacancyDistribution = this->getInitialPhotoelectricVacancyDistribution(energy[i]);
+                    result.push_back(this->getXRayLinesFromVacancyDistribution(vacancyDistribution, 1, 1));
+                    // CHECK
+                    for(it = result.back().begin(); it != result.back().end(); ++it)
+                    {
+                        std::cout << " ENERGIES = " << energy[i] << "  " << lastEnergy[this->name] << std::endl;
+                        std::cout << this->name << it->first << "->" << it->second["rate"] << " ????? ";
+                        std::cout << lastPhotoelectricExcitationFactors[this->name][it->first]["rate"] << std::endl;
+                    //result.push_back(lastPhotoelectricExcitationFactors);
+                    }
+                }
+                else
+                {
+                    result.push_back(lastPhotoelectricExcitationFactors[this->name]);
+                }
+            }
+            else
+            {
+                vacancyDistribution = this->getInitialPhotoelectricVacancyDistribution(energy[i]);
+                lastPhotoelectricExcitationFactors[this->name] = \
+                        this->getXRayLinesFromVacancyDistribution(vacancyDistribution, 1, 1);
+                lastEnergy[this->name] = energy[i];
+                result.push_back(lastPhotoelectricExcitationFactors[this->name]);
+            }
             for(it = result[i].begin(); it != result[i].end(); ++it)
             {
                 it->second["factor"] = it->second["rate"] * weight;

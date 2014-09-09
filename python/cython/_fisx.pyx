@@ -802,8 +802,10 @@ cdef class PyXRF:
         [Element Family][Layer][line][element line layer] - Secondary rate (prior to correct for detection efficiency)
         due to the fluorescence from the given element, line and layer index composing the map key.
         """
-        return self.thisptr.getMultilayerFluorescence(elementFamilyLayer, deref(elementsLibrary.thisptr), \
-                            secondary, useGeometricEfficiency, useMassFractions, secondaryCalculationLimit)
+        return self.thisptr.getMultilayerFluorescence(elementFamilyLayer, \
+                            deref(elementsLibrary.thisptr), \
+                            secondary, useGeometricEfficiency, \
+                            useMassFractions, secondaryCalculationLimit)
 
     def getFluorescence(self, std_string elementName, PyElements elementsLibrary, \
                             int sampleLayer = 0, std_string lineFamily="K", int secondary = 0, \
