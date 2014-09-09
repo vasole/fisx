@@ -51,43 +51,19 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
     std::vector<double> muTotal;
     muTotal.resize(energies.size());
     std::fill(muTotal.begin(), muTotal.end(), 0.0);
-    doubleVector.resize(energies.size());
-    std::fill(doubleVector.begin(), doubleVector.end(), 1.0);
     for (iLayer = 0; iLayer < filters.size(); iLayer++)
     {
-        try
-        {
-            doubleVector = filters[iLayer].getTransmission(energies, elementsLibrary);
-        }
-        catch(...)
-        {
-            std::cout << "Error on filter " << iLayer << " calculating transmission " << std::endl;
-            for (iRay = 0; iRay < energies.size(); iRay++)
-            {
-                if (!Math::isFiniteNumber(energies[iRay]))
-                {
-                    std::cout << " Energy index " << iRay << "is not finite" << std::endl;
-                    throw std::runtime_error("Invalid beam energy");
-                }
-                if (energies[iRay] <= 0.0)
-                {
-                    std::cout << " Energy index " << iRay << " =  " << energies[iRay] << std::endl;
-                    throw std::runtime_error("Negative beam energy");
-                }
-                try
-                {
-                    doubleVector[iRay] = filters[iLayer].getTransmission(energies[iRay], elementsLibrary);
-                }
-                catch(...)
-                {
-                    std::cout << "ERROR with Energy index " << iRay << " energy = " << energies[iRay] << std::endl;
-                    throw;
-                }
-            }
-        }
+        // on the mac there is a problem calculating all the transmissions at once
+        /*
+        doubleVector = filters[iLayer].getTransmission(energies, elementsLibrary);
         for (iRay = 0; iRay < energies.size(); iRay++)
         {
             actualRays[1][iRay] *= doubleVector[iRay];
+        }
+        */
+        for (iRay = 0; iRay < energies.size(); iRay++)
+        {
+            actualRays[1][iRay] *= filters[iLayer].getTransmission(energies, elementsLibrary)[iRay];
         }
     }
 
