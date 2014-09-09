@@ -10,16 +10,31 @@ EPDL97::EPDL97()
     this->initialized = false;
     this->bindingEnergiesFile = "Unknown";
     this->crossSectionsFile = "Unknown";
+    this->bindingEnergy.clear();
+    this->muInputLabels.clear();
+    this->muInputValues.clear();
+    this->muLabelToIndex.clear();
+    this->muEnergy.clear();
 }
 
 EPDL97::EPDL97(std::string directoryName)
 {
+    this->bindingEnergy.clear();
+    this->muInputLabels.clear();
+    this->muInputValues.clear();
+    this->muLabelToIndex.clear();
+    this->muEnergy.clear();
     // No check on directoryName.
     this->setDataDirectory(directoryName);
 }
 
 void EPDL97::setDataDirectory(std::string directoryName)
 {
+    this->bindingEnergy.clear();
+    this->muInputLabels.clear();
+    this->muInputValues.clear();
+    this->muLabelToIndex.clear();
+    this->muEnergy.clear();
     this->initialized = false;
     this->bindingEnergiesFile = "Unknown";
     this->crossSectionsFile = "Unknown";

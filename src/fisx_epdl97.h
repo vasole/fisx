@@ -10,6 +10,7 @@ class EPDL97
 public:
     EPDL97();
     EPDL97(std::string directoryName);
+
     void setDataDirectory(std::string directoryName);
     // possibility to change binding energies
     void loadBindingEnergies(std::string fileName);
