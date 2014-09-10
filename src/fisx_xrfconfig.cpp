@@ -226,7 +226,7 @@ void XRFConfig::readConfigurationFromFile(const std::string & fileName)
         }
         if (doubleVector[0] > 0.0)
         {
-            if (c_it->first.substr(0, 10) == "BeamFilter")
+            if (c_it->first.substr(0, c_it->first.size() - 1) == "BeamFilter")
             {
                 // BeamFilter0 = 0, -, 0.0, 0.0, 1.0
                 // std::cout << "BEAMFILTER" << std::endl;
