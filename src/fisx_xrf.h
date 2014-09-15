@@ -178,8 +178,8 @@ public:
     elementsLibrary - Instance of library to be used for all the Physical constants
     secondary - Flag to indicate different levels of secondary excitation to be considered.
                 0 Means not considered
-                1 Consider only intralayer secondary excitation
-                2 Consider intralayer and interlayer secondary excitation
+                1 Consider secondary excitation
+                2 Consider tertiary excitation
     useGeometricEfficiency - Take into account solid angle or not. Default is 1 (yes)
 
     useMassFractions - If 0 (default) the output corresponds to the requested information if the mass
