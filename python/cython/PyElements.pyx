@@ -152,27 +152,27 @@ cdef class PyElements:
 
     def getMassAttenuationCoefficients(self, name, energy=None):
         if hasattr(name, "keys"):
-            return self._getMaterialMassAttenuationCoefficients(name, energy)
+            return self._getMaterialMassAttenuationCoefficients(toBytes(name), energy)
         elif energy is None:
-            return self._getElementDefaultMassAttenuationCoefficients(name)
+            return self._getElementDefaultMassAttenuationCoefficients(toBytes(name))
         elif hasattr(energy, "__len__"):
-            return self._getMultipleMassAttenuationCoefficients(name, energy)
+            return self._getMultipleMassAttenuationCoefficients(toBytes(name), energy)
         else:
             # do not use the "single" version to have always the same signature
-            return self._getMultipleMassAttenuationCoefficients(name, [energy])
+            return self._getMultipleMassAttenuationCoefficients(toBytes(name), [energy])
 
     def getExcitationFactors(self, name, energy, weight=None):
         if hasattr(energy, "__len__"):
             if weight is None:
                 weight = [1.0] * len(energy)
-            return self._getExcitationFactors(name, energy, weight)[0]
+            return self._getExcitationFactors(toBytes(name), energy, weight)[0]
         else:
             energy = [energy]
             if weight is None:
                 weight = [1.0]
             else:
                 weight = [weight]
-            return self._getExcitationFactors(name, energy, weight)
+            return self._getExcitationFactors(toBytes(name), energy, weight)
 
     def _getMaterialMassAttenuationCoefficients(self, elementDict, energy):
         """
@@ -197,13 +197,25 @@ cdef class PyElements:
     def _getExcitationFactors(self, std_string element,
                                    std_vector[double] energies,
                                    std_vector[double] weights):
-        return self.thisptr.getExcitationFactors(element, energies, weights)
+        if sys.version < "3.0":
+            return self.thisptr.getExcitationFactors(element, energies, weights)
+        else:
+            return [toStringKeysAndValues(x) for x in self.thisptr.getExcitationFactors(element, energies, weights)]
 
     def getPeakFamilies(self, nameOrVector, energy):
         if type(nameOrVector) in [type([]), type(())]:
-            return sorted(self._getPeakFamiliesFromVectorOfElements(nameOrVector, energy), key=itemgetter(1))
+            if sys.version < "3.0":
+                return sorted(self._getPeakFamiliesFromVectorOfElements(nameOrVector, energy), key=itemgetter(1))
+            else:
+                nameOrVector = [toBytes(x) for x in nameOrVector]
+                return [(toString(x[0]), x[1]) for x in \
+                        sorted(self._getPeakFamiliesFromVectorOfElements(nameOrVector, energy), key=itemgetter(1))]
         else:
-            return sorted(self._getPeakFamilies(toBytes(nameOrVector), energy), key=itemgetter(1))
+            if sys.version < "3.0":
+                return sorted(self._getPeakFamilies(toBytes(nameOrVector), energy), key=itemgetter(1))
+            else:
+                return [(toString(x[0]), x[1]) for x in \
+                        sorted(self._getPeakFamilies(toBytes(nameOrVector), energy), key=itemgetter(1))]
 
     def _getPeakFamilies(self, std_string name, double energy):
         return self.thisptr.getPeakFamilies(name, energy)
@@ -212,7 +224,10 @@ cdef class PyElements:
         return self.thisptr.getPeakFamilies(elementList, energy)
 
     def getBindingEnergies(self, elementName):
-        return self.thisptr.getBindingEnergies(toBytes(elementName))
+        if sys.version < "3.0":
+            return self.thisptr.getBindingEnergies(elementName)
+        else:
+            return toStringKeys(self.thisptr.getBindingEnergies(toBytes(elementName)))
 
     def getEscape(self, std_map[std_string, double] composition, double energy, double energyThreshold=0.010,
                                         double intensityThreshold=1.0e-7,
@@ -223,13 +238,22 @@ cdef class PyElements:
                                       alphaIn, thickness)
 
     def getShellConstants(self, elementName, subshell):
-        return self.thisptr.getShellConstants(toBytes(elementName), toBytes(subshell))
+        if sys.version < "3.0":
+            return self.thisptr.getShellConstants(elementName, subshell)
+        else:
+            return toStringKeys(self.thisptr.getShellConstants(toBytes(elementName), toBytes(subshell)))
 
     def getRadiativeTransitions(self, elementName, subshell):
-        return self.thisptr.getRadiativeTransitions(toBytes(elementName), toBytes(subshell))
+        if sys.version < "3.0":
+            return self.thisptr.getRadiativeTransitions(elementName, subshell)
+        else:
+            return toStringKeys(self.thisptr.getRadiativeTransitions(toBytes(elementName), toBytes(subshell)))
 
-    def getNonradiativeTrnasitions(self, elementName, subshell):
-        return self.thisptr.getNonradiativeTransitions(toBytes(elementName), toBytes(subshell))
+    def getNonradiativeTransitions(self, elementName, subshell):
+        if sys.version < "3.0":
+            return self.thisptr.getNonradiativeTransitions(elementName, subshell)
+        else:
+            return toStringKeys(self.thisptr.getNonradiativeTransitions(toBytes(elementName), toBytes(subshell)))
 
     def setElementCascadeCacheEnabled(self, elementName, int flag = 1):
         self.thisptr.setElementCascadeCacheEnabled(toBytes(elementName), flag)

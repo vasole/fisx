@@ -9,7 +9,7 @@ from libcpp.map cimport map as std_map
 
 from Elements cimport *
 from Detector cimport *
-from FisxCythonTools import toBytes, toBytesKeys, toBytesKeysAndValues, toStringKeys, toStringKeysAndValues
+from FisxCythonTools import toBytes, toBytesKeys, toBytesKeysAndValues, toString,  toStringKeys, toStringKeysAndValues
 
 cdef class PyDetector:
     cdef Detector *thisptr

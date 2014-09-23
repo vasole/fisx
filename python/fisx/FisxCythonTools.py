@@ -5,6 +5,9 @@ if sys.version < "3.0":
     def toBytes(inputArgument, encoding="utf-8"):
         return inputArgument
 
+    def toString(inputArgument, encoding="utf-8"):
+        return inputArgument
+
     def toBytesKeys(inputDict, encoding="utf-8"):
         return inputDict
 
@@ -25,6 +28,13 @@ else:
             # I do not check for being already a bytes instance
             return inputArgument
 
+    def toString(inputArgument, encoding="utf-8"):
+        if hasattr(inputArgument, "decode"):
+            return inputArgument.decode(encoding)
+        else:
+            # I do not check for being already a string instance
+            return inputArgument
+
     def toBytesKeys(inputDict, encoding="utf-8"):
         return dict((key.encode(encoding), value) if hasattr(key, "encode") \
                     else (key, value) for key, value in inputDict.items())
@@ -40,7 +50,7 @@ else:
             return inputDict
         return dict((key.decode(encoding), toStringKeysAndValues(value)) if hasattr(key, "decode") \
                     else (key, toStringKeysAndValues(value)) for key, value in inputDict.items())
-        
+
     def toStringKeys(inputDict, encoding="utf-8"):
         return dict((key.decode(encoding), value) if hasattr(key, "decode") \
                     else (key, value) for key, value in inputDict.items())
