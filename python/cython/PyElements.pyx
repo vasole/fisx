@@ -97,7 +97,10 @@ cdef class PyElements:
         self.thisptr.setShellConstantsFile(toBytes(mainShellName), toBytes(fileName))
 
     def getShellConstantsFile(self, mainShellName):
-        return self.thisptr.getShellConstantsFile(toBytes(mainShellName))
+        if sys.version < "3.0":
+            return self.thisptr.getShellConstantsFile(mainShellName)
+        else:
+            return toString(self.thisptr.getShellConstantsFile(toBytes(mainShellName)))
 
     def setShellRadiativeTransitionsFile(self, mainShellName, fileName):
         """
@@ -107,10 +110,16 @@ cdef class PyElements:
         self.thisptr.setShellRadiativeTransitionsFile(toBytes(mainShellName), toBytes(fileName))
 
     def getShellRadiativeTransitionsFile(self, mainShellName):
-        return self.thisptr.getShellRadiativeTransitionsFile(toBytes(mainShellName))
+        if sys.version < "3.0":
+            return self.thisptr.getShellRadiativeTransitionsFile(mainShellName)
+        else:
+            return toString(self.thisptr.getShellRadiativeTransitionsFile(toBytes(mainShellName)))
 
     def getShellNonradiativeTransitionsFile(self, mainShellName):
-        return self.thisptr.getShellNonradiativeTransitionsFile(toBytes(mainShellName))
+        if sys.version < "3.0":
+            return self.thisptr.getShellNonradiativeTransitionsFile(mainShellName)
+        else:
+            return toString(self.thisptr.getShellNonradiativeTransitionsFile(toBytes(mainShellName)))
 
     def setMassAttenuationCoefficients(self,
                                        std_string element,
