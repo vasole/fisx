@@ -281,25 +281,34 @@ cdef class PyElements:
     
     def _getSingleMassAttenuationCoefficients(self, std_string element,
                                                      double energy):
-        return self.thisptr.getMassAttenuationCoefficients(element, energy)
+        if sys.version < "3.0":
+            return self.thisptr.getMassAttenuationCoefficients(element, energy)
+        else:
+            return toStringKeys(self.thisptr.getMassAttenuationCoefficients(element, energy))
 
     def _getElementDefaultMassAttenuationCoefficients(self, std_string element):
-        return self.thisptr.getMassAttenuationCoefficients(element)
+        if sys.version < "3.0":
+            return self.thisptr.getMassAttenuationCoefficients(element)
+        else:
+            return toStringKeys(self.thisptr.getMassAttenuationCoefficients(element))
 
     def getElementMassAttenuationCoefficients(self, element, energy=None):
         if energy is None:
-            return self._getElementDefaultMassAttenuationCoefficients(element)            
+            return self._getElementDefaultMassAttenuationCoefficients(toBytes(element))
         elif hasattr(energy, "__len__"):
-            return self._getMultipleMassAttenuationCoefficients(element,
+            return self._getMultipleMassAttenuationCoefficients(toBytes(element),
                                                                        energy)
         else:
-            return self._getMultipleMassAttenuationCoefficients(element,
+            return self._getMultipleMassAttenuationCoefficients(toBytes(element),
                                                                        [energy])
 
     def _getMultipleMassAttenuationCoefficients(self, std_string element,
                                                        std_vector[double] energy):
-        return self.thisptr.getMassAttenuationCoefficients(element, energy)
-                                       
+        if sys.version < "3.0":
+            return self.thisptr.getMassAttenuationCoefficients(element, energy)
+        else:
+            return toStringKeys(self.thisptr.getMassAttenuationCoefficients(element, energy))
+
 
     def getMassAttenuationCoefficients(self, name, energy=None):
         if hasattr(name, "keys"):
@@ -413,7 +422,8 @@ cdef class PyElements:
         self.thisptr.emptyElementCascadeCache(toBytes(elementName))
 
     def removeMaterials(self):
-        self.thisptr.removeMaterials()#import numpy as np
+        self.thisptr.removeMaterials()
+#import numpy as np
 #cimport numpy as np
 cimport cython
 
