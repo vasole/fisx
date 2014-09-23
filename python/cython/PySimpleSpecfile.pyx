@@ -11,7 +11,8 @@ from SimpleSpecfile cimport *
 cdef class PySimpleSpecfile:
     cdef SimpleSpecfile *thisptr
 
-    def __cinit__(self, std_string name):
+    def __cinit__(self, name):
+        name = toBytes(name)
         self.thisptr = new SimpleSpecfile(name)
 
     def __dealloc__(self):

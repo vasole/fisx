@@ -1,5 +1,5 @@
 import numpy
-#cimport numpy as np
+import sys
 cimport cython
 
 from cython.operator cimport dereference as deref
@@ -9,12 +9,13 @@ from libcpp.map cimport map as std_map
 
 from Elements cimport *
 from Detector cimport *
+from FisxCythonTools import toBytes, toBytesKeys, toBytesKeysAndValues, toStringKeys, toStringKeysAndValues
 
 cdef class PyDetector:
     cdef Detector *thisptr
 
-    def __cinit__(self, std_string materialName, double density=1.0, double thickness=1.0, double funny=1.0):
-        self.thisptr = new Detector(materialName, density, thickness, funny)
+    def __cinit__(self, materialName, double density=1.0, double thickness=1.0, double funny=1.0):
+        self.thisptr = new Detector(toBytes(materialName), density, thickness, funny)
 
     def __dealloc__(self):
         del self.thisptr
@@ -46,7 +47,13 @@ cdef class PyDetector:
         self.thisptr.setMaximumNumberOfEscapePeaks(n)
 
     def getEscape(self, double energy, PyElements elementsLib, std_string label="", int update=1):
-        if update:
-            return self.thisptr.getEscape(energy, deref(elementsLib.thisptr), label, 1)
+        if sys.version < "3.0":
+            if update:
+                return self.thisptr.getEscape(energy, deref(elementsLib.thisptr), label, 1)
+            else:
+                return self.thisptr.getEscape(energy, deref(elementsLib.thisptr), label, 0)
         else:
-            return self.thisptr.getEscape(energy, deref(elementsLib.thisptr), label, 0)
+            if update:
+                return toStringKeysAndValues(self.thisptr.getEscape(energy, deref(elementsLib.thisptr), label, 1))
+            else:
+                return toStringKeysAndValues(self.thisptr.getEscape(energy, deref(elementsLib.thisptr), label, 0))

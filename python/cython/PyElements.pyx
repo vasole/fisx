@@ -1,5 +1,4 @@
-#import numpy as np
-#cimport numpy as np
+import sys
 cimport cython
 
 from operator import itemgetter
@@ -37,12 +36,15 @@ xcom = Elements(dataDir, bindingEnergies, xcomFile)
 cdef class PyElements:
     cdef Elements *thisptr
 
-    def __cinit__(self, std_string directoryName="",
-                        std_string bindingEnergiesFile="",
-                        std_string crossSectionsFile=""):
+    def __cinit__(self, directoryName="",
+                        bindingEnergiesFile="",
+                        crossSectionsFile=""):
         if len(directoryName) == 0:
             from fisx import DataDir
             directoryName = DataDir.DATA_DIR
+        directoryName = toBytes(directoryName)
+        bindingEnergiesFile = toBytes(bindingEnergiesFile)
+        crossSectionsFile = toBytes(crossSectionsFile)
         if len(bindingEnergiesFile):
             self.thisptr = new Elements(directoryName, bindingEnergiesFile)
         else:
@@ -67,17 +69,20 @@ cdef class PyElements:
         self.thisptr = new Elements(directoryName, bindingEnergies, xcomFile)
         for shell in ["K", "L", "M"]:
             shellConstantsFile = os.path.join(dataDir, shell+"ShellConstants.dat")
-            self.thisptr.setShellConstantsFile(shell, shellConstantsFile)
+            self.thisptr.setShellConstantsFile(toBytes(shell), toBytes(shellConstantsFile))
 
         for shell in ["K", "L", "M"]:
             radiativeRatesFile = os.path.join(dataDir, shell+"ShellRates.dat")
-            self.thisptr.setShellRadiativeTransitionsFile(shell, radiativeRatesFile)
+            self.thisptr.setShellRadiativeTransitionsFile(toBytes(shell), toBytes(radiativeRatesFile))
 
     def getElementNames(self):
         return self.thisptr.getElementNames()
 
-    def getComposition(self, std_string materialOrFormula):
-        return self.thisptr.getComposition(materialOrFormula)
+    def getComposition(self, materialOrFormula):
+        if sys.version < "3.0":
+            return self.thisptr.getComposition(toBytes(materialOrFormula))
+        else:
+            return toStringKeys(self.thisptr.getComposition(toBytes(materialOrFormula)))
 
     def __dealloc__(self):
         del self.thisptr
@@ -85,27 +90,27 @@ cdef class PyElements:
     def addMaterial(self, PyMaterial material, int errorOnReplace=1):
         self.thisptr.addMaterial(deref(material.thisptr), errorOnReplace)
 
-    def setShellConstantsFile(self, std_string mainShellName, std_string fileName):
+    def setShellConstantsFile(self, mainShellName, fileName):
         """
         Load main shell (K, L or M) constants from file (fluorescence and Coster-Kronig yields)
         """
-        self.thisptr.setShellConstantsFile(mainShellName, fileName)
+        self.thisptr.setShellConstantsFile(toBytes(mainShellName), toBytes(fileName))
 
-    def getShellConstantsFile(self, std_string mainShellName):
-        return self.thisptr.getShellConstantsFile(mainShellName)
+    def getShellConstantsFile(self, mainShellName):
+        return self.thisptr.getShellConstantsFile(toBytes(mainShellName))
 
-    def setShellRadiativeTransitionsFile(self, std_string mainShellName, std_string fileName):
+    def setShellRadiativeTransitionsFile(self, mainShellName, fileName):
         """
         Load main shell (K, L or M) X-ray emission rates from file.
         The library normalizes internally.
         """
-        self.thisptr.setShellRadiativeTransitionsFile(mainShellName, fileName)
+        self.thisptr.setShellRadiativeTransitionsFile(toBytes(mainShellName), toBytes(fileName))
 
-    def getShellRadiativeTransitionsFile(self, std_string mainShellName):
-        return self.thisptr.getShellRadiativeTransitionsFile(mainShellName)
+    def getShellRadiativeTransitionsFile(self, mainShellName):
+        return self.thisptr.getShellRadiativeTransitionsFile(toBytes(mainShellName))
 
-    def getShellNonradiativeTransitionsFile(self, std_string mainShellName):
-        return self.thisptr.getShellNonradiativeTransitionsFile(mainShellName)
+    def getShellNonradiativeTransitionsFile(self, mainShellName):
+        return self.thisptr.getShellNonradiativeTransitionsFile(toBytes(mainShellName))
 
     def setMassAttenuationCoefficients(self,
                                        std_string element,
@@ -120,8 +125,8 @@ cdef class PyElements:
                                                     coherent,
                                                     compton,
                                                     pair)
-    def setMassAttenuationCoefficientsFile(self, std_string crossSectionsFile):
-        self.thisptr.setMassAttenuationCoefficientsFile(crossSectionsFile)
+    def setMassAttenuationCoefficientsFile(self, crossSectionsFile):
+        self.thisptr.setMassAttenuationCoefficientsFile(toBytes(crossSectionsFile))
     
     def _getSingleMassAttenuationCoefficients(self, std_string element,
                                                      double energy):
@@ -198,7 +203,7 @@ cdef class PyElements:
         if type(nameOrVector) in [type([]), type(())]:
             return sorted(self._getPeakFamiliesFromVectorOfElements(nameOrVector, energy), key=itemgetter(1))
         else:
-            return sorted(self._getPeakFamilies(nameOrVector, energy), key=itemgetter(1))
+            return sorted(self._getPeakFamilies(toBytes(nameOrVector), energy), key=itemgetter(1))
 
     def _getPeakFamilies(self, std_string name, double energy):
         return self.thisptr.getPeakFamilies(name, energy)
@@ -206,8 +211,8 @@ cdef class PyElements:
     def _getPeakFamiliesFromVectorOfElements(self, std_vector[std_string] elementList, double energy):
         return self.thisptr.getPeakFamilies(elementList, energy)
 
-    def getBindingEnergies(self, std_string elementName):
-        return self.thisptr.getBindingEnergies(elementName)
+    def getBindingEnergies(self, elementName):
+        return self.thisptr.getBindingEnergies(toBytes(elementName))
 
     def getEscape(self, std_map[std_string, double] composition, double energy, double energyThreshold=0.010,
                                         double intensityThreshold=1.0e-7,
@@ -217,20 +222,20 @@ cdef class PyElements:
         return self.thisptr.getEscape(composition, energy, energyThreshold, intensityThreshold, nThreshold,
                                       alphaIn, thickness)
 
-    def getShellConstants(self, std_string elementName, std_string subshell):
-        return self.thisptr.getShellConstants(elementName, subshell)
+    def getShellConstants(self, elementName, subshell):
+        return self.thisptr.getShellConstants(toBytes(elementName), toBytes(subshell))
 
-    def getRadiativeTransitions(self, std_string elementName, std_string subshell):
-        return self.thisptr.getRadiativeTransitions(elementName, subshell)
+    def getRadiativeTransitions(self, elementName, subshell):
+        return self.thisptr.getRadiativeTransitions(toBytes(elementName), toBytes(subshell))
 
-    def getNonradiativeTrnasitions(self, std_string elementName, std_string subshell):
-        return self.thisptr.getNonradiativeTransitions(elementName, subshell)
+    def getNonradiativeTrnasitions(self, elementName, subshell):
+        return self.thisptr.getNonradiativeTransitions(toBytes(elementName), toBytes(subshell))
 
-    def setElementCascadeCacheEnabled(self, std_string elementName, int flag = 1):
-        self.thisptr.setElementCascadeCacheEnabled(elementName, flag)
+    def setElementCascadeCacheEnabled(self, elementName, int flag = 1):
+        self.thisptr.setElementCascadeCacheEnabled(toBytes(elementName), flag)
 
-    def emptyElementCascadeCache(self, std_string elementName):
-        self.thisptr.emptyElementCascadeCache(elementName)
+    def emptyElementCascadeCache(self, elementName):
+        self.thisptr.emptyElementCascadeCache(toBytes(elementName))
 
     def removeMaterials(self):
         self.thisptr.removeMaterials()

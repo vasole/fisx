@@ -16,8 +16,8 @@ from Layer cimport *
 cdef class PyLayer:
     cdef Layer *thisptr
 
-    def __cinit__(self, std_string materialName, double density=1.0, double thickness=1.0, double funny=1.0):
-        self.thisptr = new Layer(materialName, density, thickness, funny)
+    def __cinit__(self, materialName, double density=1.0, double thickness=1.0, double funny=1.0):
+        self.thisptr = new Layer(toBytes(materialName), density, thickness, funny)
 
     def __dealloc__(self):
         del self.thisptr

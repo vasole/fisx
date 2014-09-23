@@ -1,3 +1,4 @@
+import sys
 cimport cython
 
 from cython.operator cimport dereference as deref
@@ -10,19 +11,26 @@ from Material cimport *
 cdef class PyMaterial:
     cdef Material *thisptr
 
-    def __cinit__(self, std_string materialName, double density=1.0, double thickness=1.0, std_string comment=""):
+    def __cinit__(self, materialName, double density=1.0, double thickness=1.0, comment=""):
+        materialName = toBytes(materialName)
+        comment = toBytes(comment)
         self.thisptr = new Material(materialName, density, thickness, comment)
 
     def __dealloc__(self):
         del self.thisptr
 
-    def setName(self, std_string name):
+    def setName(self, name):
+        name = toBytes(name)
         self.thisptr.setName(name)
 
-    def setCompositionFromLists(self, std_vector[std_string] elementList, std_vector[double] massFractions):
+    def setCompositionFromLists(self, elementList, std_vector[double] massFractions):
+        if sys.version > "3.0":
+            elementList = [toBytes(x) for x in elementList]
         self.thisptr.setComposition(elementList, massFractions)
 
-    def setComposition(self, std_map[std_string, double] composition):
+    def setComposition(self, composition):
+        if sys.version > "3.0":
+            composition = toBytesKeys(composition)
         self.thisptr.setComposition(composition)
 
     def getComposition(self):

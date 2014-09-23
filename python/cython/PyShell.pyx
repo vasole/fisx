@@ -1,5 +1,4 @@
-#import numpy as np
-#cimport numpy as np
+import sys
 cimport cython
 
 #from libcpp.string cimport string as std_string
@@ -12,15 +11,20 @@ cdef class PyShell:
     cdef Shell *thisptr
 
     def __cinit__(self, name):
+        name = toBytes(name)
         self.thisptr = new Shell(name)
 
     def __dealloc__(self):
         del self.thisptr
 
-    def setRadiativeTransitions(self, std_vector[std_string] transitions, std_vector[double] values):
+    def setRadiativeTransitions(self, transitions, std_vector[double] values):
+        if sys.version > "3.0":
+            transitions = [toBytes(x) for x in transitions]
         self.thisptr.setRadiativeTransitions(transitions, values)
 
-    def setNonradiativeTransitions(self, std_vector[std_string] transitions, std_vector[double] values):
+    def setNonradiativeTransitions(self, transitions, std_vector[double] values):
+        if sys.version > "3.0":
+            transitions = [toBytes(x) for x in transitions]
         self.thisptr.setNonradiativeTransitions(transitions, values)
 
     def getAugerRatios(self):
@@ -38,10 +42,12 @@ cdef class PyShell:
     def getNonradiativeTransitions(self):
         return self.thisptr.getNonradiativeTransitions()
 
-    def getDirectVacancyTransferRatios(self, std_string subshell):
-        return self.thisptr.getDirectVacancyTransferRatios(subshell)
+    def getDirectVacancyTransferRatios(self, subshell):
+        return self.thisptr.getDirectVacancyTransferRatios(toBytes(subshell))
 
-    def setShellConstants(self, std_map[std_string, double] shellConstants):
+    def setShellConstants(self, shellConstants):
+        if sys.version > "3.0":
+            shellConstants = toBytesKeys(shellConstants)
         self.thisptr.setShellConstants(shellConstants)
 
     def getShellConstants(self):

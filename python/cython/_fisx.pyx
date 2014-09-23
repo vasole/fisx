@@ -1,5 +1,5 @@
 import numpy
-#cimport numpy as np
+import sys
 cimport cython
 
 from cython.operator cimport dereference as deref
@@ -9,12 +9,13 @@ from libcpp.map cimport map as std_map
 
 from Elements cimport *
 from Detector cimport *
+from FisxCythonTools import toBytes, toBytesKeys, toBytesKeysAndValues, toStringKeys, toStringKeysAndValues
 
 cdef class PyDetector:
     cdef Detector *thisptr
 
-    def __cinit__(self, std_string materialName, double density=1.0, double thickness=1.0, double funny=1.0):
-        self.thisptr = new Detector(materialName, density, thickness, funny)
+    def __cinit__(self, materialName, double density=1.0, double thickness=1.0, double funny=1.0):
+        self.thisptr = new Detector(toBytes(materialName), density, thickness, funny)
 
     def __dealloc__(self):
         del self.thisptr
@@ -46,10 +47,16 @@ cdef class PyDetector:
         self.thisptr.setMaximumNumberOfEscapePeaks(n)
 
     def getEscape(self, double energy, PyElements elementsLib, std_string label="", int update=1):
-        if update:
-            return self.thisptr.getEscape(energy, deref(elementsLib.thisptr), label, 1)
+        if sys.version < "3.0":
+            if update:
+                return self.thisptr.getEscape(energy, deref(elementsLib.thisptr), label, 1)
+            else:
+                return self.thisptr.getEscape(energy, deref(elementsLib.thisptr), label, 0)
         else:
-            return self.thisptr.getEscape(energy, deref(elementsLib.thisptr), label, 0)
+            if update:
+                return toStringKeysAndValues(self.thisptr.getEscape(energy, deref(elementsLib.thisptr), label, 1))
+            else:
+                return toStringKeysAndValues(self.thisptr.getEscape(energy, deref(elementsLib.thisptr), label, 0))
 cimport cython
 
 from libcpp.string cimport string as std_string
@@ -61,14 +68,14 @@ from Element cimport *
 cdef class PyElement:
     cdef Element *thisptr
 
-    def __cinit__(self, std_string name, z = 0):
-        self.thisptr = new Element(name, z)
+    def __cinit__(self, name, z = 0):
+        self.thisptr = new Element(toBytes(name), z)
 
     def __dealloc__(self):
         del self.thisptr
 
-    def setName(self, std_string name):
-        self.thisptr.setName(name)
+    def setName(self, name):
+        self.thisptr.setName(toBytes(name))
 
     def setAtomicNumber(self, int z):
         self.thisptr.setAtomicNumber(z)
@@ -111,28 +118,28 @@ cdef class PyElement:
     def _getMultipleMassAttenuationCoefficients(self, std_vector[double] energy):
         return self.thisptr.getMassAttenuationCoefficients(energy)
                                        
-    def setRadiativeTransitions(self, std_string shell,
+    def setRadiativeTransitions(self, shell,
                                 std_vector[std_string] labels,
                                 std_vector[double] values):
-        self.thisptr.setRadiativeTransitions(shell, labels, values)
+        self.thisptr.setRadiativeTransitions(toBytes(shell), labels, values)
 
-    def getRadiativeTransitions(self, std_string shell):
-        return self.thisptr.getRadiativeTransitions(shell)
+    def getRadiativeTransitions(self, shell):
+        return self.thisptr.getRadiativeTransitions(toBytes(shell))
 
-    def setNonradiativeTransitions(self, std_string shell,
+    def setNonradiativeTransitions(self, shell,
                                    std_vector[std_string] labels,
                                    std_vector[double] values):
-        self.thisptr.setNonradiativeTransitions(shell, labels, values)
+        self.thisptr.setNonradiativeTransitions(toBytes(shell), labels, values)
 
-    def getNonradiativeTransitions(self, std_string shell):
-        return self.thisptr.getNonradiativeTransitions(shell)
+    def getNonradiativeTransitions(self, shell):
+        return self.thisptr.getNonradiativeTransitions(toBytes(shell))
 
-    def setShellConstants(self, std_string shell,
+    def setShellConstants(self, shell,
                           std_map[std_string, double] valuesDict):
-        self.thisptr.setShellConstants(shell, valuesDict)
+        self.thisptr.setShellConstants(toBytes(shell), valuesDict)
 
-    def getShellConstants(self, std_string shell):
-        return self.thisptr.getShellConstants(shell)
+    def getShellConstants(self, shell):
+        return self.thisptr.getShellConstants(toBytes(shell))
 
     #def getXRayLines(self, std_string shell):
     #    return self.thisptr.getXRayLines(shell)
@@ -141,9 +148,8 @@ cdef class PyElement:
                             std_map[std_string, double] vacancyDict):
         return self.thisptr.getXRayLinesFromVacancyDistribution(\
                                 vacancyDict)
-    
-#import numpy as np
-#cimport numpy as np
+
+import sys
 cimport cython
 
 from operator import itemgetter
@@ -181,12 +187,15 @@ xcom = Elements(dataDir, bindingEnergies, xcomFile)
 cdef class PyElements:
     cdef Elements *thisptr
 
-    def __cinit__(self, std_string directoryName="",
-                        std_string bindingEnergiesFile="",
-                        std_string crossSectionsFile=""):
+    def __cinit__(self, directoryName="",
+                        bindingEnergiesFile="",
+                        crossSectionsFile=""):
         if len(directoryName) == 0:
             from fisx import DataDir
             directoryName = DataDir.DATA_DIR
+        directoryName = toBytes(directoryName)
+        bindingEnergiesFile = toBytes(bindingEnergiesFile)
+        crossSectionsFile = toBytes(crossSectionsFile)
         if len(bindingEnergiesFile):
             self.thisptr = new Elements(directoryName, bindingEnergiesFile)
         else:
@@ -211,17 +220,20 @@ cdef class PyElements:
         self.thisptr = new Elements(directoryName, bindingEnergies, xcomFile)
         for shell in ["K", "L", "M"]:
             shellConstantsFile = os.path.join(dataDir, shell+"ShellConstants.dat")
-            self.thisptr.setShellConstantsFile(shell, shellConstantsFile)
+            self.thisptr.setShellConstantsFile(toBytes(shell), toBytes(shellConstantsFile))
 
         for shell in ["K", "L", "M"]:
             radiativeRatesFile = os.path.join(dataDir, shell+"ShellRates.dat")
-            self.thisptr.setShellRadiativeTransitionsFile(shell, radiativeRatesFile)
+            self.thisptr.setShellRadiativeTransitionsFile(toBytes(shell), toBytes(radiativeRatesFile))
 
     def getElementNames(self):
         return self.thisptr.getElementNames()
 
-    def getComposition(self, std_string materialOrFormula):
-        return self.thisptr.getComposition(materialOrFormula)
+    def getComposition(self, materialOrFormula):
+        if sys.version < "3.0":
+            return self.thisptr.getComposition(toBytes(materialOrFormula))
+        else:
+            return toStringKeys(self.thisptr.getComposition(toBytes(materialOrFormula)))
 
     def __dealloc__(self):
         del self.thisptr
@@ -229,27 +241,27 @@ cdef class PyElements:
     def addMaterial(self, PyMaterial material, int errorOnReplace=1):
         self.thisptr.addMaterial(deref(material.thisptr), errorOnReplace)
 
-    def setShellConstantsFile(self, std_string mainShellName, std_string fileName):
+    def setShellConstantsFile(self, mainShellName, fileName):
         """
         Load main shell (K, L or M) constants from file (fluorescence and Coster-Kronig yields)
         """
-        self.thisptr.setShellConstantsFile(mainShellName, fileName)
+        self.thisptr.setShellConstantsFile(toBytes(mainShellName), toBytes(fileName))
 
-    def getShellConstantsFile(self, std_string mainShellName):
-        return self.thisptr.getShellConstantsFile(mainShellName)
+    def getShellConstantsFile(self, mainShellName):
+        return self.thisptr.getShellConstantsFile(toBytes(mainShellName))
 
-    def setShellRadiativeTransitionsFile(self, std_string mainShellName, std_string fileName):
+    def setShellRadiativeTransitionsFile(self, mainShellName, fileName):
         """
         Load main shell (K, L or M) X-ray emission rates from file.
         The library normalizes internally.
         """
-        self.thisptr.setShellRadiativeTransitionsFile(mainShellName, fileName)
+        self.thisptr.setShellRadiativeTransitionsFile(toBytes(mainShellName), toBytes(fileName))
 
-    def getShellRadiativeTransitionsFile(self, std_string mainShellName):
-        return self.thisptr.getShellRadiativeTransitionsFile(mainShellName)
+    def getShellRadiativeTransitionsFile(self, mainShellName):
+        return self.thisptr.getShellRadiativeTransitionsFile(toBytes(mainShellName))
 
-    def getShellNonradiativeTransitionsFile(self, std_string mainShellName):
-        return self.thisptr.getShellNonradiativeTransitionsFile(mainShellName)
+    def getShellNonradiativeTransitionsFile(self, mainShellName):
+        return self.thisptr.getShellNonradiativeTransitionsFile(toBytes(mainShellName))
 
     def setMassAttenuationCoefficients(self,
                                        std_string element,
@@ -264,8 +276,8 @@ cdef class PyElements:
                                                     coherent,
                                                     compton,
                                                     pair)
-    def setMassAttenuationCoefficientsFile(self, std_string crossSectionsFile):
-        self.thisptr.setMassAttenuationCoefficientsFile(crossSectionsFile)
+    def setMassAttenuationCoefficientsFile(self, crossSectionsFile):
+        self.thisptr.setMassAttenuationCoefficientsFile(toBytes(crossSectionsFile))
     
     def _getSingleMassAttenuationCoefficients(self, std_string element,
                                                      double energy):
@@ -342,7 +354,7 @@ cdef class PyElements:
         if type(nameOrVector) in [type([]), type(())]:
             return sorted(self._getPeakFamiliesFromVectorOfElements(nameOrVector, energy), key=itemgetter(1))
         else:
-            return sorted(self._getPeakFamilies(nameOrVector, energy), key=itemgetter(1))
+            return sorted(self._getPeakFamilies(toBytes(nameOrVector), energy), key=itemgetter(1))
 
     def _getPeakFamilies(self, std_string name, double energy):
         return self.thisptr.getPeakFamilies(name, energy)
@@ -350,8 +362,8 @@ cdef class PyElements:
     def _getPeakFamiliesFromVectorOfElements(self, std_vector[std_string] elementList, double energy):
         return self.thisptr.getPeakFamilies(elementList, energy)
 
-    def getBindingEnergies(self, std_string elementName):
-        return self.thisptr.getBindingEnergies(elementName)
+    def getBindingEnergies(self, elementName):
+        return self.thisptr.getBindingEnergies(toBytes(elementName))
 
     def getEscape(self, std_map[std_string, double] composition, double energy, double energyThreshold=0.010,
                                         double intensityThreshold=1.0e-7,
@@ -361,20 +373,20 @@ cdef class PyElements:
         return self.thisptr.getEscape(composition, energy, energyThreshold, intensityThreshold, nThreshold,
                                       alphaIn, thickness)
 
-    def getShellConstants(self, std_string elementName, std_string subshell):
-        return self.thisptr.getShellConstants(elementName, subshell)
+    def getShellConstants(self, elementName, subshell):
+        return self.thisptr.getShellConstants(toBytes(elementName), toBytes(subshell))
 
-    def getRadiativeTransitions(self, std_string elementName, std_string subshell):
-        return self.thisptr.getRadiativeTransitions(elementName, subshell)
+    def getRadiativeTransitions(self, elementName, subshell):
+        return self.thisptr.getRadiativeTransitions(toBytes(elementName), toBytes(subshell))
 
-    def getNonradiativeTrnasitions(self, std_string elementName, std_string subshell):
-        return self.thisptr.getNonradiativeTransitions(elementName, subshell)
+    def getNonradiativeTrnasitions(self, elementName, subshell):
+        return self.thisptr.getNonradiativeTransitions(toBytes(elementName), toBytes(subshell))
 
-    def setElementCascadeCacheEnabled(self, std_string elementName, int flag = 1):
-        self.thisptr.setElementCascadeCacheEnabled(elementName, flag)
+    def setElementCascadeCacheEnabled(self, elementName, int flag = 1):
+        self.thisptr.setElementCascadeCacheEnabled(toBytes(elementName), flag)
 
-    def emptyElementCascadeCache(self, std_string elementName):
-        self.thisptr.emptyElementCascadeCache(elementName)
+    def emptyElementCascadeCache(self, elementName):
+        self.thisptr.emptyElementCascadeCache(toBytes(elementName))
 
     def removeMaterials(self):
         self.thisptr.removeMaterials()#import numpy as np
@@ -451,8 +463,8 @@ from Layer cimport *
 cdef class PyLayer:
     cdef Layer *thisptr
 
-    def __cinit__(self, std_string materialName, double density=1.0, double thickness=1.0, double funny=1.0):
-        self.thisptr = new Layer(materialName, density, thickness, funny)
+    def __cinit__(self, materialName, double density=1.0, double thickness=1.0, double funny=1.0):
+        self.thisptr = new Layer(toBytes(materialName), density, thickness, funny)
 
     def __dealloc__(self):
         del self.thisptr
@@ -469,6 +481,7 @@ cdef class PyLayer:
         tmpResult = self.thisptr.getPeakFamilies(energy, deref(elementsLib.thisptr))
         return sorted(tmpResult, key=itemgetter(1))
 
+import sys
 cimport cython
 
 from cython.operator cimport dereference as deref
@@ -481,19 +494,26 @@ from Material cimport *
 cdef class PyMaterial:
     cdef Material *thisptr
 
-    def __cinit__(self, std_string materialName, double density=1.0, double thickness=1.0, std_string comment=""):
+    def __cinit__(self, materialName, double density=1.0, double thickness=1.0, comment=""):
+        materialName = toBytes(materialName)
+        comment = toBytes(comment)
         self.thisptr = new Material(materialName, density, thickness, comment)
 
     def __dealloc__(self):
         del self.thisptr
 
-    def setName(self, std_string name):
+    def setName(self, name):
+        name = toBytes(name)
         self.thisptr.setName(name)
 
-    def setCompositionFromLists(self, std_vector[std_string] elementList, std_vector[double] massFractions):
+    def setCompositionFromLists(self, elementList, std_vector[double] massFractions):
+        if sys.version > "3.0":
+            elementList = [toBytes(x) for x in elementList]
         self.thisptr.setComposition(elementList, massFractions)
 
-    def setComposition(self, std_map[std_string, double] composition):
+    def setComposition(self, composition):
+        if sys.version > "3.0":
+            composition = toBytesKeys(composition)
         self.thisptr.setComposition(composition)
 
     def getComposition(self):
@@ -551,8 +571,7 @@ cdef class PyMath:
         """
         return self.thisptr.hypermet(x, gaussArea, position, fwhm,
                                      shortTailArea, shortTailSlope, longTailArea, longTailSlope, stepHeight)
-#import numpy as np
-#cimport numpy as np
+import sys
 cimport cython
 
 #from libcpp.string cimport string as std_string
@@ -565,15 +584,20 @@ cdef class PyShell:
     cdef Shell *thisptr
 
     def __cinit__(self, name):
+        name = toBytes(name)
         self.thisptr = new Shell(name)
 
     def __dealloc__(self):
         del self.thisptr
 
-    def setRadiativeTransitions(self, std_vector[std_string] transitions, std_vector[double] values):
+    def setRadiativeTransitions(self, transitions, std_vector[double] values):
+        if sys.version > "3.0":
+            transitions = [toBytes(x) for x in transitions]
         self.thisptr.setRadiativeTransitions(transitions, values)
 
-    def setNonradiativeTransitions(self, std_vector[std_string] transitions, std_vector[double] values):
+    def setNonradiativeTransitions(self, transitions, std_vector[double] values):
+        if sys.version > "3.0":
+            transitions = [toBytes(x) for x in transitions]
         self.thisptr.setNonradiativeTransitions(transitions, values)
 
     def getAugerRatios(self):
@@ -591,10 +615,12 @@ cdef class PyShell:
     def getNonradiativeTransitions(self):
         return self.thisptr.getNonradiativeTransitions()
 
-    def getDirectVacancyTransferRatios(self, std_string subshell):
-        return self.thisptr.getDirectVacancyTransferRatios(subshell)
+    def getDirectVacancyTransferRatios(self, subshell):
+        return self.thisptr.getDirectVacancyTransferRatios(toBytes(subshell))
 
-    def setShellConstants(self, std_map[std_string, double] shellConstants):
+    def setShellConstants(self, shellConstants):
+        if sys.version > "3.0":
+            shellConstants = toBytesKeys(shellConstants)
         self.thisptr.setShellConstants(shellConstants)
 
     def getShellConstants(self):
@@ -612,7 +638,8 @@ from SimpleIni cimport *
 cdef class PySimpleIni:
     cdef SimpleIni *thisptr
 
-    def __cinit__(self, std_string name):
+    def __cinit__(self, name):
+        name = toBytes(name)
         self.thisptr = new SimpleIni(name)
 
     def __dealloc__(self):
@@ -621,7 +648,8 @@ cdef class PySimpleIni:
     def getKeys(self):
         return self.thisptr.getSections()
 
-    def readKey(self, std_string key):
+    def readKey(self, key):
+        key = toBytes(key)
         return self.thisptr.readSection(key)
 #import numpy as np
 #cimport numpy as np
@@ -636,7 +664,8 @@ from SimpleSpecfile cimport *
 cdef class PySimpleSpecfile:
     cdef SimpleSpecfile *thisptr
 
-    def __cinit__(self, std_string name):
+    def __cinit__(self, name):
+        name = toBytes(name)
         self.thisptr = new SimpleSpecfile(name)
 
     def __dealloc__(self):
@@ -718,10 +747,10 @@ cdef class PyXRF:
         if len(layerList):
             if len(layerList[0]) == 4:
                 for name, density, thickness, funny in layerList:
-                    container.push_back(Layer(name, density, thickness, funny))
+                    container.push_back(Layer(toBytes(name), density, thickness, funny))
             else:
                 for name, density, thickness in layerList:
-                    container.push_back(Layer(name, density, thickness, 1.0))
+                    container.push_back(Layer(toBytes(name), density, thickness, 1.0))
         self.thisptr.setBeamFilters(container)
 
     def setSample(self, layerList, referenceLayer=0):
@@ -737,10 +766,10 @@ cdef class PyXRF:
         cdef std_vector[Layer] container
         if len(layerList[0]) == 4:
             for name, density, thickness, funny in layerList:
-                container.push_back(Layer(name, density, thickness, funny))
+                container.push_back(Layer(toBytes(name), density, thickness, funny))
         else:
             for name, density, thickness in layerList:
-                container.push_back(Layer(name, density, thickness, 1.0))
+                container.push_back(Layer(toBytes(name), density, thickness, 1.0))
         self.thisptr.setSample(container, referenceLayer)
 
 
@@ -757,10 +786,10 @@ cdef class PyXRF:
         cdef std_vector[Layer] container
         if len(layerList[0]) == 4:
             for name, density, thickness, funny in layerList:
-                container.push_back(Layer(name, density, thickness, funny))
+                container.push_back(Layer(toBytes(name), density, thickness, funny))
         else:
             for name, density, thickness in layerList:
-                container.push_back(Layer(name, density, thickness, 1.0))
+                container.push_back(Layer(toBytes(name), density, thickness, 1.0))
         self.thisptr.setAttenuators(container)
 
     def setDetector(self, PyDetector detector):
@@ -772,7 +801,7 @@ cdef class PyXRF:
         else:
             self.thisptr.setGeometry(alphaIn, alphaOut, scatteringAngle)
 
-    def getMultilayerFluorescence(self, std_vector[std_string] elementFamilyLayer, PyElements elementsLibrary, \
+    def getMultilayerFluorescence(self, elementFamilyLayer, PyElements elementsLibrary, \
                             int secondary = 0, int useGeometricEfficiency = 1, int useMassFractions = 0, \
                             secondaryCalculationLimit = 0.0):
         """
@@ -802,16 +831,30 @@ cdef class PyXRF:
         [Element Family][Layer][line][element line layer] - Secondary rate (prior to correct for detection efficiency)
         due to the fluorescence from the given element, line and layer index composing the map key.
         """
-        return self.thisptr.getMultilayerFluorescence(elementFamilyLayer, \
+        if sys.version > "3.0":
+            elementFamilyLayer = [toBytes(x) for x in elementFamilyLayer]
+            return toStringKeysAndValues(self.thisptr.getMultilayerFluorescence(elementFamilyLayer, \
+                            deref(elementsLibrary.thisptr), \
+                            secondary, useGeometricEfficiency, \
+                            useMassFractions, secondaryCalculationLimit))
+        else:
+            return self.thisptr.getMultilayerFluorescence(elementFamilyLayer, \
                             deref(elementsLibrary.thisptr), \
                             secondary, useGeometricEfficiency, \
                             useMassFractions, secondaryCalculationLimit)
 
-    def getFluorescence(self, std_string elementName, PyElements elementsLibrary, \
-                            int sampleLayer = 0, std_string lineFamily="K", int secondary = 0, \
+    def getFluorescence(self, elementName, PyElements elementsLibrary, \
+                            int sampleLayer = 0, lineFamily="K", int secondary = 0, \
                             int useGeometricEfficiency = 1, int useMassFractions = 0, \
                             double secondaryCalculationLimit = 0.0):
-        return self.thisptr.getMultilayerFluorescence(elementName, deref(elementsLibrary.thisptr), \
+        if sys.version > "3.0":
+            elementName = toBytes(elementName)
+            lineFamily = toBytes(lineFamily)
+            return toStringKeysAndValues(self.thisptr.getMultilayerFluorescence(elementName, deref(elementsLibrary.thisptr), \
+                            sampleLayer, lineFamily, secondary, useGeometricEfficiency, useMassFractions, \
+                            secondaryCalculationLimit))
+        else:
+            return self.thisptr.getMultilayerFluorescence(elementName, deref(elementsLibrary.thisptr), \
                             sampleLayer, lineFamily, secondary, useGeometricEfficiency, useMassFractions, \
                             secondaryCalculationLimit)
 

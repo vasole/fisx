@@ -63,10 +63,10 @@ cdef class PyXRF:
         if len(layerList):
             if len(layerList[0]) == 4:
                 for name, density, thickness, funny in layerList:
-                    container.push_back(Layer(name, density, thickness, funny))
+                    container.push_back(Layer(toBytes(name), density, thickness, funny))
             else:
                 for name, density, thickness in layerList:
-                    container.push_back(Layer(name, density, thickness, 1.0))
+                    container.push_back(Layer(toBytes(name), density, thickness, 1.0))
         self.thisptr.setBeamFilters(container)
 
     def setSample(self, layerList, referenceLayer=0):
@@ -82,10 +82,10 @@ cdef class PyXRF:
         cdef std_vector[Layer] container
         if len(layerList[0]) == 4:
             for name, density, thickness, funny in layerList:
-                container.push_back(Layer(name, density, thickness, funny))
+                container.push_back(Layer(toBytes(name), density, thickness, funny))
         else:
             for name, density, thickness in layerList:
-                container.push_back(Layer(name, density, thickness, 1.0))
+                container.push_back(Layer(toBytes(name), density, thickness, 1.0))
         self.thisptr.setSample(container, referenceLayer)
 
 
@@ -102,10 +102,10 @@ cdef class PyXRF:
         cdef std_vector[Layer] container
         if len(layerList[0]) == 4:
             for name, density, thickness, funny in layerList:
-                container.push_back(Layer(name, density, thickness, funny))
+                container.push_back(Layer(toBytes(name), density, thickness, funny))
         else:
             for name, density, thickness in layerList:
-                container.push_back(Layer(name, density, thickness, 1.0))
+                container.push_back(Layer(toBytes(name), density, thickness, 1.0))
         self.thisptr.setAttenuators(container)
 
     def setDetector(self, PyDetector detector):
@@ -117,7 +117,7 @@ cdef class PyXRF:
         else:
             self.thisptr.setGeometry(alphaIn, alphaOut, scatteringAngle)
 
-    def getMultilayerFluorescence(self, std_vector[std_string] elementFamilyLayer, PyElements elementsLibrary, \
+    def getMultilayerFluorescence(self, elementFamilyLayer, PyElements elementsLibrary, \
                             int secondary = 0, int useGeometricEfficiency = 1, int useMassFractions = 0, \
                             secondaryCalculationLimit = 0.0):
         """
@@ -147,16 +147,30 @@ cdef class PyXRF:
         [Element Family][Layer][line][element line layer] - Secondary rate (prior to correct for detection efficiency)
         due to the fluorescence from the given element, line and layer index composing the map key.
         """
-        return self.thisptr.getMultilayerFluorescence(elementFamilyLayer, \
+        if sys.version > "3.0":
+            elementFamilyLayer = [toBytes(x) for x in elementFamilyLayer]
+            return toStringKeysAndValues(self.thisptr.getMultilayerFluorescence(elementFamilyLayer, \
+                            deref(elementsLibrary.thisptr), \
+                            secondary, useGeometricEfficiency, \
+                            useMassFractions, secondaryCalculationLimit))
+        else:
+            return self.thisptr.getMultilayerFluorescence(elementFamilyLayer, \
                             deref(elementsLibrary.thisptr), \
                             secondary, useGeometricEfficiency, \
                             useMassFractions, secondaryCalculationLimit)
 
-    def getFluorescence(self, std_string elementName, PyElements elementsLibrary, \
-                            int sampleLayer = 0, std_string lineFamily="K", int secondary = 0, \
+    def getFluorescence(self, elementName, PyElements elementsLibrary, \
+                            int sampleLayer = 0, lineFamily="K", int secondary = 0, \
                             int useGeometricEfficiency = 1, int useMassFractions = 0, \
                             double secondaryCalculationLimit = 0.0):
-        return self.thisptr.getMultilayerFluorescence(elementName, deref(elementsLibrary.thisptr), \
+        if sys.version > "3.0":
+            elementName = toBytes(elementName)
+            lineFamily = toBytes(lineFamily)
+            return toStringKeysAndValues(self.thisptr.getMultilayerFluorescence(elementName, deref(elementsLibrary.thisptr), \
+                            sampleLayer, lineFamily, secondary, useGeometricEfficiency, useMassFractions, \
+                            secondaryCalculationLimit))
+        else:
+            return self.thisptr.getMultilayerFluorescence(elementName, deref(elementsLibrary.thisptr), \
                             sampleLayer, lineFamily, secondary, useGeometricEfficiency, useMassFractions, \
                             secondaryCalculationLimit)
 

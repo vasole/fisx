@@ -11,7 +11,8 @@ from SimpleIni cimport *
 cdef class PySimpleIni:
     cdef SimpleIni *thisptr
 
-    def __cinit__(self, std_string name):
+    def __cinit__(self, name):
+        name = toBytes(name)
         self.thisptr = new SimpleIni(name)
 
     def __dealloc__(self):
@@ -20,5 +21,6 @@ cdef class PySimpleIni:
     def getKeys(self):
         return self.thisptr.getSections()
 
-    def readKey(self, std_string key):
+    def readKey(self, key):
+        key = toBytes(key)
         return self.thisptr.readSection(key)

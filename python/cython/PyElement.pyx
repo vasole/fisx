@@ -9,14 +9,14 @@ from Element cimport *
 cdef class PyElement:
     cdef Element *thisptr
 
-    def __cinit__(self, std_string name, z = 0):
-        self.thisptr = new Element(name, z)
+    def __cinit__(self, name, z = 0):
+        self.thisptr = new Element(toBytes(name), z)
 
     def __dealloc__(self):
         del self.thisptr
 
-    def setName(self, std_string name):
-        self.thisptr.setName(name)
+    def setName(self, name):
+        self.thisptr.setName(toBytes(name))
 
     def setAtomicNumber(self, int z):
         self.thisptr.setAtomicNumber(z)
@@ -59,28 +59,28 @@ cdef class PyElement:
     def _getMultipleMassAttenuationCoefficients(self, std_vector[double] energy):
         return self.thisptr.getMassAttenuationCoefficients(energy)
                                        
-    def setRadiativeTransitions(self, std_string shell,
+    def setRadiativeTransitions(self, shell,
                                 std_vector[std_string] labels,
                                 std_vector[double] values):
-        self.thisptr.setRadiativeTransitions(shell, labels, values)
+        self.thisptr.setRadiativeTransitions(toBytes(shell), labels, values)
 
-    def getRadiativeTransitions(self, std_string shell):
-        return self.thisptr.getRadiativeTransitions(shell)
+    def getRadiativeTransitions(self, shell):
+        return self.thisptr.getRadiativeTransitions(toBytes(shell))
 
-    def setNonradiativeTransitions(self, std_string shell,
+    def setNonradiativeTransitions(self, shell,
                                    std_vector[std_string] labels,
                                    std_vector[double] values):
-        self.thisptr.setNonradiativeTransitions(shell, labels, values)
+        self.thisptr.setNonradiativeTransitions(toBytes(shell), labels, values)
 
-    def getNonradiativeTransitions(self, std_string shell):
-        return self.thisptr.getNonradiativeTransitions(shell)
+    def getNonradiativeTransitions(self, shell):
+        return self.thisptr.getNonradiativeTransitions(toBytes(shell))
 
-    def setShellConstants(self, std_string shell,
+    def setShellConstants(self, shell,
                           std_map[std_string, double] valuesDict):
-        self.thisptr.setShellConstants(shell, valuesDict)
+        self.thisptr.setShellConstants(toBytes(shell), valuesDict)
 
-    def getShellConstants(self, std_string shell):
-        return self.thisptr.getShellConstants(shell)
+    def getShellConstants(self, shell):
+        return self.thisptr.getShellConstants(toBytes(shell))
 
     #def getXRayLines(self, std_string shell):
     #    return self.thisptr.getXRayLines(shell)
@@ -89,4 +89,4 @@ cdef class PyElement:
                             std_map[std_string, double] vacancyDict):
         return self.thisptr.getXRayLinesFromVacancyDistribution(\
                                 vacancyDict)
-    
+
