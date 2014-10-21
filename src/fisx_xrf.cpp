@@ -126,6 +126,7 @@ std::map<std::string, std::map<std::string, double> > XRF::getFluorescence(const
     double tmpDouble;
     std::string tmpString;
 
+    std::cout << "WARNING: This method is obsolete. Use any of the getMultilayerFluorescnce ones" << std::endl;
     if (actualRays.size() == 0)
     {
         // no excitation beam

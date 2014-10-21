@@ -36,6 +36,11 @@ public:
 
     /*!
     Easy to wrap funtion to set the excitation beam
+    \param energies Set of double values corresponding to energies (in keV) describing
+           the incoming beam
+    \param weight Set of weights with the relative intensity of each energy
+    \param characteristic Integer flag currently ignored by fisx library
+    \param divergency Beam divergency in degrees (currently ignored by fisx library)
     */
     void setBeam(const std::vector<double> & energies, \
                  const std::vector<double> & weight, \
@@ -44,6 +49,7 @@ public:
 
     /*!
     Funtion to set a single energy excitation beam
+    \param energy Energy of the incoming beam
     */
     void setBeam(const double & energy, const double & divergency = 0.0);
 
@@ -170,31 +176,31 @@ public:
                 const int & useGeometricEfficiency = 1, const int & useMassFractions = 0, \
                 const double & secondaryCalculationLimit = 0.0);
     /*!
-    Input
-    elementFamilyLayer - Vector of strings. Each string represents the information we are interested on.
-    "Cr"     - We want the information for Cr, for all line families and sample layers
-    "Cr K"   - We want the information for Cr, for the family of K-shell emission lines, in all layers.
+    Basis method called by all the other convenience methods.
+    \param elementFamilyLayer - Vector of strings. Each string represents the information we are interested on.\n
+    "Cr"     - We want the information for Cr, for all line families and sample layers\n
+    "Cr K"   - We want the information for Cr, for the family of K-shell emission lines, in all layers.\n
     "Cr K 0" - We want the information for Cr, for the family of K-shell emission lines, in layer 0.
-    elementsLibrary - Instance of library to be used for all the Physical constants
-    secondary - Flag to indicate different levels of secondary excitation to be considered.
-                0 Means not considered
-                1 Consider secondary excitation
-                2 Consider tertiary excitation
-    useGeometricEfficiency - Take into account solid angle or not. Default is 1 (yes)
+    \param elementsLibrary - Instance of library to be used for all the Physical constants
+    \param secondary - Flag to indicate different levels of secondary excitation to be considered.\n
+                0 Means not considered\n
+                1 Consider secondary excitation\n
+                2 Consider tertiary excitation\n
+    \param useGeometricEfficiency - Take into account solid angle or not. Default is 1 (yes)
 
-    useMassFractions - If 0 (default) the output corresponds to the requested information if the mass
+    \param useMassFractions - If 0 (default) the output corresponds to the requested information if the mass
     fraction of the element would be one on each calculated sample layer. To get the actual signal, one
     has to multiply the rates by the actual mass fraction of the element on each sample layer.
                        If set to 1, the rate will be already corrected by the actual mass fraction.
 
-    Return a complete output of the form
-    [Element Family][Layer][line]["energy"] - Energy in keV of the emission line
-    [Element Family][Layer][line]["primary"] - Primary rate prior to correct for detection efficiency
-    [Element Family][Layer][line]["secondary"] - Secondary rate prior to correct for detection efficiency
-    [Element Family][Layer][line]["rate"] - Overall rate
-    [Element Family][Layer][line]["efficiency"] - Detection efficiency
+    \return Return a complete output of the form:\n
+    [Element Family][Layer][line]["energy"] - Energy in keV of the emission line\n
+    [Element Family][Layer][line]["primary"] - Primary rate prior to correct for detection efficiency\n
+    [Element Family][Layer][line]["secondary"] - Secondary rate prior to correct for detection efficiency\n
+    [Element Family][Layer][line]["rate"] - Overall rate\n
+    [Element Family][Layer][line]["efficiency"] - Detection efficiency\n
     [Element Family][Layer][line][element line layer] - Secondary rate (prior to correct for detection efficiency)
-    due to the fluorescence from the given element, line and layer index composing the map key.
+    due to the fluorescence from the given element, line and layer index composing the map key.\n
     [Element Family][Layer][line]["massFraction"] - Mass fraction of the element in the considered layer
     */
     std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, double> > > > \
