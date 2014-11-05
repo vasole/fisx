@@ -3,6 +3,9 @@
 #include <stdexcept>
 #include <algorithm>
 
+namespace fisx
+{
+
 Layer::Layer(const std::string & name, const double & density, \
              const double & thickness, const double & funnyFactor)
 {
@@ -232,3 +235,4 @@ std::ostream& operator<< (std::ostream& o, Layer const & layer)
     return o;
 }
 
+} // namespace fisx

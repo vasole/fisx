@@ -4,6 +4,9 @@
 #include <math.h>
 #include <stdexcept>
 
+namespace fisx
+{
+
 Element::Element()
 {
     // Default constructor required
@@ -1616,3 +1619,5 @@ int Element::isCascadeCacheFilled() const
         return 0;
     }
 }
+
+} // namespace fisx

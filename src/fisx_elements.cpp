@@ -7,6 +7,9 @@
 #include <algorithm>
 #include "fisx_elements.h"
 
+namespace fisx
+{
+
 Elements::Elements(std::string epdl97Directory, std::string bindingEnergiesFileName, std::string crossSectionsFile)
 {
     // this is to simplify an initialization equivalent to that of PyMca:
@@ -1798,3 +1801,5 @@ void Elements::emptyElementCascadeCache(const std::string & elementName)
     else
         throw std::invalid_argument("Invalid element: " + elementName);
 }
+
+} // namespace fisx

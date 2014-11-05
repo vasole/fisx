@@ -5,6 +5,10 @@
 #include <vector>
 #include <map>
 
+
+namespace fisx
+{
+
 class Shell
 {
 public:
@@ -103,4 +107,7 @@ private:
     std::map<std::string, std::map<std::string, double> > costerKronigRatios;
     std::map<std::string, double> fluorescenceRatios;
 };
-#endif
+
+} // namespace fisx
+
+#endif // FISX_SHELL_H

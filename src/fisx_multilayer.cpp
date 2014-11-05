@@ -6,6 +6,9 @@
 #include <sstream>
 #include <iomanip>
 
+namespace fisx
+{
+
 std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, double> > > > \
                 XRF::getMultilayerFluorescence(const std::vector<std::string> & elementList,
                                                const Elements & elementsLibrary, \
@@ -919,3 +922,4 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
     return actualResult;
 }
 
+} // namespace fisx

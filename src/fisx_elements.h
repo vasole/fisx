@@ -15,6 +15,9 @@
 #include "fisx_epdl97.h"
 #include "fisx_material.h"
 
+namespace fisx
+{
+
 /*!
   \class Elements
   \brief Class handling the physical properties
@@ -393,4 +396,7 @@ private:
 };
 
 };
-#endif
+
+} // namespace fisx
+
+#endif //FISX_ELEMENTS_H

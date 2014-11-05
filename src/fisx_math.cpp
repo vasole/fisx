@@ -4,6 +4,9 @@
 #include <stdexcept>
 #include <iostream>
 
+namespace fisx
+{
+
 double Math::E1(const double & x)
 {
     if (x == 0)
@@ -645,3 +648,5 @@ double Math::hypermet(const double & x, \
     return result;
 
 }
+
+} // namespace fisx

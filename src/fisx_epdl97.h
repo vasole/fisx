@@ -5,6 +5,9 @@
 #include <vector>
 #include <map>
 
+namespace fisx
+{
+
 class EPDL97
 {
 public:
@@ -70,5 +73,7 @@ private:
     // K, L1, L2, L3, M1, M2, M3, M4, M5, "all other"
     void initPartialPhotoelectricCoefficients();
 };
-#endif
-// FISX_EPDL97_H
+
+} // namespace fisx
+
+#endif // FISX_EPDL97_H

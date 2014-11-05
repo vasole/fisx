@@ -4,6 +4,8 @@
 #include "fisx_elements.h"
 #include <iostream>
 
+namespace fisx
+{
 
 class XRF
 {
@@ -294,4 +296,7 @@ private:
 
     expectedLayerEmissionType lastMultilayerFluorescence;
 };
-#endif
+
+} // namespace fisx
+
+#endif // FISX_XRF_H

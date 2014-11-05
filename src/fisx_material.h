@@ -4,6 +4,9 @@
 #include <vector>
 #include <map>
 
+namespace fisx
+{
+
 /*!
   \class Material
   \brief Class containing the composition of a material
@@ -59,5 +62,7 @@ private:
     double defaultThickness;
     std::string    comment;
 };
+
+} // namespace fisx
 
 #endif //FISX_MATERIAL_H

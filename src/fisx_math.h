@@ -1,6 +1,9 @@
 #ifndef FISX_DEBOER_H
 #define FISX_DEBOER_H
 
+namespace fisx
+{
+
 /*!
   \class Math
   \brief Common fluorescence spectroscopy math functions
@@ -161,4 +164,7 @@ class Math
                         const double & epsilon = 1.0e-7, \
                         const int & maxIter = 100);
 };
+
+} // namespace fisx
+
 #endif // FISX_DEBOER_H

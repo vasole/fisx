@@ -7,6 +7,9 @@
 #include "fisx_shell.h"
 #include "fisx_epdl97.h"
 
+namespace fisx
+{
+
 class Element
 {
 public:
@@ -326,5 +329,7 @@ private:
     // cascade and fluorescence yields
     std::map<std::string, std::map<std::string, std::map<std::string, double> > > cascadeCache;
 };
-#endif
-// FISX_ELEMENT_H
+
+} // namespace fisx
+
+#endif // FISX_ELEMENT_H

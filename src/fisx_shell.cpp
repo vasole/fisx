@@ -6,6 +6,9 @@
 #include "fisx_shell.h"
 // #include <iostream>
 
+namespace fisx
+{
+
 Shell::Shell()
 {
     this->shellConstants["omega"] = 0.0;
@@ -643,3 +646,5 @@ bool Shell::StringToInteger(const std::string& str, int & number)
     }
     return true;
 }
+
+} // namespace fisx

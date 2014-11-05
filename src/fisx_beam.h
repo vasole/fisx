@@ -4,6 +4,9 @@
 #include <vector>
 #include <iostream>
 
+namespace fisx
+{
+
 struct Ray
 {
     double energy;
@@ -84,5 +87,7 @@ private:
     void normalizeBeam(void);
     std::vector<Ray> rays;
 };
+
+} // namespace fisx
 
 #endif //FISX_BEAM_H

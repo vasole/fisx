@@ -6,6 +6,9 @@
 #include <cctype>
 #define isNumber(x) ( isdigit(x) || x == '-' || x == '+' || x == '.' || x == 'E' || x == 'e')
 
+namespace fisx
+{
+
 SimpleSpecfile::SimpleSpecfile()
 {
     this->fileName = "";
@@ -260,3 +263,5 @@ std::vector<std::vector<double> > SimpleSpecfile::getScanData(int scanIndex)
     }
     return result;
 }
+
+} // namespace fisx

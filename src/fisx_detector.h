@@ -2,6 +2,9 @@
 #define FISX_DETECTOR_H
 #include "fisx_layer.h"
 
+namespace fisx
+{
+
 /*!
   \class Detector
   \brief Class describing the detector.
@@ -82,5 +85,7 @@ private:
     std::map< std::string, std::map<std::string, std::map<std::string, double> > > escapePeakCache;
     // TODO: Calibration, fano, noise, and so on.
 };
+
+} // namespace fisx
 
 #endif //FISX_DETECTOR_H

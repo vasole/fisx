@@ -4,6 +4,9 @@
 #include <vector>
 #include <map>
 
+namespace fisx
+{
+
 #ifdef SCAN_CLASS
 class SpecfileScan
 {
@@ -19,7 +22,7 @@ public:
 private:
     std::vector<std::string> scanBuffer;
 };
-#endif
+#endif // SCAN_CLASS
 
 
 class SimpleSpecfile
@@ -44,4 +47,7 @@ private:
     std::vector<std::pair<long, long> > scanFilePositions;
     std::vector<std::streampos> scanPosition;
 };
-#endif
+
+} // namespace fisx
+
+#endif // FISX_SIMPLE_SPECFILE_H

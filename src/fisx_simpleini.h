@@ -6,6 +6,9 @@
 #include <sstream>
 #include <locale>  // std::locale, std::tolower, std::toupper
 
+namespace fisx
+{
+
 class SimpleIni
 {
 public:
@@ -119,4 +122,7 @@ private:
     std::map<std::string, long> sectionPositions;
     std::map<std::string, std::string>  defaultContent;
 };
-#endif
+
+} // namespace fisx
+
+#endif // FISX_SIMPLE_INI_H

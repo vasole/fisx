@@ -1,6 +1,9 @@
 #include "fisx_beam.h"
 #include <algorithm>
 
+namespace fisx
+{
+
 Beam::Beam()
 {
     this->normalized = false;
@@ -230,3 +233,4 @@ std::ostream& operator<< (std::ostream& o, Beam const & beam)
     return o;
 }
 
+} // namespace fisx

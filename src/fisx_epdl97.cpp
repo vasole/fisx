@@ -5,6 +5,9 @@
 #include <math.h>
 
 
+namespace fisx
+{
+
 EPDL97::EPDL97()
 {
     this->initialized = false;
@@ -792,3 +795,5 @@ std::pair<long, long> EPDL97::getInterpolationIndices(const std::vector<double> 
     result.second = (long) iMax;
     return result;
 }
+
+} // namespace fisx

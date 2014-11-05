@@ -2,6 +2,9 @@
 #include <math.h>
 #include <stdexcept>
 
+namespace fisx
+{
+
 Detector::Detector(const std::string & name, const double & density, const double & thickness, \
                   const double & funnyFactor): Layer(name, density, thickness, funnyFactor)
 {
@@ -122,3 +125,5 @@ std::map<std::string, std::map<std::string, double> > Detector::getEscape(const 
                                          this->escapePeakAlphaIn);
     }
 }
+
+} // namespace fisx

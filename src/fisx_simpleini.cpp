@@ -4,6 +4,9 @@
 #include <stdexcept>
 #include <stdlib.h>
 
+namespace fisx
+{
+
 SimpleIni::SimpleIni()
 {
     this->fileName = "";
@@ -294,3 +297,5 @@ const std::map<std::string, std::string > & SimpleIni::readSection(const std::st
     }
     return this->sectionContents[key];
 }
+
+} // namespace fisx

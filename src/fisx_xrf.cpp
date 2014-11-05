@@ -7,6 +7,9 @@
 #include <sstream>
 #include <iomanip>
 
+namespace fisx
+{
+
 XRF::XRF()
 {
     // initialize geometry with default parameters
@@ -803,3 +806,5 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                            layerList, familyList, secondary, useGeometricEfficiency, \
                                            useMassFractions, secondaryCalculationLimit);
 }
+
+} // namespace fisx

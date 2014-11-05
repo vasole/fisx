@@ -2,6 +2,9 @@
 #include "fisx_material.h"
 #include <iostream>
 
+namespace fisx
+{
+
 Material::Material()
 {
     this->initialized = false;
@@ -129,3 +132,5 @@ std::string Material::getComment() const
 {
     return this->comment;
 }
+
+} // namespace fisx

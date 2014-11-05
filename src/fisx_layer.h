@@ -5,6 +5,9 @@
 #include <iostream>
 #include "fisx_elements.h"
 
+namespace fisx
+{
+
 /*!
   \class Layer
   \brief Class containing the composition of a layer
@@ -106,5 +109,7 @@ private:
     double density;
     double thickness;
 };
+
+} // namespace fisx
 
 #endif //FISX_LAYER_H

@@ -4,6 +4,9 @@
 #include <iostream>
 #include <algorithm>
 
+namespace fisx
+{
+
 XRFConfig::XRFConfig()
 {
     this->setGeometry(45.0, 45.0, 90.);
@@ -443,3 +446,4 @@ std::ostream& operator<< (std::ostream& o, XRFConfig const& config)
     return o;
 }
 
+} // namespace fisx

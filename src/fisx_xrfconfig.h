@@ -4,6 +4,9 @@
 #include "fisx_detector.h"
 #include "fisx_beam.h"
 
+namespace fisx
+{
+
 class XRFConfig
 {
 public:
@@ -127,4 +130,7 @@ private:
     detector returns a set of peaks (with labels!) for each incoming energy. Escape peaks handled. Sum peaks not yet.
     */
 };
-#endif
+
+} // namespace fisx
+
+#endif // FISX_SRF_CONFIG_H
