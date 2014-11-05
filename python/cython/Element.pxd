@@ -8,7 +8,7 @@ from libcpp.map cimport map as std_map
 
 from Shell cimport *
 
-cdef extern from "fisx_element.h":
+cdef extern from "fisx_element.h" namespace "fisx":
     cdef cppclass Element:
         Element(std_string, int) except +
 

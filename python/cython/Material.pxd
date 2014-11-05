@@ -6,7 +6,7 @@ from libcpp.string cimport string as std_string
 from libcpp.vector cimport vector as std_vector
 from libcpp.map cimport map as std_map
 
-cdef extern from "fisx_material.h":
+cdef extern from "fisx_material.h" namespace "fisx":
     cdef cppclass Material:
         Material(std_string, double, double, std_string) except +
 

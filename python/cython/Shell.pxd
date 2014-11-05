@@ -6,7 +6,7 @@ from libcpp.string cimport string as std_string
 from libcpp.vector cimport vector as std_vector
 from libcpp.map cimport map as std_map
 
-cdef extern from "fisx_shell.h":
+cdef extern from "fisx_shell.h" namespace "fisx":
     cdef cppclass Shell:
         Shell(std_string) except +
         void setRadiativeTransitions(std_vector[std_string], std_vector[double]) except +

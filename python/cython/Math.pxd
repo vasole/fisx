@@ -4,7 +4,7 @@ cimport cython
 
 from libcpp.vector cimport vector as std_vector
 
-cdef extern from "fisx_math.h":
+cdef extern from "fisx_math.h" namespace "fisx":
     cdef cppclass Math:
         Math()
 

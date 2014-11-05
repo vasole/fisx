@@ -10,7 +10,7 @@ from libcpp.map cimport pair as std_pair
 from Elements cimport *
 from Material cimport *
 
-cdef extern from "fisx_layer.h":
+cdef extern from "fisx_layer.h" namespace "fisx":
     cdef cppclass Layer:
         Layer(std_string, double, double, double)
 

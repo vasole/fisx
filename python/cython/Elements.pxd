@@ -9,7 +9,7 @@ from libcpp.pair cimport pair as std_pair
 
 from Material cimport *
 
-cdef extern from "fisx_elements.h":
+cdef extern from "fisx_elements.h" namespace "fisx":
     cdef cppclass Elements:
         Elements(std_string) except +
         Elements(std_string, std_string) except +

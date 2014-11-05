@@ -10,7 +10,7 @@ from Detector cimport *
 from Elements cimport *
 from Layer cimport *
 
-cdef extern from "fisx_xrf.h":
+cdef extern from "fisx_xrf.h" namespace "fisx":
     cdef cppclass XRF:
         XRF() except +
         XRF(std_string) except +

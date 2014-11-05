@@ -6,7 +6,7 @@ from libcpp.string cimport string as std_string
 from libcpp.vector cimport vector as std_vector
 from libcpp.map cimport map as std_map
 
-cdef extern from "fisx_epdl97.h":
+cdef extern from "fisx_epdl97.h" namespace "fisx":
     cdef cppclass EPDL97:
         EPDL97(std_string) except +
         void setDataDirectory(std_string) except +        

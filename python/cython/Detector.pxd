@@ -8,7 +8,7 @@ from libcpp.map cimport map as std_map
 
 from Elements cimport *
 
-cdef extern from "fisx_detector.h":
+cdef extern from "fisx_detector.h" namespace "fisx":
     cdef cppclass Detector:
         Detector(std_string, double, double, double) except +
 

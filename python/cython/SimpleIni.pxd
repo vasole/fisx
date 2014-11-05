@@ -6,7 +6,7 @@ from libcpp.string cimport string as std_string
 from libcpp.vector cimport vector as std_vector
 from libcpp.map cimport map as std_map
 
-cdef extern from "fisx_simpleini.h":
+cdef extern from "fisx_simpleini.h" namespace "fisx":
     cdef cppclass SimpleIni:
         SimpleIni() except +
         SimpleIni(std_string) except +
