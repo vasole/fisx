@@ -1,7 +1,9 @@
 include MANIFEST.in
-include ../LICENSE
-include ../changelog.txt
-include ../README.md
-recursive-include ../fisx_data *.dat
-recursive-include ../python *.py *.pyx *.pyd *.cpp
-recursive-include ../src *.h *.cpp
+include LICENSE
+include changelog.txt
+include README.md
+include README
+include TODO
+recursive-include fisx_data *.dat
+recursive-include python *.py *.pyx *.pxd *.cpp
+recursive-include src *.h *.cpp
