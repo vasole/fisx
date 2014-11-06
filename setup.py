@@ -6,6 +6,9 @@ from distutils.core import setup, Extension
 from distutils.sysconfig import get_python_lib
 try:
     from Cython.Distutils import build_ext
+    from Cython.Compiler.Version import version
+    if version < "0.17":
+        build_ext = None
 except:
     build_ext = None
 import numpy
