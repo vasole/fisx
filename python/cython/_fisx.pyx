@@ -724,7 +724,14 @@ cdef class PySimpleSpecfile:
 
     def getScanData(self, int scanIndex):
         return self.thisptr.getScanData(scanIndex)
-#import numpy as np
+cimport cython
+
+#from libcpp.string cimport string as std_string
+
+from Version cimport fisxVersion as _fisxVersion
+
+def fisxVersion():
+    return _fisxVersion()#import numpy as np
 #cimport numpy as np
 cimport cython
 

@@ -9,3 +9,9 @@ from ._fisx import PyDetector as Detector
 from ._fisx import PyXRF as XRF
 from ._fisx import PyMath as Math
 from ._fisx import PyMaterial as Material
+from ._fisx import fisxVersion
+
+__version__ = fisxVersion()
+
+def version():
+    return __version__
