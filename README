@@ -1,0 +1,18 @@
+fisx
+====
+
+C++ port (with enhancements) of the PyMca Physics routines.
+
+This library allows to calculate the expected X-ray fluorescence intensities measured by a detection system.
+
+Account for scondary excitation is made via the reference:
+
+D.K.G. de Boer, X-Ray Spectrometry 19 (1990) 145-154
+
+with the correction mentioned in:
+
+D.K.G. de Boer et al, X-Ray Spectrometry 22 (1993) 33-28
+
+Tertiary excitation is accounted for with an appproximation.
+
+The accuracy of the corrections has been tested against experimental data and Monte Carlo simulations.

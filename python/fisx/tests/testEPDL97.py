@@ -8,8 +8,7 @@ import numpy
 import time
 import os
 import sys
-from fisx import EPDL97
-#from PyMca import Elements
+
 ElementList= ['H', 'He', 
             'Li', 'Be', 'B', 'C', 'N', 'O', 'F', 'Ne',
             'Na', 'Mg', 'Al', 'Si', 'P', 'S', 'Cl', 'Ar',
@@ -32,12 +31,8 @@ def getSymbol(z):
 def getZ(ele):
     return ElementList.index(ele) + 1
 
-try:
-    from fisx import DataDir
-except:
-    print("\nUsing PyMca data directory\n")
-    from PyMca import PyMcaDataDir as DataDir
-
+#from fisx import EPDL97
+#from fisx import DataDir
 
 class testEPDL97(unittest.TestCase):
     def setUp(self):
@@ -58,12 +53,10 @@ class testEPDL97(unittest.TestCase):
                         'Unsuccessful fisx.EPDL97 import')
     
     def testEPDL97BindingVersusPyMcaEPDL97Binding(self):
-        from PyMca import PyMcaEPDL97
-        from PyMca import PyMcaDataDir
-        #dirname = PyMcaDataDir.PYMCA_DATA_DIR
+        from PyMca5.PyMca import PyMcaEPDL97
         from fisx import DataDir
-        dirname = DataDir.DATA_DIR
-        epdl = EPDL97(dirname)
+        dirname = DataDir.FISX_DATA_DIR
+        epdl = self.epdl97(dirname)
         for i in range(1, 99):
             pymca = PyMcaEPDL97.EPDL97_DICT[getSymbol(i)]['binding']
             cpp = epdl.getBindingEnergies(i)
@@ -75,12 +68,10 @@ class testEPDL97(unittest.TestCase):
         epdl = None
         
     def testEPDL97MuVersusPyMcaEPDL97Mu(self):
-        from PyMca import PyMcaEPDL97
-        from PyMca import PyMcaDataDir
-        #dirname = PyMcaDataDir.PYMCA_DATA_DIR
+        from PyMca5.PyMca import PyMcaEPDL97
         from fisx import DataDir
-        dirname = DataDir.DATA_DIR
-        epdl = EPDL97(dirname)
+        dirname = DataDir.FISX_DATA_DIR
+        epdl = self.epdl97(dirname)
         x = numpy.linspace(1.0, 80., 157)
         for j in range(1, 100):
             pymca = PyMcaEPDL97.getElementCrossSections(getSymbol(j), x)
@@ -103,12 +94,10 @@ class testEPDL97(unittest.TestCase):
         epdl = None
 
     def testEPDL97PartialVersusPyMcaPartial(self):
-        from PyMca import PyMcaEPDL97
-        from PyMca import PyMcaDataDir
-        #dirname = PyMcaDataDir.PYMCA_DATA_DIR
+        from PyMca5.PyMca import PyMcaEPDL97
         from fisx import DataDir
-        dirname = DataDir.DATA_DIR
-        epdl = EPDL97(dirname)
+        dirname = DataDir.FISX_DATA_DIR
+        epdl = self.epdl97(dirname)
         pymca = PyMcaEPDL97.getElementCrossSections('Pb')
         idx = numpy.nonzero((pymca['energy'] > 1.0) & \
                             (pymca['energy'] < 100))[0]
@@ -128,7 +117,7 @@ class testEPDL97(unittest.TestCase):
                     self.assertTrue(delta < tol,
                         "Default E, z = %d, shell = %s, energy = %f, delta = %f" %\
                             (j, key, x[i], delta))
-        #print("Photoelectric weights OK at default energies")
+        print("Photoelectric weights OK at default energies")
         x += 0.123
         for j in range(1, 100):
             cpp = epdl.getPhotoelectricWeights(j, x)
@@ -145,8 +134,7 @@ class testEPDL97(unittest.TestCase):
                     self.assertTrue(delta < tol,
                         "z = %d, shell = %s, energy = %f, delta = %f" %\
                             (j, key, x[i], delta))
-        #print("Photoelectric weights OK at any energy")
-
+        print("Photoelectric weights OK at any energy")
 
 def getSuite(auto=True):
     testSuite = unittest.TestSuite()

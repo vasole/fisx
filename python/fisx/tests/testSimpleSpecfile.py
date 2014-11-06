@@ -99,8 +99,8 @@ class testSimpleSpecfile(unittest.TestCase):
     def testSimpleSpecfileVersusPyMca(self):
         import glob
         try:
-            from PyMca import PyMcaDataDir
-            from PyMca.PyMcaIO import specfilewrapper as Specfile
+            from PyMca5 import PyMcaDataDir
+            from PyMca5.PyMcaIO import specfilewrapper as Specfile
         except ImportError:
             print("\n ****** Skipping: PyMca not installed ******* \n")
             return

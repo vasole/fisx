@@ -1,0 +1,7 @@
+VERSION 1.0.0
+
+First release.
+
+Secondary excitation due to fluorescence and elastic scattering considered.
+
+Tertiary implemented via an approximation method.
