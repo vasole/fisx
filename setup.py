@@ -4,13 +4,35 @@ import os
 import sys
 from distutils.core import setup, Extension
 from distutils.sysconfig import get_python_lib
-try:
-    from Cython.Distutils import build_ext
-    from Cython.Compiler.Version import version
-    if version < "0.17":
+
+# check if cython is not to be used despite being present
+def use_cython():
+    """
+    Check if cython is disabled from the command line or the environment.
+    """
+    if "WITH_CYTHON" in os.environ:
+        if os.environ["WITH_CYTHON"] == "False":
+            print("No Cython requested by environment")
+            return False
+    
+    if ("--no-cython" in sys.argv):
+        sys.argv.remove("--no-cython")
+        os.environ["WITH_CYTHON"] = "False"
+        print("No Cython requested by command line")
+        return False
+    return True
+
+if use_cython():
+    try:
+        from Cython.Distutils import build_ext
+        from Cython.Compiler.Version import version
+        if version < "0.17":
+            build_ext = None
+    except:
         build_ext = None
-except:
+else:
     build_ext = None
+
 import numpy
 # deal with required data
 
