@@ -7,7 +7,7 @@ FISX_DOC_DIR = 'DOC_DIR_FROM_SETUP'
 if not os.path.exists(FISX_DATA_DIR):
     tmp_dir = os.path.dirname(__file__)
     old_tmp_dir = tmp_dir + "dummy"
-    basename = os.path.basename(DATA_DIR)
+    basename = os.path.basename(FISX_DATA_DIR)
     FISX_DATA_DIR = os.path.join(tmp_dir, "fisx", basename)
     while (len(FISX_DATA_DIR) > 14) and (tmp_dir != old_tmp_dir):
         if os.path.exists(FISX_DATA_DIR):
