@@ -1,0 +1,32 @@
+package:
+  name: fisx
+  version: {{ environ.get('GIT_DESCRIBE_TAG', '')[1:] }}
+
+source:
+  git_url: ../
+  git_tag: master # change to branch or tag name, as needed
+
+build:
+  number: {{ environ.get('GIT_DESCRIBE_NUMBER', 0) }}
+  detect_binary_files_with_prefix: true
+
+requirements:
+  build:
+    - python
+    - cython
+    - numpy
+  run:
+    - python
+    - numpy
+    - pymca
+
+test:
+  requires:
+    - pymca
+  imports:
+    - fisx
+
+about:
+  license: MIT
+  home: http://pymca.sourceforge.net
+  summary: Resources for synchrotron data analysis
