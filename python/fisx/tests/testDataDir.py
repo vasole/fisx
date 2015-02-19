@@ -28,12 +28,12 @@ class testDataDir(unittest.TestCase):
         try:
             from fisx import DataDir
             self._importSuccess = True
-            self.dataDir = DataDir.DATA_DIR
+            self.dataDir = DataDir.FISX_DATA_DIR
         except:
             self.dataDir = None
 
         try:
-            self.docDir = DataDir.DOC_DIR
+            self.docDir = DataDir.FISX_DOC_DIR
         except:
             self.docDir = None
 
@@ -41,7 +41,7 @@ class testDataDir(unittest.TestCase):
         self.assertTrue(self._importSuccess,
                         'Unsuccessful fisx.DataDir import')
         self.assertTrue(self.dataDir is not None,
-                        'Unassigned fisx.DataDir.DATA_DIR')
+                        'Unassigned fisx.DataDir.FISX_DATA_DIR')
         self.assertTrue(os.path.exists(self.dataDir),
                         'Directory "%s" does not exist' % self.dataDir)
         self.assertTrue(os.path.isdir(self.dataDir),
@@ -76,7 +76,7 @@ class testDataDir(unittest.TestCase):
         self.assertTrue(self._importSuccess,
                         'Unsuccessful fisx.DataDir import')
         self.assertTrue(self.docDir is not None,
-                        'Unassigned fisx.DataDir.DOC_DIR')
+                        'Unassigned fisx.DataDir.FISX_DOC_DIR')
         #self.assertTrue(os.path.exists(self.docDir),
         #                'Directory "%s" does not exist' % self.docDir)
         #self.assertTrue(os.path.isdir(self.docDir),
