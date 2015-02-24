@@ -18,7 +18,7 @@ struct Ray
     {
         energy = 0.0;
         weight = 0.0;
-        characteristic = 0.0;
+        characteristic = 0;
         divergency = 0.0;
     }
 
