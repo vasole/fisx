@@ -731,7 +731,8 @@ cimport cython
 from Version cimport fisxVersion as _fisxVersion
 
 def fisxVersion():
-    return _fisxVersion()#import numpy as np
+    return _fisxVersion()
+#import numpy as np
 #cimport numpy as np
 cimport cython
 
