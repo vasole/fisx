@@ -15,12 +15,12 @@ Initialization with XCOM parameters from fisx:
 
 import os
 from fisx import DataDir
-dataDir = DataDir.DATA_DIR
+dataDir = DataDir.FISX_DATA_DIR
 bindingEnergies = os.path.join(dataDir, "BindingEnergies.dat")
 xcomFile = os.path.join(dataDir, "XCOM_CrossSections.dat")
 xcom = Elements(dataDir, bindingEnergies, xcomFile)
 
-Initialization with XCOM parameters from PyMca:
+Initialization with XCOM parameters and binding energies from PyMca:
 
 import os
 from PyMca5 import PyMcaDataDir
@@ -29,7 +29,7 @@ bindingEnergies = os.path.join(dataDir, "BindingEnergies.dat")
 xcomFile = os.path.join(dataDir, "XCOM_CrossSections.dat")
 # This is needed because PyMca does not have the non-radiative rates
 from fisx import DataDir
-dataDir = DataDir.DATA_DIR
+dataDir = DataDir.FISX_DATA_DIR
 xcom = Elements(dataDir, bindingEnergies, xcomFile)
 
 """
@@ -41,7 +41,7 @@ cdef class PyElements:
                         crossSectionsFile=""):
         if len(directoryName) == 0:
             from fisx import DataDir
-            directoryName = DataDir.DATA_DIR
+            directoryName = DataDir.FISX_DATA_DIR
         directoryName = toBytes(directoryName)
         bindingEnergiesFile = toBytes(bindingEnergiesFile)
         crossSectionsFile = toBytes(crossSectionsFile)
@@ -53,15 +53,18 @@ cdef class PyElements:
             self.thisptr.setMassAttenuationCoefficientsFile(crossSectionsFile)
 
     def initializeAsPyMca(self):
+        """
+        Configure the instance to use the same set of data as PyMca.
+        """
         import os
         try:
             from fisx import DataDir
-            directoryName = DataDir.DATA_DIR
+            directoryName = DataDir.FISX_DATA_DIR
             from PyMca5 import PyMcaDataDir
             dataDir = PyMcaDataDir.PYMCA_DATA_DIR
         except ImportError:
             from fisx import DataDir
-            directoryName = DataDir.DATA_DIR
+            directoryName = DataDir.FISX_DATA_DIR
             dataDir = directoryName
         bindingEnergies = os.path.join(dataDir, "BindingEnergies.dat")
         xcomFile = os.path.join(dataDir, "XCOM_CrossSections.dat")
@@ -280,3 +283,4 @@ cdef class PyElements:
 
     def removeMaterials(self):
         self.thisptr.removeMaterials()
+
