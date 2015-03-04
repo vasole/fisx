@@ -1,2 +1,2 @@
 - Add doc strings based on the C++ doxygen information to the python binding.
-- Possibility to save and to load the configuration in own fix format.
+- Possibility to save and to load the configuration in own fisx format.
