@@ -36,6 +36,8 @@ elementsInstance.addMaterial(SRM_1155)
 xrf.setSample([["SRM_1155", 1.0, 1.0]]) # Sample, density and thickness
 xrf.setGeometry(45., 45.)               # Incident and fluorescent beam angles
 detector = Detector("Si1", 2.33, 0.035) # Detector Material, density, thickness
+detector.setActiveArea(0.50)            # Area and distance in consistent units
+detector.setDistance(2.1)               # expected cm2 and cm.
 xrf.setDetector(detector)
 Air = Material("Air", 0.0012048, 1.0)
 Air.setCompositionFromLists(["C1", "N1", "O1", "Ar1", "Kr1"],
@@ -45,7 +47,8 @@ xrf.setAttenuators([["Air", 0.0012048, 5.0, 1.0],
                     ["Be1", 1.848, 0.002, 1.0]]) # Attenuators
 fluo = xrf.getMultilayerFluorescence(["Cr K", "Fe K"],
                                      elementsInstance,
-                                     secondary=1)
+                                     secondary=1,
+                                     useMassFractions=1)
 print("Element   Peak      Energy      Rate     Correction Factor")
 for key in fluo:
     for layer in fluo[key]:
