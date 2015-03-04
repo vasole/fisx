@@ -1,10 +1,21 @@
 fisx
 ====
 
-C++ port (with enhancements) of the PyMca Physics routines.
+This software library implements the needed formulas to calculate the expected theoretical fluorescence intensities that would be measured given an experimental setup. The library accounts for secondary and tertiary excitation, K, L and M shell emission lines and de-excitation cascade effects. The basic implementation is written in C++ and a Python binding is provided.
+
+License
+-------
+
+This code is relased under the MIT license as detailed in the LICENSE file.
+
+Installation
+------------
+
+To build the library for python use, just use the "python setup.py install" approach. It is convenient (but not mandatory) to have cython >= 0.17 installed.
+
 
 Example
-=======
+-------
 
 This piece of Python code shows how the library can be used via its python binding.
 
