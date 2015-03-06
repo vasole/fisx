@@ -223,7 +223,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                 sampleLayerMuTotal[iLayer] = tmpStringDoubleVecMap["total"];
 
                 sampleLayerRates[iLayer].push_back((weights[iRay] * sampleLayerWeight[iLayer])*\
-                      tmpStringDoubleVecMap["coherent"].back() / tmpStringDoubleVecMap["total"].back());
+                tmpStringDoubleVecMap["coherent"].back());
             }
         }
         // we start calculation
@@ -898,13 +898,27 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                         it->second["tertiary"] = 0.0;
                         continue;
                     }
-                    for (contributingKeysIt = contributingKeys.begin(); \
-                         contributingKeysIt != contributingKeys.end(); ++contributingKeysIt)
+                    if (it->first.find("esc") != std::string::npos)
                     {
-                        if (it->second.find(contributingKeysIt->first) != it->second.end())
+                        // this is a escape line -> the contribution to be used is the one of
+                        // the originating line that should already be calculated
+                        key = it->first.substr(0, it->first.find(" "));
+                        tertiary = (it->second["primary"] + it->second["secondary"]) * \
+                                   (actualResultIt->second[iLayer][key]["tertiary"] /  \
+                                   (actualResultIt->second[iLayer][key]["primary"] +   \
+                                    actualResultIt->second[iLayer][key]["secondary"] + \
+                                    actualResultIt->second[iLayer][key]["tertiary"]));
+                    }
+                    else
+                    {
+                        for (contributingKeysIt = contributingKeys.begin(); \
+                             contributingKeysIt != contributingKeys.end(); ++contributingKeysIt)
                         {
-                            tertiary += it->second[contributingKeysIt->first] * \
-                                        (contributingKeysIt->second - 1.0);
+                            if (it->second.find(contributingKeysIt->first) != it->second.end())
+                            {
+                                tertiary += it->second[contributingKeysIt->first] * \
+                                            (contributingKeysIt->second - 1.0);
+                            }
                         }
                     }
                     it->second["tertiary"] = tertiary;
