@@ -477,7 +477,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                         std::cout << c_it->first << "primary = " << result[c_it->first]["primary"] << std::endl;
                         std::cout << c_it->first << "sampleLayerWeight = " << sampleLayerWeight[iLayer] << std::endl;
                         std::cout << c_it->first << "Excitation E = " << energies[iRay] << std::endl;
-                        std::cout << c_it->first << "FLuoresnce E = " << result[c_it->first]["energy"] << std::endl;
+                        std::cout << c_it->first << "Fluorescence E = " << result[c_it->first]["energy"] << std::endl;
                         std::cout << c_it->first << "mu_1_i = " << mu_1_i << std::endl;
                         std::cout << c_it->first << "mu_1_lambda = " << mu_1_lambda<< std::endl;
                         std::cout << c_it->first << "d * t = " << density_1 * thickness_1 << std::endl;
