@@ -848,7 +848,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                         // this is a escape line -> Ignore it
                         continue;
                     }
-                    if (it->second["massFraction"] < 1.0E-2)
+                    if (it->second["massFraction"] < 5.0E-3)
                     {
                         // one should be able to neglect tertiary excitation from elements
                         // with less than 1 % concentration
@@ -906,8 +906,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                         tertiary = (it->second["primary"] + it->second["secondary"]) * \
                                    (actualResultIt->second[iLayer][key]["tertiary"] /  \
                                    (actualResultIt->second[iLayer][key]["primary"] +   \
-                                    actualResultIt->second[iLayer][key]["secondary"] + \
-                                    actualResultIt->second[iLayer][key]["tertiary"]));
+                                    actualResultIt->second[iLayer][key]["secondary"]));
                     }
                     else
                     {

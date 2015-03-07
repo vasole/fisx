@@ -2,11 +2,7 @@
 #define FISX_VERSION_H
 #include <string>
 
-#define FISX_VERSION_STR "1.0.1"
-/*
-   FISX_VERSION is (major << 16) + (minor << 8) + patch.
-*/
-#define FISX_VERSION_HEX 0x010001
+#define FISX_VERSION_STR "1.0.2"
 
 namespace fisx
 {
