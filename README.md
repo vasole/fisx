@@ -86,5 +86,6 @@ for key in fluo:
             enhancement2 = (primary + secondary) / primary
             enhancement3 = (primary + secondary + tertiary) / primary
             print("%s   %s    %.4f     %.3g     %.5g    %.5g" % \
-                  (key, peak + (13 - len(peak)) * " ", energy, rate, enhancement2, enhancement3))
+                               (key, peak + (13 - len(peak)) * " ", energy,
+                               rate, enhancement2, enhancement3))
 ```
