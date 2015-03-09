@@ -26,10 +26,27 @@ from fisx import Detector
 from fisx import XRF
 elementsInstance = Elements()
 elementsInstance.initializeAsPyMca()
+# After the slow initialization (to be made once), the rest is fairly fast.
 xrf = XRF()
 xrf.setBeam(16.0) # set incident beam as a single photon energy of 16 keV
 xrf.setBeamFilters([["Al1", 2.72, 0.11, 1.0]]) # Incident beam filters
-steel = {"Cr": 0.1837,  "Fe": 0.654, "Ni": 0.1235, "Mo": 0.0226, "Mn": 0.01619}
+# Steel composition of Schoonjans et al, 2012 used to generate table I
+steel = {"C":  0.0445, 
+         "N":  0.04,
+         "Si": 0.5093,
+         "P":  0.02,
+         "S":  0.0175,
+         "V":  0.05,
+         "Cr":18.37,
+         "Mn": 1.619,
+         "Fe":64.314, # calculated by subtracting the sum of all other elements
+         "Co": 0.109,
+         "Ni":12.35,
+         "Cu": 0.175,
+         "As": 0.010670,
+         "Mo": 2.26,
+         "W":  0.11,
+         "Pb": 0.001}
 SRM_1155 = Material("SRM_1155", 1.0, 1.0)
 SRM_1155.setComposition(steel)
 elementsInstance.addMaterial(SRM_1155)
@@ -45,11 +62,11 @@ Air.setCompositionFromLists(["C1", "N1", "O1", "Ar1", "Kr1"],
 elementsInstance.addMaterial(Air)
 xrf.setAttenuators([["Air", 0.0012048, 5.0, 1.0],
                     ["Be1", 1.848, 0.002, 1.0]]) # Attenuators
-fluo = xrf.getMultilayerFluorescence(["Cr K", "Fe K"],
+fluo = xrf.getMultilayerFluorescence(["Cr K", "Fe K", "Ni K"],
                                      elementsInstance,
-                                     secondary=1,
+                                     secondary=2,
                                      useMassFractions=1)
-print("Element   Peak      Energy      Rate     Correction Factor")
+print("Element   Peak          Energy       Rate      Secondary  Tertiary")
 for key in fluo:
     for layer in fluo[key]:
         peakList = list(fluo[key][layer].keys())
@@ -63,9 +80,11 @@ for key in fluo:
             primary = fluo[key][layer][peak]["primary"]
             # secondary photons (no attenuation and no detector considered)
             secondary = fluo[key][layer][peak]["secondary"]
+            # tertiary photons (no attenuation and no detector considered)
+            tertiary = fluo[key][layer][peak].get("tertiary", 0.0)
             # correction due to secondary excitation
-            enhancement = (primary + secondary) / primary
-            print("%s   %s    %.4f     %.3g     %.3g" % \
-                  (key, peak, energy, rate, enhancement))
-
+            enhancement2 = (primary + secondary) / primary
+            enhancement3 = (primary + secondary + tertiary) / primary
+            print("%s   %s    %.4f     %.3g     %.5g    %.5g" % \
+                  (key, peak + (13 - len(peak)) * " ", energy, rate, enhancement2, enhancement3))
 ```
