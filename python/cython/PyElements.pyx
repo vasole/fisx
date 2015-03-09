@@ -96,7 +96,7 @@ cdef class PyElements:
         bindingEnergies = os.path.join(dataDir, "BindingEnergies.dat")
         xcomFile = os.path.join(dataDir, "XCOM_CrossSections.dat")
         del self.thisptr
-        self.thisptr = new Elements(directoryName, bindingEnergies, xcomFile)
+        self.thisptr = new Elements(toBytes(directoryName), toBytes(bindingEnergies), toBytes(xcomFile))
         for shell in ["K", "L", "M"]:
             shellConstantsFile = os.path.join(dataDir, shell+"ShellConstants.dat")
             self.thisptr.setShellConstantsFile(toBytes(shell), toBytes(shellConstantsFile))
