@@ -29,8 +29,8 @@ struct ElementsInfo
 {
     std::string symbol;
     int         z;
-    int         row;
     int         column;
+    int         row;
     std::string longName;
     double      atomicMass;
     double      density;
