@@ -87,7 +87,7 @@ void XRFConfig::readConfigurationFromFile(const std::string & fileName)
     */
 
     // Assume is a PyMca generated file.
-    // TODO: Still to find out if it is a fir output file or a configuration file
+    // TODO: Still to find out if it is a fit output file or a configuration file
     // Assume it is configuration file.
     // In case of fit file, the configuration is under [result.config]
     // GET BEAM

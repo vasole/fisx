@@ -137,7 +137,7 @@ private:
     Beam beam;
     std::vector<Material> materials;
     std::vector<Layer> beamFilters;
-    std::vector<Layer> sample;
+    std::vector<Layer> sample;          // just other layer with funny factor set to 1.0
     std::vector<Layer> attenuators;
     int referenceLayer;
     double  alphaIn;
@@ -149,12 +149,19 @@ private:
 
 
     /*
-    The Attenuators have methods getTransmission(double Energy) and getTransmissions(std::vector<double> Energies)
-    std::map<std::string, Attenuators>  beamFilters;
-    geometry
-    std::map<std::string, Attenuators> Sample; #Funny set to 1
-    std::map<std::string, Attenuators>  attenuators;
-    detector returns a set of peaks (with labels!) for each incoming energy. Escape peaks handled. Sum peaks not yet.
+    WARNING: If materials are not defined in terms of formulas or elemental compositions but in terms of other materials,
+    the methods using a constant reference to an Elements instance can fail if all the materials are not present in the
+    library or have been redefined:
+
+    layer.getTransmission(energy, elementsInstance)
+    layer.getTransmission(energies, elementsInstance)
+    layer.getMassAttenuationCoefficients(energy, elementsInstance)
+    layer.getMassAttenuationCoefficients(energies, elementsInstance)
+    layer.getComposition(elementsInstance)
+    detector.getEscape(energy, elementsInstance, const std::string & label = "", const int & update = 1)
+
+    TODO: Implement those methods as XRF methods taken layers or detector as first argument.
+
     */
 };
 

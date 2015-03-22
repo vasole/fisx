@@ -295,11 +295,19 @@ public:
     std::map<std::string, double> getComposition(const std::string & name) const;
 
     /*!
+    Try to interpret a given string as a chemical formula or a defined material, returning the
+    associated mass fractions as a map of elements and mass fractions using the supplied list
+    of materials.
+    In case of failure, it returns an empty map.
+    */
+    std::map<std::string, double> getComposition(const std::string & name, \
+                                                 const std::vector<Material> & materials) const;
+
+    /*!
     Try to parse a given string as a formula, returning the associated number of "atoms"
     per single molecule. In case of failure, it returns an empty map.
     */
     std::map<std::string, double> parseFormula(const std::string & formula) const;
-
 
     /*!
     Given a set of energies and (optional) weights, for the specfified element, this method returns

@@ -975,6 +975,7 @@ std::map<std::string, std::vector<double> > Elements::getMassAttenuationCoeffici
         if (composition.size() < 1)
         {
             msg = "Name " + c_it->first + " not understood";
+            std::cout << msg << std::endl;
             throw std::invalid_argument(msg);
         }
         for(it = composition.begin(); it != composition.end(); ++it)
@@ -1241,6 +1242,85 @@ std::map<std::string, double> Elements::getComposition(const std::string & name)
     return result;
 }
 
+std::map<std::string, double> Elements::getComposition(const std::string & name, \
+                                                 const std::vector<Material> & additionalMaterials) const
+{
+    std::vector<Material>::size_type i;
+    std::map<std::string, double> result;
+    std::map<std::string, double> tmpResult;
+    std::map<std::string, double> composition;
+    std::map<std::string, double>::const_iterator c_it, c_it2;
+    double total;
+
+    // check if name is a valid element or formula
+    result = this->getCompositionFromFormula(name);
+    if (result.size() > 0)
+    {
+        return result;
+    }
+
+    // We are dealing with a material
+    if (additionalMaterials.size() == 0)
+    {
+        // The additional materials are not going to be needed
+        return this->getComposition(name);
+    }
+
+    // check if it is a material of the supplied list
+    for (i = 0; i < additionalMaterials.size(); i++)
+    {
+        if(additionalMaterials[i].getName() == name)
+        {
+            break;
+        }
+    }
+    if (i == additionalMaterials.size())
+    {
+        // The additional materials not needed in this iteration
+        tmpResult =  this->getComposition(name);
+    }
+    else
+    {
+        tmpResult =  additionalMaterials[i].getComposition();
+    }
+    if (tmpResult.size() < 1)
+    {
+        // throw an exception because we have an undefined material in the list of materials
+        std::string msg;
+        msg = "Material " + name + " with empty or non-valid composition";
+        throw std::invalid_argument(msg);
+    }
+    // We are dealing with a material that can be defined (or redefined) using the
+    // supplied list and a material can be made of formulas, elements or other materials.
+    for (c_it = tmpResult.begin(); c_it != tmpResult.end(); ++c_it)
+    {
+        composition = this->getComposition(c_it->first, additionalMaterials);
+        if (composition.size() < 1)
+        {
+            return composition;
+        }
+        for (c_it2 = composition.begin(); c_it2 != composition.end(); ++c_it2)
+        {
+            if (result.find(c_it2->first) == result.end())
+            {
+                result[c_it2->first] = 0.0;
+            }
+            result[c_it2->first] += composition[c_it2->first] * tmpResult[c_it->first];
+        }
+    }
+    // make sure (again ?) that material is normalized
+    total = 0;
+    for (c_it = result.begin(); c_it != result.end(); ++c_it)
+    {
+        total += c_it->second;
+    }
+    std::cout << "total = " << total << std::endl;
+    for (c_it = result.begin(); c_it != result.end(); ++c_it)
+    {
+        result[c_it->first] /= total;
+    }
+    return result;
+}
 
 std::map<std::string, double> Elements::getCompositionFromFormula(const std::string & formula) const
 {
