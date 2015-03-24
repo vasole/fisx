@@ -37,6 +37,12 @@
 namespace fisx
 {
 
+
+const std::string Elements::defaultDataDir()
+{
+    return FISX_DATA_DIR;
+}
+
 Elements::Elements(std::string epdl97Directory, std::string bindingEnergiesFileName, std::string crossSectionsFile)
 {
     // this is to simplify an initialization equivalent to that of PyMca:
@@ -83,6 +89,15 @@ Elements::Elements(std::string directoryName)
 void Elements::initialize(std::string epdl97Directory, std::string bindingEnergiesFile)
 {
 #include "fisx_defaultelementsinfo.h"
+    const std::string K_SHELL_CONSTANTS_FILE = "EADL97_KShellConstants.dat";
+    const std::string L_SHELL_CONSTANTS_FILE = "EADL97_LShellConstants.dat";
+    const std::string M_SHELL_CONSTANTS_FILE = "EADL97_MShellConstants.dat";
+    const std::string K_SHELL_RADIATIVE_FILE = "EADL97_KShellRadiativeRates.dat";
+    const std::string L_SHELL_RADIATIVE_FILE = "EADL97_LShellRadiativeRates.dat";
+    const std::string M_SHELL_RADIATIVE_FILE = "EADL97_MShellRadiativeRates.dat";
+    const std::string K_SHELL_NONRADIATIVE_FILE = "EADL97_KShellNonradiativeRates.dat";
+    const std::string L_SHELL_NONRADIATIVE_FILE = "EADL97_LShellNonradiativeRates.dat";
+    const std::string M_SHELL_NONRADIATIVE_FILE = "EADL97_MShellNonradiativeRates.dat";
     std::string shell;
     int i, j;
     std::string shellList[10] = {"K", "L1", "L2", "L3", "M1", "M2", "M3", "M4", "M5", "all other"};

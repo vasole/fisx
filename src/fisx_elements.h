@@ -31,7 +31,7 @@
   \file fisx_elements.h
   \brief Elements properties
   \author V.A. Sole
-  \version 0.1
+  \version 1.0
  */
 
 #include <string>
@@ -52,14 +52,25 @@ namespace fisx
    This class initializes a default library of physical properties and allows the user
    to modify and to access those properties.
  */
+
+#ifndef FISX_DATA_DIR
+#define FISX_DATA_DIR ""
+#endif
+
 class Elements
 {
 
 public:
     /*!
+    Default directory where the library looks for the data files
+    */
+    static const std::string defaultDataDir();
+
+
+    /*!
     Initialize the library from the EPDL97 data files found in the provided directory.
     */
-    Elements(std::string dataDirectory);
+    Elements(std::string dataDirectory = FISX_DATA_DIR);
 
     /*!
     Initialize the library from the EPDL97 data files found in the provided directory.

@@ -148,60 +148,6 @@ ElementsInfo defaultElementsInfo[N_PREDEFINED_ELEMENTS] = {\
                        {"Hs",  108,   8,7,  "hassium",    269,         0         },    \
                        {"Mt",  109,   9,7,  "meitnerium", 268,         0         }};
 
-#ifndef K_SHELL_CONSTANTS
-    std::string K_SHELL_CONSTANTS_FILE = "EADL97_KShellConstants.dat";
-#else
-    std::string K_SHELL_CONSTANTS_FILE = K_SHELL_CONSTANTS;
-#endif
-
-#ifndef L_SHELL_CONSTANTS
-    std::string L_SHELL_CONSTANTS_FILE = "EADL97_LShellConstants.dat";
-#else
-    std::string L_SHELL_CONSTANTS_FILE = L_SHELL_CONSTANTS;
-#endif
-
-#ifndef M_SHELL_CONSTANTS
-    std::string M_SHELL_CONSTANTS_FILE = "EADL97_MShellConstants.dat";
-#else
-    std::string M_SHELL_CONSTANTS_FILE = M_SHELL_CONSTANTS;
-#endif
-
-#ifndef K_SHELL_RADIATIVE
-    std::string K_SHELL_RADIATIVE_FILE = "EADL97_KShellRadiativeRates.dat";
-#else
-    std::string K_SHELL_RADIATIVE_FILE = K_SHELL_RADIATIVE;
-#endif
-
-#ifndef L_SHELL_RADIATIVE
-    std::string L_SHELL_RADIATIVE_FILE = "EADL97_LShellRadiativeRates.dat";
-#else
-    std::string L_SHELL_RADIATIVE_FILE = L_SHELL_RADIATIVE;
-#endif
-
-#ifndef M_SHELL_RADIATIVE
-    std::string M_SHELL_RADIATIVE_FILE = "EADL97_MShellRadiativeRates.dat";
-#else
-    std::string M_SHELL_RADIATIVE_FILE = M_SHELL_RADIATIVE;
-#endif
-
-#ifndef K_SHELL_NONRADIATIVE
-    std::string K_SHELL_NONRADIATIVE_FILE = "EADL97_KShellNonradiativeRates.dat";
-#else
-    std::string K_SHELL_NONRADIATIVE_FILE = K_SHELL_NONRADIATIVE;
-#endif
-
-#ifndef L_SHELL_NONRADIATIVE
-    std::string L_SHELL_NONRADIATIVE_FILE = "EADL97_LShellNonradiativeRates.dat";
-#else
-    std::string L_SHELL_NONRADIATIVE_FILE = L_SHELL_NONRADIATIVE;
-#endif
-
-#ifndef M_SHELL_NONRADIATIVE
-    std::string M_SHELL_NONRADIATIVE_FILE = "EADL97_MShellNonradiativeRates.dat";
-#else
-    std::string M_SHELL_NONRADIATIVE_FILE = M_SHELL_NONRADIATIVE;
-#endif
-
 /*
 struct MaterialsInfo
 {
@@ -240,3 +186,4 @@ defaultMaterialsInfo = {\
                                         "Viton Fluoroelastomer density=1.8 g/cm3"}\
 {"Water", {"H", "O"}, {0.11900533, 0.88809947}, 1.0, 1.0, "Water density=1.0 g/cm3"}};
 */
+
