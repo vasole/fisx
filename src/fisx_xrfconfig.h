@@ -161,7 +161,7 @@ private:
     detector.getEscape(energy, elementsInstance, const std::string & label = "", const int & update = 1)
 
     TODO: Implement those methods as XRF methods taken layers or detector as first argument.
-
+rt
     */
 };
 
