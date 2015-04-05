@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014 V. Armando Sole
+# Copyright (c) 2014-2015 V. Armando Sole
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -29,7 +29,7 @@
 #define FISX_VERSION_H
 #include <string>
 
-#define FISX_VERSION_STR "1.0.2"
+#define FISX_VERSION_STR "1.0.3"
 
 namespace fisx
 {
