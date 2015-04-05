@@ -270,19 +270,24 @@ cdef class PyElements:
 
     def __cinit__(self, directoryName="",
                         bindingEnergiesFile="",
-                        crossSectionsFile=""):
+                        crossSectionsFile="",
+                        pymca=0):
         if len(directoryName) == 0:
             from fisx import DataDir
             directoryName = DataDir.FISX_DATA_DIR
         directoryName = toBytes(directoryName)
-        bindingEnergiesFile = toBytes(bindingEnergiesFile)
-        crossSectionsFile = toBytes(crossSectionsFile)
-        if len(bindingEnergiesFile):
-            self.thisptr = new Elements(directoryName, bindingEnergiesFile)
+        if pymca:
+            pymca = 1
+            self.thisptr = new Elements(directoryName, pymca)
         else:
-            self.thisptr = new Elements(directoryName)
-        if len(crossSectionsFile):
-            self.thisptr.setMassAttenuationCoefficientsFile(crossSectionsFile)
+            bindingEnergiesFile = toBytes(bindingEnergiesFile)
+            crossSectionsFile = toBytes(crossSectionsFile)
+            if len(bindingEnergiesFile):
+                self.thisptr = new Elements(directoryName, bindingEnergiesFile, crossSectionsFile)
+            else:
+                self.thisptr = new Elements(directoryName)
+                if len(crossSectionsFile):
+                    self.thisptr.setMassAttenuationCoefficientsFile(crossSectionsFile)
 
     def initializeAsPyMca(self):
         """
