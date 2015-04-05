@@ -30,7 +30,7 @@
 #include <stdexcept>
 #include <iostream>
 #include <math.h>
-
+// #include <ctime>
 
 namespace fisx
 {
@@ -97,7 +97,9 @@ void EPDL97::loadData(std::string directoryName)
 
     // Load the cross sections
     filename = directoryName + joinSymbol + CROSS_SECTIONS;
+//     clock_t startTime = clock();
     this->loadCrossSections(filename);
+//     std::cout << "CROSS SECTIONS " << double( clock() - startTime ) / (double)CLOCKS_PER_SEC<< " seconds." << std::endl;
 
     //
     this->directoryName = directoryName;
@@ -134,6 +136,9 @@ void EPDL97::loadBindingEnergies(std::string fileName)
     nLabels = tmpLabels.size();
     if (tmpValues[0].size() != nLabels)
     {
+        std::cout << fileName;
+        std::cout << " nLabels = " << nLabels;
+        std::cout << " nValues = " << tmpValues[0].size();
         throw std::ios_base::failure("EPDL97: Number of values does not match number of labels");
     }
 
@@ -615,6 +620,9 @@ std::map< std::string, std::vector<double> > EPDL97::getMassAttenuationCoefficie
     std::map<std::string, int>::const_iterator c_it;
     std::string key;
     const std::vector<std::vector<double> > *pVector;
+    std::vector<double>  tmpVector;
+    std::vector<double>  tmpPhotoelectricVector;
+    std::vector<double>  nonPhotoelectricVector;
 
     if(!this->initialized)
     {
@@ -636,7 +644,11 @@ std::map< std::string, std::vector<double> > EPDL97::getMassAttenuationCoefficie
 
     pVector = &(this->muInputValues[idx]);
     nValues = (int) this->muEnergy[idx].size();
-    result["total"].resize(nValues);
+    tmpVector.resize(nValues);
+    tmpPhotoelectricVector.resize(nValues);
+    nonPhotoelectricVector.resize(nValues);
+    std::fill(tmpPhotoelectricVector.begin(), tmpPhotoelectricVector.end(), 0.0);
+    std::fill(nonPhotoelectricVector.begin(), nonPhotoelectricVector.end(), 0.0);
     for (c_it = this->muLabelToIndex.begin(); c_it != this->muLabelToIndex.end(); ++c_it)
     {
         key = c_it->first;
@@ -645,32 +657,37 @@ std::map< std::string, std::vector<double> > EPDL97::getMassAttenuationCoefficie
             continue;
         }
         iMu = c_it->second;
-        result[key].resize(nValues);
         for (i = 0; i < nValues; i++)
         {
-            result[key][i] = (*pVector)[i][iMu];
+            tmpVector[i] = (*pVector)[i][iMu];
+            if ((key == "coherent") || (key == "compton") || (key == "pair"))
+            {
+                nonPhotoelectricVector[i] += tmpVector[i];
+            }
+            else
+            {
+                if ((key == "K") || (key == "L1") || (key == "L2") || (key == "L3") || \
+                    (key == "M1") || (key == "M2") || (key == "M3") || (key == "M4") || \
+                    (key == "M5") || (key == "all other"))
+                {
+                    tmpPhotoelectricVector[i] += tmpVector[i];
+                }
+            }
         }
+        result[key] = tmpVector;
     }
+    std::fill(tmpVector.begin(), tmpVector.end(), 0.0);
     if (this->muLabelToIndex.find("pair") == this->muLabelToIndex.end())
     {
-        result["pair"].resize(nValues);
-        for (i = 0; i < nValues; i++)
-        {
-            result[key][i] = 0.0;
-        }
+        result["pair"] = tmpVector;
     }
-
-    result["photoelectric"].resize(nValues);
     result["total"].resize(nValues);
+    result["photoelectric"] = tmpPhotoelectricVector;
     for (i = 0; i < nValues; i++)
     {
-        for (j = 0; j < 10; j++)
-        {
-            result["photoelectric"][i] += result[shellList[j]][i];
-        }
-        result["total"][i] = result["coherent"][i] + result["compton"][i] + result["pair"][i] +\
-                             result["photoelectric"][i];
+        tmpVector[i] = nonPhotoelectricVector[i] + tmpPhotoelectricVector[i];
     }
+    result["total"] = tmpVector;
     return result;
 }
 
