@@ -90,7 +90,7 @@ Elements::Elements(std::string directoryName, short pymca)
         const std::string L_SHELL_CONSTANTS_FILE = "LShellConstants.dat";
         const std::string M_SHELL_CONSTANTS_FILE = "MShellConstants.dat";
         const std::string K_SHELL_RADIATIVE_FILE = "KShellRates.dat";
-        const std::string L_SHELL_RADIATIVE_FILE = "LShellRaRates.dat";
+        const std::string L_SHELL_RADIATIVE_FILE = "LShellRates.dat";
         const std::string M_SHELL_RADIATIVE_FILE = "MShellRates.dat";
         const std::string XCOM_FILE = "XCOM_CrossSections.dat";
         std::string xcom = directoryName + joinSymbol + XCOM_FILE;
