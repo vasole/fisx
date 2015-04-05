@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014 V. Armando Sole
+# Copyright (c) 2014-2015 V. Armando Sole
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -50,17 +50,20 @@ Elements::Elements(std::string epdl97Directory, std::string bindingEnergiesFileN
     // - use a different binding energies file
     // - use different mass atenuation coefficients (i.e. XCOM)
     this->initialize(epdl97Directory, bindingEnergiesFileName);
-    this->setMassAttenuationCoefficientsFile(crossSectionsFile);
+    if (crossSectionsFile.size())
+    {
+        this->setMassAttenuationCoefficientsFile(crossSectionsFile);
+    }
 }
 
-Elements::Elements(std::string epdl97Directory, std::string bindingEnergiesFileName)
-{
-    this->initialize(epdl97Directory, bindingEnergiesFileName);
-}
-
-Elements::Elements(std::string directoryName)
+Elements::Elements(std::string epdl97Directory)
 {
     // pure EPDL97 initialization
+    this->initialize(epdl97Directory, "");
+}
+
+Elements::Elements(std::string directoryName, short pymca)
+{
     std::string BINDING_ENERGIES="EADL97_BindingEnergies.dat";
     std::string joinSymbol;
     std::string bindingEnergies;
@@ -79,12 +82,41 @@ Elements::Elements(std::string directoryName)
         joinSymbol = "";
     }
 
-    // binding energies
-    bindingEnergies = directoryName + joinSymbol + BINDING_ENERGIES;
-
-    this->initialize(directoryName, "");
+    if (pymca)
+    {
+        // binding energies
+        bindingEnergies = directoryName + joinSymbol + "BindingEnergies.dat";
+        const std::string K_SHELL_CONSTANTS_FILE = "KShellConstants.dat";
+        const std::string L_SHELL_CONSTANTS_FILE = "LShellConstants.dat";
+        const std::string M_SHELL_CONSTANTS_FILE = "MShellConstants.dat";
+        const std::string K_SHELL_RADIATIVE_FILE = "KShellRates.dat";
+        const std::string L_SHELL_RADIATIVE_FILE = "LShellRaRates.dat";
+        const std::string M_SHELL_RADIATIVE_FILE = "MShellRates.dat";
+        const std::string XCOM_FILE = "XCOM_CrossSections.dat";
+        std::string xcom = directoryName + joinSymbol + XCOM_FILE;
+        std::string tmpFileName;
+        this->initialize(directoryName, bindingEnergies);
+        this->setMassAttenuationCoefficientsFile(xcom);
+        tmpFileName = directoryName + joinSymbol + K_SHELL_CONSTANTS_FILE;
+        this->setShellConstantsFile("K", tmpFileName);
+        tmpFileName = directoryName + joinSymbol + L_SHELL_CONSTANTS_FILE;
+        this->setShellConstantsFile("L", tmpFileName);
+        tmpFileName = directoryName + joinSymbol + M_SHELL_CONSTANTS_FILE;
+        this->setShellConstantsFile("M", tmpFileName);
+        tmpFileName = directoryName + joinSymbol + K_SHELL_RADIATIVE_FILE;
+        this->setShellRadiativeTransitionsFile("K", tmpFileName);
+        tmpFileName = directoryName + joinSymbol + L_SHELL_RADIATIVE_FILE;
+        this->setShellRadiativeTransitionsFile("L", tmpFileName);
+        tmpFileName = directoryName + joinSymbol + M_SHELL_RADIATIVE_FILE;
+        this->setShellRadiativeTransitionsFile("M", tmpFileName);
+    }
+    else
+    {
+        // binding energies
+        bindingEnergies = directoryName + joinSymbol + BINDING_ENERGIES;
+        this->initialize(directoryName, "");
+    }
 }
-
 
 void Elements::initialize(std::string epdl97Directory, std::string bindingEnergiesFile)
 {

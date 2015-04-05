@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014 V. Armando Sole
+# Copyright (c) 2014-2015 V. Armando Sole
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -39,7 +39,7 @@ from Material cimport *
 cdef extern from "fisx_elements.h" namespace "fisx":
     cdef cppclass Elements:
         Elements(std_string) except +
-        Elements(std_string, std_string) except +
+        Elements(std_string, short) except +
         Elements(std_string, std_string, std_string) except +
 
         std_vector[std_string] getElementNames()

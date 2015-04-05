@@ -68,24 +68,29 @@ public:
 
 
     /*!
-    Initialize the library from the EPDL97 data files found in the provided directory.
+    Initialize the library from the EADL and EPDL97 data files found in the provided directory.
     */
     Elements(std::string dataDirectory = FISX_DATA_DIR);
+
+    /*!
+    Initialize the library from the data files found in the provided directory.
+
+    By default it uses EADL and EPDL97 files. If the optional flag is set to 1, it will only use
+    the non-radiative transition rates and partial photoelectric cross sections from EADL and EPDL97.
+    For the rest of files, it will use those used by default by PyMca (they have to be in the directory).
+    */
+    Elements(std::string dataDirectory, short pymca);
 
     /*!
     Initialize the library from the EPDL97 data files found in the provided directory.
     It forces the EPDL97 photon photoelectric cross sections to follow the shell binding
     energies found in the provided binding energies file (full path needed because it is
     not necessarily found in the the same directory as the EPDL97 data).
-    */
-    Elements(std::string dataDirectory, std::string bindingEnergiesFile);
 
-    /*!
-    Convenience constructor. It is equivalent to use the previous constructor and
-    - to call the setMassAttenuationCoefficientsFile with that file name.
-    - to call the setMassAttenuationCoefficientes method with the values extracted from the crossSectionFile.
+    If the cross sections file is provided, it calls setMassAttenuationCoefficientes method
+    with the values extracted from the crossSectionFile.
     */
-    Elements(std::string dataDirectory, std::string bindingEnergiesFile, std::string crossSectionsFile);
+    Elements(std::string dataDirectory, std::string bindingEnergiesFile, std::string crossSectionsFile="");
 
     // Direct element handling
     /*!
