@@ -196,7 +196,6 @@ def buildExtension():
                     extra_compile_args=extra_compile_args,
                     extra_link_args=extra_link_args,
                     language="c++",
-                    define_macros = [('FISX_DATA_DIR', FISX_DATA_DIR)],
                     )
     return module
 
