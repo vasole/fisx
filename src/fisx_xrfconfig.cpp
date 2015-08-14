@@ -152,7 +152,7 @@ void XRFConfig::readConfigurationFromFile(const std::string & fileName)
             {
                 throw std::invalid_argument("Negative excitation beam photon energy");
             }
-            if(mapDoubles["weight"][iIntVector] <= 0.0)
+            if(mapDoubles["weight"][iIntVector] < 0.0)
             {
                 throw std::invalid_argument("Negative excitation beam photon weight");
             }
