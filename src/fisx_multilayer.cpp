@@ -567,7 +567,15 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                                                sampleLayerMuTotal[jLayer][iLambda],
                                                                density_1,
                                                                thickness_1);
-                                    tmpDouble += Math::deBoerL0(mu_1_i / sinAlphaOut,
+                                    // Workaround incident angle of 90 degrees and scatter contribution
+                                    if ((mu_1_lambda / sinAlphaIn) == sampleLayerMuTotal[jLayer][iLambda])
+                                        tmpDouble += Math::deBoerL0(mu_1_i / sinAlphaOut,
+                                                               mu_1_lambda / (0.99999*sinAlphaIn),
+                                                               sampleLayerMuTotal[jLayer][iLambda],
+                                                               density_1,
+                                                               thickness_1);
+                                    else
+                                        tmpDouble += Math::deBoerL0(mu_1_i / sinAlphaOut,
                                                                mu_1_lambda / sinAlphaIn,
                                                                sampleLayerMuTotal[jLayer][iLambda],
                                                                density_1,
@@ -666,7 +674,16 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                         if (tmpDouble < 0.001)
                                             continue;
                                         tmpDouble *= sampleLayerRates[jLayer][iLambda];
-                                        tmpDouble *= Math::deBoerX(mu_2_lambda/sinAlphaIn, \
+                                        if (-(mu_2_lambda/sinAlphaIn) == mu_2_j)
+                                            tmpDouble *= Math::deBoerX(mu_2_lambda/(0.99999*sinAlphaIn), \
+                                                                  mu_1_i/sinAlphaOut, \
+                                                                  density_1 * thickness_1, \
+                                                                  density_2 * thickness_2, \
+                                                                  mu_1_j, \
+                                                                  mu_2_j, \
+                                                                  mu_b_j_d_t);
+                                        else
+                                            tmpDouble *= Math::deBoerX(mu_2_lambda/sinAlphaIn, \
                                                                   mu_1_i/sinAlphaOut, \
                                                                   density_1 * thickness_1, \
                                                                   density_2 * thickness_2, \
@@ -765,7 +782,16 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                             bLayer++;
                                         }
                                         tmpDouble = layerFactor * sampleLayerRates[jLayer][iLambda];
-                                        tmpDouble *= Math::deBoerX(-mu_2_lambda/sinAlphaIn, \
+                                        if ((mu_2_lambda/sinAlphaIn) == mu_2_j)
+                                            tmpDouble *= Math::deBoerX(-mu_2_lambda/(0.99999*sinAlphaIn), \
+                                                                  -mu_1_i/sinAlphaOut, \
+                                                                  density_1 * thickness_1, \
+                                                                  density_2 * thickness_2, \
+                                                                  mu_1_j, \
+                                                                  mu_2_j, \
+                                                                  mu_b_j_d_t);
+                                        else
+                                            tmpDouble *= Math::deBoerX(-mu_2_lambda/sinAlphaIn, \
                                                                   -mu_1_i/sinAlphaOut, \
                                                                   density_1 * thickness_1, \
                                                                   density_2 * thickness_2, \
