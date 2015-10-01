@@ -1,14 +1,22 @@
+VERSION 1.0.4
+
+Workaround issue calculating secondary excitation due to scattering of the incident beam when the incident beam is normal to the sample surface.
+
+VERSION 1.0.3
+
+Add a new Elements constructor.
+
 VERSION 1.0.2
 
 Give correct weight to elastic scattering contribution.
 
 VERSION 1.0.1
 
-Add conda recipe
+Add conda recipe.
 
-Correct test suite
+Correct test suite.
 
-Correct bug reading PyMca configuration files
+Correct bug reading PyMca configuration files.
 
 VERSION 1.0.0
 
