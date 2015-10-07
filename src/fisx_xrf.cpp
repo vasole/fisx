@@ -664,7 +664,7 @@ void XRF::getSpectrum(double * channel, double * energy, double *spectrum, int n
                     if (ratePointer == lineIterator->second.end())
                     {
                         tmpString = "Keyword <rate> not found!!!";
-                        std::cout << tmpString << std::cout;
+                        std::cout << tmpString << std::endl;
                         throw std::invalid_argument(tmpString);
                     }
                     layerTotalSignal[layerTotalSignal.size() - 1] += ratePointer->second;
@@ -685,7 +685,7 @@ void XRF::getSpectrum(double * channel, double * energy, double *spectrum, int n
                     if (ratePointer == lineIterator->second.end())
                     {
                         tmpString = "Keyword <energy> not found!!!";
-                        std::cout << tmpString << std::cout;
+                        std::cout << tmpString << std::endl;
                         throw std::invalid_argument(tmpString);
                     }
                     position = ratePointer->second;
@@ -713,7 +713,7 @@ void XRF::getSpectrum(double * channel, double * energy, double *spectrum, int n
             if (!SimpleIni::stringConverter(tmpStringVector[2], layerIndex))
             {
                 tmpString = "Unsuccessul conversion to layer integer: " + tmpStringVector[2];
-                std::cout << tmpString << std::cout;
+                std::cout << tmpString << std::endl;
                 throw std::invalid_argument(tmpString);
             }
             // TODO: Deal with Ka, Kb, L, L1, L2, L3, ...
@@ -723,7 +723,7 @@ void XRF::getSpectrum(double * channel, double * energy, double *spectrum, int n
             {
                 tmpString = "Undefined emission ratios for element " + tmpStringVector[0] +\
                             " family " + tmpStringVector[1];
-                std::cout << tmpString << std::cout;
+                std::cout << tmpString << std::endl;
                 throw std::invalid_argument(tmpString);
             }
             // Emission ratios has the form "Cr K" but we have received peakFamily can have the form "Cr K index"
@@ -733,7 +733,7 @@ void XRF::getSpectrum(double * channel, double * energy, double *spectrum, int n
             if (layerIterator == emissionRatiosPointer->second.end())
             {
                 tmpString = "I do not have information for layer number " + tmpStringVector[2];
-                std::cout << tmpString << std::cout;
+                std::cout << tmpString << std::endl;
                 throw std::invalid_argument(tmpString);
             }
             layerTotalSignal.clear();
@@ -746,7 +746,7 @@ void XRF::getSpectrum(double * channel, double * energy, double *spectrum, int n
                 if (ratePointer == lineIterator->second.end())
                 {
                     tmpString = "Keyword <rate> not found!!!";
-                    std::cout << tmpString << std::cout;
+                    std::cout << tmpString << std::endl;
                     throw std::invalid_argument(tmpString);
                 }
                 layerTotalSignal[layerTotalSignal.size() - 1] += ratePointer->second;
@@ -763,7 +763,7 @@ void XRF::getSpectrum(double * channel, double * energy, double *spectrum, int n
                 if (ratePointer == lineIterator->second.end())
                 {
                     tmpString = "Keyword <energy> not found!!!";
-                    std::cout << tmpString << std::cout;
+                    std::cout << tmpString << std::endl;
                     throw std::invalid_argument(tmpString);
                 }
                 position = ratePointer->second;
@@ -811,7 +811,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
             if (!SimpleIni::stringConverter(tmpStringVector[2], layerIndex))
             {
                 tmpString = "Unsuccessul conversion to layer integer: " + tmpStringVector[2];
-                std::cout << tmpString << std::cout;
+                std::cout << tmpString << std::endl;
                 throw std::invalid_argument(tmpString);
             }
             layerList[i] = layerIndex;
