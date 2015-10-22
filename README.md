@@ -17,6 +17,8 @@ To build the library for python use, just use the "python setup.py install" appr
 Example
 -------
 
+There is a [web application](http://fisxserver.esrf.fr) using this library for calculating expected x-ray count rates.
+
 This piece of Python code shows how the library can be used via its python binding.
 
 ```python
