@@ -38,8 +38,8 @@ struct ElementsInfo
 
 const int N_PREDEFINED_ELEMENTS = 109;
 ElementsInfo defaultElementsInfo[N_PREDEFINED_ELEMENTS] = {\
-                       {"H",   1,    1,1,   "hydrogen",   1.00800,     1008.00   },    \
-                       {"He",  2,   18,1,   "helium",     4.00300,     0.118500  },    \
+                       {"H",   1,    1,1,   "hydrogen",   1.00800,     0.08988   },    \
+                       {"He",  2,   18,1,   "helium",     4.00300,     0.17860   },    \
                        {"Li",  3,    1,2,   "lithium",    6.94000,     534.000   },    \
                        {"Be",  4,    2,2,   "beryllium",  9.01200,     1848.00   },    \
                        {"B",   5,   13,2,   "boron",      10.8110,     2340.00   },    \
@@ -47,7 +47,7 @@ ElementsInfo defaultElementsInfo[N_PREDEFINED_ELEMENTS] = {\
                        {"N",   7,   15,2,   "nitrogen",   14.0080,     1.25      },    \
                        {"O",   8,   16,2,   "oxygen",     16.0000,     1.429     },    \
                        {"F",   9,   17,2,   "fluorine",   19.0000,     1108.00   },    \
-                       {"Ne",  10,  18,2,   "neon",       20.1830,     0.9       },    \
+                       {"Ne",  10,  18,2,   "neon",       20.1830,     0.90020   },    \
                        {"Na",  11,   1,3,   "sodium",     22.9970,     970.000   },    \
                        {"Mg",  12,   2,3,   "magnesium",  24.3200,     1740.00   },    \
                        {"Al",  13,  13,3,   "aluminium",  26.9700,     2720.00   },    \
