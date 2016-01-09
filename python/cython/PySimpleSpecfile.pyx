@@ -52,7 +52,11 @@ cdef class PySimpleSpecfile:
     #    return self.thisptr.getScanHeader(scanIndex)
 
     def getScanLabels(self, int scanIndex):
-        return self.thisptr.getScanLabels(scanIndex)
+        if sys.version < '3':
+            return self.thisptr.getScanLabels(scanIndex)
+        else:
+            bytesLabels = self.thisptr.getScanLabels(scanIndex)
+            return [toString(x) for x in bytesLabels]
 
     def getScanData(self, int scanIndex):
         return self.thisptr.getScanData(scanIndex)
