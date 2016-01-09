@@ -561,28 +561,28 @@ from EPDL97 cimport *
 cdef class PyEPDL97:
     cdef EPDL97 *thisptr
 
-    def __cinit__(self, std_string name):
-        self.thisptr = new EPDL97(name)
+    def __cinit__(self, name):
+        self.thisptr = new EPDL97(toBytes(name))
 
     def __dealloc__(self):
         del self.thisptr
 
-    def setDataDirectory(self, std_string name):
-        self.thisptr.setDataDirectory(name)
+    def setDataDirectory(self, name):
+        self.thisptr.setDataDirectory(toBytes(name))
 
     def setBindingEnergies(self, int z, std_map[std_string, double] energies):
         self.thisptr.setBindingEnergies(z, energies)
 
     def getBindingEnergies(self, int z):
-        return self.thisptr.getBindingEnergies(z)
+        return toStringKeys(self.thisptr.getBindingEnergies(z))
     
     def getMassAttenuationCoefficients(self, z, energy=None):
         if energy is None:
-            return self._getDefaultMassAttenuationCoefficients(z)            
+            return toStringKeys(self._getDefaultMassAttenuationCoefficients(z))
         elif hasattr(energy, "__len__"):
-            return self._getMultipleMassAttenuationCoefficients(z, energy)
+            return toStringKeys(self._getMultipleMassAttenuationCoefficients(z, energy))
         else:
-            return self._getMultipleMassAttenuationCoefficients(z, [energy])
+            return toStringKeys(self._getMultipleMassAttenuationCoefficients(z, [energy]))
 
     def _getDefaultMassAttenuationCoefficients(self, int z):
         return self.thisptr.getMassAttenuationCoefficients(z)
@@ -595,9 +595,9 @@ cdef class PyEPDL97:
                                        
     def getPhotoelectricWeights(self, z, energy):
         if hasattr(energy, "__len__"):
-            return self._getMultiplePhotoelectricWeights(z, energy)
+            return toStringKeys(self._getMultiplePhotoelectricWeights(z, energy))
         else:
-            return self._getMultiplePhotoelectricWeights(z, [energy])
+            return toStringKeys(self._getMultiplePhotoelectricWeights(z, [energy]))
 
     def _getSinglePhotoelectricWeights(self, int z, double energy):
         return self.thisptr.getPhotoelectricWeights(z, energy)
@@ -999,7 +999,11 @@ cdef class PySimpleSpecfile:
     #    return self.thisptr.getScanHeader(scanIndex)
 
     def getScanLabels(self, int scanIndex):
-        return self.thisptr.getScanLabels(scanIndex)
+        if sys.version < '3':
+            return self.thisptr.getScanLabels(scanIndex)
+        else:
+            bytesLabels = self.thisptr.getScanLabels(scanIndex)
+            return [toString(x) for x in bytesLabels]
 
     def getScanData(self, int scanIndex):
         return self.thisptr.getScanData(scanIndex)
