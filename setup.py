@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 #/*##########################################################################
 #
 # The fisx library for X-Ray Fluorescence
@@ -29,8 +30,20 @@
 import glob
 import os
 import sys
-from distutils.core import setup, Extension
-from distutils.sysconfig import get_python_lib
+if "bdist_wheel" in sys.argv:
+    from setuptools import setup, Extension
+    from setuptools.command.build_py import build_py
+    from distutils.command.install_data import install_data
+else:
+    try:
+        from setuptools import setup, Extension
+        from setuptools.command.build_py import build_py
+        from distutils.command.install_data import install_data
+    except ImportError:
+        from distutils.core import setup, Extension
+        from distutils.sysconfig import get_python_lib
+        from distutils.command.build_py import build_py
+        from distutils.command.install_data import install_data
 
 # check if cython is not to be used despite being present
 def use_cython():
@@ -85,7 +98,6 @@ __version__ = getFisxVersion()
 
 print("fisx X-Ray Fluorescence Toolkit %s\n" % __version__)
 
-from distutils.command.build_py import build_py
 class smart_build_py(build_py):
     def run (self):
         toReturn = build_py.run(self)
@@ -122,7 +134,6 @@ class smart_build_py(build_py):
         fid.close()
         return toReturn
 
-from distutils.command.install_data import install_data
 class smart_install_data(install_data):
     def run(self):
         global INSTALL_DIR
@@ -215,18 +226,47 @@ Tools to evaluate the expected X-ray fluorescence measured when a sample is exci
 # tell distutils where to find the packages
 package_dir = {"":"python"}
 packages = ['fisx', 'fisx.tests']
-setup(
-    name='fisx',
-    version=__version__,
-    author="V. Armando Sole",
-    author_email="sole@esrf.fr",
-    description=description,
-    long_description=long_description,
-    license="MIT",
-    url="https://github.com/vasole/fisx",
-    package_dir=package_dir,
-    packages=packages,
-    ext_modules=ext_modules,
-    data_files=data_files,
-    cmdclass=cmdclass,
-)
+
+classifiers = ["Development Status :: 5 - Production/Stable",
+               "Programming Language :: C++",
+               "Programming Language :: Python :: 2",
+               "Programming Language :: Python :: 3",
+               "Programming Language :: Cython",
+               "Environment :: Console",
+               "Intended Audience :: Developers",
+               "Intended Audience :: End Users/Desktop",
+               "Intended Audience :: Science/Research",
+               "License :: OSI Approved :: MIT License",
+               "Topic :: Software Development :: Libraries :: Python Modules",
+               "Operating System :: Microsoft :: Windows",
+               "Operating System :: Unix",
+               "Operating System :: MacOS :: MacOS X",
+               "Operating System :: POSIX",
+               "Topic :: Scientific/Engineering :: Physics"
+               ]
+
+install_requires = ["numpy"]
+
+# cython is not mandatory to build because generated code is supplied
+setup_requires = ["numpy"]
+
+if __name__ == "__main__":
+    setup(
+        name='fisx',
+        version=__version__,
+        author="V. Armando Solé",
+        author_email="sole@esrf.fr",
+        description=description,
+        long_description=long_description,
+        license="MIT",
+        url="https://github.com/vasole/fisx",
+        download_url="https://github.com/vasole/fisx/archive/v%s.tar.gz" % __version__, 
+        package_dir=package_dir,
+        packages=packages,
+        ext_modules=ext_modules,
+        data_files=data_files,
+        cmdclass=cmdclass,
+        classifiers=classifiers,
+        install_requires=install_requires,
+        setup_requires=setup_requires,
+    )
