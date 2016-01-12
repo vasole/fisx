@@ -12,7 +12,7 @@ with the correction mentioned in:
 
 D.K.G. de Boer et al, X-Ray Spectrometry 22 (1993) 33-28
 
-Tertiary excitation is accounted for with an appproximation.
+Tertiary excitation is accounted for via an appproximation.
 
 The accuracy of the corrections has been tested against experimental data and Monte Carlo simulations.
 
