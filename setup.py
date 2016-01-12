@@ -150,8 +150,7 @@ topLevel = os.path.dirname(os.path.abspath(__file__))
 fileList = glob.glob(os.path.join(topLevel, "fisx_data", "*.dat"))
 fileList.append(os.path.join(topLevel, "changelog.txt"))
 fileList.append(os.path.join(topLevel, "LICENSE"))
-fileList.append(os.path.join(topLevel, "README.md"))
-fileList.append(os.path.join(topLevel, "README"))
+fileList.append(os.path.join(topLevel, "README.rst"))
 fileList.append(os.path.join(topLevel, "TODO"))
 data_files = [(FISX_DATA_DIR, fileList)]
 
