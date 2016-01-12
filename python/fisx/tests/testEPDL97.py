@@ -36,6 +36,13 @@ import time
 import os
 import sys
 
+try:
+    from PyMca5.PyMca import PyMcaEPDL97
+    PYMCA = True
+except ImportError:
+    # do not compare with PyMca because it is not installed
+    PYMCA = False
+
 ElementList= ['H', 'He', 
             'Li', 'Be', 'B', 'C', 'N', 'O', 'F', 'Ne',
             'Na', 'Mg', 'Al', 'Si', 'P', 'S', 'Cl', 'Ar',
@@ -58,9 +65,6 @@ def getSymbol(z):
 def getZ(ele):
     return ElementList.index(ele) + 1
 
-#from fisx import EPDL97
-#from fisx import DataDir
-
 class testEPDL97(unittest.TestCase):
     def setUp(self):
         """
@@ -78,90 +82,88 @@ class testEPDL97(unittest.TestCase):
     def testEPDL97Import(self):
         self.assertTrue(self.epdl97 is not None,
                         'Unsuccessful fisx.EPDL97 import')
-    
-    def testEPDL97BindingVersusPyMcaEPDL97Binding(self):
-        from PyMca5.PyMca import PyMcaEPDL97
-        from fisx import DataDir
-        dirname = DataDir.FISX_DATA_DIR
-        epdl = self.epdl97(dirname)
-        for i in range(1, 99):
-            pymca = PyMcaEPDL97.EPDL97_DICT[getSymbol(i)]['binding']
-            cpp = epdl.getBindingEnergies(i)
-            for key in cpp:
-                difference = abs(cpp[key] - pymca[key])
-                self.assertTrue(difference < 1.0e-7,
-                    "Element %s, shell %s , difference %f" %\
-                        (getSymbol(i), key, difference))
-        epdl = None
-        
-    def testEPDL97MuVersusPyMcaEPDL97Mu(self):
-        from PyMca5.PyMca import PyMcaEPDL97
-        from fisx import DataDir
-        dirname = DataDir.FISX_DATA_DIR
-        epdl = self.epdl97(dirname)
-        x = numpy.linspace(1.0, 80., 157)
-        for j in range(1, 100):
-            pymca = PyMcaEPDL97.getElementCrossSections(getSymbol(j), x)
-            cpp = epdl.getMassAttenuationCoefficients(j, x)
-            for key in cpp:
-                for i in range(len(x)):
-                    if key == "photoelectric":
-                        delta = cpp[key][i] - pymca["photo"][i]
-                    else:
-                        delta = cpp[key][i] - pymca[key][i]
-                    if cpp[key][i] > 0:
-                        delta = 100. * (abs(delta)/cpp[key][i])
-                        tol = 1.0e-5
-                    else:
-                        delta = abs(delta)
-                        tol = 1.0e-7
-                    self.assertTrue(delta < tol,
-                        "z = %d, effect = %s, energy = %f, delta = %f" %\
-                            (j, key, x[i], delta))
-        epdl = None
+    if PYMCA:
+        def testEPDL97BindingVersusPyMcaEPDL97Binding(self):
+            from fisx import DataDir
+            dirname = DataDir.FISX_DATA_DIR
+            epdl = self.epdl97(dirname)
+            for i in range(1, 99):
+                pymca = PyMcaEPDL97.EPDL97_DICT[getSymbol(i)]['binding']
+                cpp = epdl.getBindingEnergies(i)
+                for key in cpp:
+                    difference = abs(cpp[key] - pymca[key])
+                    self.assertTrue(difference < 1.0e-7,
+                        "Element %s, shell %s , difference %f" %\
+                            (getSymbol(i), key, difference))
+            epdl = None
 
-    def testEPDL97PartialVersusPyMcaPartial(self):
-        from PyMca5.PyMca import PyMcaEPDL97
-        from fisx import DataDir
-        dirname = DataDir.FISX_DATA_DIR
-        epdl = self.epdl97(dirname)
-        pymca = PyMcaEPDL97.getElementCrossSections('Pb')
-        idx = numpy.nonzero((pymca['energy'] > 1.0) & \
-                            (pymca['energy'] < 100))[0]
-        x = pymca['energy'][idx]
-        # test partial photoelectric cross sections
-        shellList = ["K", "L1", "L2", "L3", "M1", "M2", "M3", "M4", "M5", "all other"]
-        for j in range(1, 100):
-            cpp = epdl.getPhotoelectricWeights(j, x)
-            for i in range(len(x)):
-                pymca = PyMcaEPDL97.getPhotoelectricWeights(getSymbol(j),
+        def testEPDL97MuVersusPyMcaEPDL97Mu(self):
+            from fisx import DataDir
+            dirname = DataDir.FISX_DATA_DIR
+            epdl = self.epdl97(dirname)
+            x = numpy.linspace(1.0, 80., 157)
+            for j in range(1, 100):
+                pymca = PyMcaEPDL97.getElementCrossSections(getSymbol(j), x)
+                cpp = epdl.getMassAttenuationCoefficients(j, x)
+                for key in cpp:
+                    for i in range(len(x)):
+                        if key == "photoelectric":
+                            delta = cpp[key][i] - pymca["photo"][i]
+                        else:
+                            delta = cpp[key][i] - pymca[key][i]
+                        if cpp[key][i] > 0:
+                            delta = 100. * (abs(delta)/cpp[key][i])
+                            tol = 1.0e-5
+                        else:
+                            delta = abs(delta)
+                            tol = 1.0e-7
+                        self.assertTrue(delta < tol,
+                            "z = %d, effect = %s, energy = %f, delta = %f" %\
+                                (j, key, x[i], delta))
+            epdl = None
+
+        def testEPDL97PartialVersusPyMcaPartial(self):
+            from PyMca5.PyMca import PyMcaEPDL97
+            from fisx import DataDir
+            dirname = DataDir.FISX_DATA_DIR
+            epdl = self.epdl97(dirname)
+            pymca = PyMcaEPDL97.getElementCrossSections('Pb')
+            idx = numpy.nonzero((pymca['energy'] > 1.0) & \
+                                (pymca['energy'] < 100))[0]
+            x = pymca['energy'][idx]
+            # test partial photoelectric cross sections
+            shellList = ["K", "L1", "L2", "L3", "M1", "M2", "M3", "M4", "M5", "all other"]
+            for j in range(1, 100):
+                cpp = epdl.getPhotoelectricWeights(j, x)
+                for i in range(len(x)):
+                    pymca = PyMcaEPDL97.getPhotoelectricWeights(getSymbol(j),
+                                                                    shellList,
+                                                                    x[i])
+                    for ikey in range(len(shellList)):
+                        key = shellList[ikey]
+                        delta = abs(pymca[ikey]- cpp[key][i])
+                        tol = 1.0e-7
+                        self.assertTrue(delta < tol,
+                            "Default E, z = %d, shell = %s, energy = %f, delta = %f" %\
+                                (j, key, x[i], delta))
+            print("\nPhotoelectric weights OK at default energies")
+            x += 0.123
+            for j in range(1, 100):
+                cpp = epdl.getPhotoelectricWeights(j, x)
+                for i in range(len(x)):
+                    if x[i] < 1.0:
+                        continue
+                    pymca = PyMcaEPDL97.getPhotoelectricWeights(getSymbol(j),
                                                                 shellList,
                                                                 x[i])
-                for ikey in range(len(shellList)):
-                    key = shellList[ikey]
-                    delta = abs(pymca[ikey]- cpp[key][i])
-                    tol = 1.0e-7
-                    self.assertTrue(delta < tol,
-                        "Default E, z = %d, shell = %s, energy = %f, delta = %f" %\
-                            (j, key, x[i], delta))
-        print("Photoelectric weights OK at default energies")
-        x += 0.123
-        for j in range(1, 100):
-            cpp = epdl.getPhotoelectricWeights(j, x)
-            for i in range(len(x)):
-                if x[i] < 1.0:
-                    continue
-                pymca = PyMcaEPDL97.getPhotoelectricWeights(getSymbol(j),
-                                                            shellList,
-                                                            x[i])
-                for ikey in range(len(shellList)):
-                    key = shellList[ikey]
-                    delta = abs(pymca[ikey]- cpp[key][i])
-                    tol = 1.0e-7
-                    self.assertTrue(delta < tol,
-                        "z = %d, shell = %s, energy = %f, delta = %f" %\
-                            (j, key, x[i], delta))
-        print("Photoelectric weights OK at any energy")
+                    for ikey in range(len(shellList)):
+                        key = shellList[ikey]
+                        delta = abs(pymca[ikey]- cpp[key][i])
+                        tol = 1.0e-7
+                        self.assertTrue(delta < tol,
+                            "z = %d, shell = %s, energy = %f, delta = %f" %\
+                                (j, key, x[i], delta))
+            print("Photoelectric weights OK at any energy")
 
 def getSuite(auto=True):
     testSuite = unittest.TestSuite()
