@@ -240,6 +240,7 @@ classifiers = ["Development Status :: 5 - Production/Stable",
                "Operating System :: Unix",
                "Operating System :: MacOS :: MacOS X",
                "Operating System :: POSIX",
+               "Topic :: Scientific/Engineering :: Chemistry",
                "Topic :: Scientific/Engineering :: Physics"
                ]
 
