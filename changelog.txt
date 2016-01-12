@@ -1,6 +1,14 @@
+VERSION 1.0.6
+
+Allow building without a cython installation
+
+Tests comparing against PyMca only taken into account if PyMca5 installed
+
 VERSION 1.0.5
 
 Correct error preventing compilation with Visual Studio 2015
+
+Tests passing under Python 3.5
 
 VERSION 1.0.4
 
