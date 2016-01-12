@@ -32,6 +32,13 @@ import os
 import gc
 import tempfile
 
+try:
+    from PyMca5.PyMca import specfile
+    PYMCA = True
+except ImportError:
+    # do not compare with PyMca because it is not installed
+    PYMCA = False
+
 class testSimpleSpecfile(unittest.TestCase):
     def setUp(self):
         """
@@ -123,35 +130,35 @@ class testSimpleSpecfile(unittest.TestCase):
                     (data[2] [0], 3.7))
         gc.collect()
 
-    def testSimpleSpecfileVersusPyMca(self):
-        import glob
-        try:
+    
+    if PYMCA:
+        def testSimpleSpecfileVersusPyMca(self):
+            import glob
+            import PyMca5
             from PyMca5 import PyMcaDataDir
             from PyMca5.PyMcaIO import specfilewrapper as Specfile
-        except ImportError:
-            print("\n ****** Skipping: PyMca not installed ******* \n")
-            return
-        fileList = glob.glob(os.path.join(PyMcaDataDir.PYMCA_DATA_DIR, '*.dat'))
-        self.testSimpleSpecfileImport()
-        for filename in fileList:
-            self._sf = self.specfileClass(filename)
-            a = self._sf
-            nScans = a.getNumberOfScans()
-            sf = Specfile.Specfile(filename)
-            for i in range(nScans):
-                scan = sf[i]
-                labels0 = a.getScanLabels(i)
-                labels1 = scan.alllabels()
-                for j in range(len(labels0)):
-                    self.assertEqual(labels0[j], labels1[j],
-                                "Read <%s> instead of <%s>" %\
-                                     (labels0[j], labels1[j]))
-                data0 = a.getScanData(i)
-                data1 = scan.data().T
-                M = abs(data0 - data1).max()
-                if M > 1.0e-8:
-                    raise ValueError("Error reading data")
-        
+            fileList = glob.glob(os.path.join(PyMcaDataDir.PYMCA_DATA_DIR, '*.dat'))
+            self.testSimpleSpecfileImport()
+            for filename in fileList:
+                self._sf = self.specfileClass(filename)
+                a = self._sf
+                nScans = a.getNumberOfScans()
+                sf = Specfile.Specfile(filename)
+                for i in range(nScans):
+                    scan = sf[i]
+                    if PyMca5.version() > "5.1.1":
+                        # previous versions of PyMca5 could segfault here
+                        labels0 = a.getScanLabels(i)
+                        labels1 = scan.alllabels()
+                        for j in range(len(labels0)):
+                            self.assertEqual(labels0[j], labels1[j],
+                                        "Read <%s> instead of <%s>" %\
+                                             (labels0[j], labels1[j]))
+                    data0 = a.getScanData(i)
+                    data1 = scan.data().T
+                    M = abs(data0 - data1).max()
+                    if M > 1.0e-8:
+                        raise ValueError("Error reading data")        
 
 def getSuite(auto=True):
     testSuite = unittest.TestSuite()
