@@ -214,14 +214,12 @@ def buildExtension():
 ext_modules = [buildExtension()]
 
 cmdclass = {'install_data':smart_install_data,
-            'build_py':smart_build_py,
-            'build_ext': build_ext,
-            }
+            'build_py':smart_build_py}
+if build_ext:
+    cmdclass['build_ext'] = build_ext
 
 description = "Quantitative X-Ray Fluorescence Analysis Support Library"
-long_description = """
-Tools to evaluate the expected X-ray fluorescence measured when a sample is excitated by an X-ray beam. Secondary and tertiary excitation effects taken into account.
-"""
+long_description = open("README.rst").read()
 
 # tell distutils where to find the packages
 package_dir = {"":"python"}
