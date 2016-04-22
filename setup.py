@@ -202,7 +202,6 @@ else:
         outFile.writelines(inLines)
         outFile.close()
     src = [outSrc]
-    sys.exit(0)
 
 src += glob.glob(os.path.join(os.path.dirname(os.path.abspath(__file__)),
                 'src', 'fisx_*.cpp'))
