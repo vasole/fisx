@@ -186,7 +186,7 @@ if build_ext:
         f.close()
     src = [multiple_pyx]
 else:
-    src = glob.glob(os.path.join(cython_dir,'*.cpp'))
+    src = glob.glob(os.path.join(cython_dir, 'default', '*.cpp'))
 src += glob.glob(os.path.join(os.path.dirname(os.path.abspath(__file__)),
                 'src', 'fisx_*.cpp'))
 
