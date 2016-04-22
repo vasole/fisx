@@ -57,7 +57,7 @@ script:
     - pip freeze
 
     # Run the tests
-    - pythn -m fisx.tests.testAll
+    - python -m fisx.tests.testAll
 
     # Mac OS X specific cleanup
     - travis_osx_run_end
