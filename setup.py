@@ -186,17 +186,23 @@ if build_ext:
         f.close()
     src = [multiple_pyx]
 else:
-    src_files = glob.glob(os.path.join(cython_dir, 'default', '*.cpp'))
-    src = []
-    for fname in src_files:
-        inFile = open(fname, 'rb')
-        lines = inFile.readlines()
-        inFile.close()
-        f = open(os.path.join(cython_dir, os.path.basename(fname, 'wb')))
-        for line in lines:
-            f.write(line)
-        f.close()
-        src.append(f)
+    inSrc = os.path.join(cython_dir, 'default', '_fisx.cpp')
+    inFile = open(inSrc, 'rb')
+    inLines = inFile.readlines()
+    inFile.close()
+    outSrc = os.path.join(cython_dir, '_fisx.cpp')
+    if os.path.exists(outSrc):
+        outFile = open(outSrc, 'rb')
+        outLines = outFile.readlines()
+        outFile.close()
+        if outLines != inLines:
+            os.remove(outFile)
+    if not os.path.exists(outSrc):
+        outFile = open(outSrc, 'wb')
+        outFile.writelines(inLines)
+        outFile.close()
+    src = [outSrc]
+    sys.exit(0)
 
 src += glob.glob(os.path.join(os.path.dirname(os.path.abspath(__file__)),
                 'src', 'fisx_*.cpp'))
