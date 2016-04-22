@@ -192,7 +192,7 @@ else:
         inFile = open(fname, 'rb')
         lines = inFile.readlines()
         inFile.close()
-        f = open(os.path.join(cython_dir, os.path.basename(fname), 'wb'))
+        f = open(os.path.join(cython_dir, os.path.basename(fname, 'wb')))
         for line in lines:
             f.write(line)
         f.close()
