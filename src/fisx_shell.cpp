@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014 V. Armando Sole
+# Copyright (c) 2014-2016 V. Armando Sole
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -230,6 +230,7 @@ void Shell::setRadiativeTransitions(std::vector<std::string> labels, std::vector
             }
             else
             {
+                std::cout << "Not a valid transition <" << tmpString << ">" << std::endl;
                 tmpString += " is not a valid transition";
                 throw std::invalid_argument(tmpString);
             }
