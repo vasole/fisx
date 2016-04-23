@@ -2,6 +2,10 @@
 fisx
 ====
 
+Main development website: https://github.com/vasole/fisx
+
+|Build Status| |Appveyor Status|
+
 This software library implements formulas to calculate, given an experimental setup, the expected x-ray fluorescence intensities. The library accounts for secondary and tertiary excitation, K, L and M shell emission lines and de-excitation cascade effects. The basic implementation is written in C++ and a Python binding is provided.
 
 Account for scondary excitation is made via the reference:
