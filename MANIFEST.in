@@ -4,5 +4,6 @@ include changelog.txt
 include README.rst
 include TODO
 recursive-include fisx_data *.dat
-recursive-include python *.py *.pyx *.pxd *.cpp
+recursive-include python *.py *.pyx *.pxd
+include python/cython/default/_fisx.cpp
 recursive-include src *.h *.cpp

@@ -21,8 +21,8 @@
 __pycache__/
 *.py[cod]
 
-#cython generated files added (line commented)
-#python/cython/*.cpp
+#cython generated files
+python/cython/*.cpp
 
 # Distribution / packaging
 #bin/

@@ -4,7 +4,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014 V. Armando Sole
+# Copyright (c) 2014-2016 V. Armando Sole
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -186,7 +186,23 @@ if build_ext:
         f.close()
     src = [multiple_pyx]
 else:
-    src = glob.glob(os.path.join(cython_dir,'*.cpp'))
+    inSrc = os.path.join(cython_dir, 'default', '_fisx.cpp')
+    inFile = open(inSrc, 'rb')
+    inLines = inFile.readlines()
+    inFile.close()
+    outSrc = os.path.join(cython_dir, '_fisx.cpp')
+    if os.path.exists(outSrc):
+        outFile = open(outSrc, 'rb')
+        outLines = outFile.readlines()
+        outFile.close()
+        if outLines != inLines:
+            os.remove(outFile)
+    if not os.path.exists(outSrc):
+        outFile = open(outSrc, 'wb')
+        outFile.writelines(inLines)
+        outFile.close()
+    src = [outSrc]
+
 src += glob.glob(os.path.join(os.path.dirname(os.path.abspath(__file__)),
                 'src', 'fisx_*.cpp'))
 
