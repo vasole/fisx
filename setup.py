@@ -196,7 +196,7 @@ else:
         outLines = outFile.readlines()
         outFile.close()
         if outLines != inLines:
-            os.remove(outFile)
+            os.remove(outSrc)
     if not os.path.exists(outSrc):
         outFile = open(outSrc, 'wb')
         outFile.writelines(inLines)
