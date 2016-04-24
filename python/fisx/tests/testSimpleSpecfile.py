@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014 V. Armando Sole
+# Copyright (c) 2014-2016 V. Armando Sole
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -74,6 +74,16 @@ class testSimpleSpecfile(unittest.TestCase):
             os.close(tmpFile[0])
             self.fname = tmpFile[1]
 
+            # generate a badly formatted file using \r\n endings
+            text = text.replace("\n", "\r\n")
+            tmpFile = tempfile.mkstemp(text=False)
+            if sys.version < '3.0':
+                os.write(tmpFile[0], text)
+            else:
+                os.write(tmpFile[0], bytes(text, 'utf-8'))
+            os.close(tmpFile[0])
+            self.fnameCR = tmpFile[1]
+
     def tearDown(self):
         """clean up any possible files"""
         # make sure the file handle is free
@@ -84,6 +94,8 @@ class testSimpleSpecfile(unittest.TestCase):
         if self.specfileClass is not None:
             if os.path.exists(self.fname):
                 os.remove(self.fname)
+            if os.path.exists(self.fnameCR):
+                os.remove(self.fnameCR)
 
     def testSimpleSpecfileImport(self):
         #"""Test successful import"""
@@ -105,10 +117,33 @@ class testSimpleSpecfile(unittest.TestCase):
         labels = self._sf.getScanLabels(1)
         expectedLabels = ['First', 'Second', 'Third']
         self.assertEqual(len(labels), 3,
-                         'Expected to read 3 scans, got %s' % len(labels))
+                         'Expected to read 3 labels, got %d' % len(labels))
         for i in range(3):
             self.assertEqual(labels[i], expectedLabels[i],
                     'Read "%s" instead of "%s"' %\
+                     (labels[i], expectedLabels[i]))
+
+        gc.collect()
+
+    def testSimpleSpecfileReadingWithCRLF(self):
+        #"""Test specfile readout"""
+        self.testSimpleSpecfileImport()
+        self._sf = self.specfileClass(self.fnameCR)
+
+        # test the number of found scans
+        nScans = self._sf.getNumberOfScans()
+        self.assertEqual(nScans, 2,
+                         'Expected to read 2 scans, read %s' %\
+                         nScans)
+
+        # test scan iteration selection method
+        labels = self._sf.getScanLabels(1)
+        expectedLabels = ['First', 'Second', 'Third']
+        self.assertEqual(len(labels), 3,
+                    'Expected to read 3 labels, got %d' % len(labels))
+        for i in range(3):
+            self.assertEqual(labels[i], expectedLabels[i],
+                    'Read <"%s"> instead of "%s" with CRLF endings' %\
                      (labels[i], expectedLabels[i]))
 
         gc.collect()
@@ -169,6 +204,8 @@ def getSuite(auto=True):
         # use a predefined order
         testSuite.addTest(testSimpleSpecfile("testSimpleSpecfileImport"))
         testSuite.addTest(testSimpleSpecfile("testSimpleSpecfileReading"))
+        testSuite.addTest(testSimpleSpecfile(\
+            "testSimpleSpecfileReadingWithCRLF"))
         testSuite.addTest(\
             testSimpleSpecfile("testSimpleSpecfileReadingCompatibleWithUserLocale"))
         testSuite.addTest(\
