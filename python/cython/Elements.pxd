@@ -44,6 +44,8 @@ cdef extern from "fisx_elements.h" namespace "fisx":
 
         std_vector[std_string] getElementNames()
 
+        std_vector[std_string] getMaterialNames()
+
         std_map[std_string, double] getComposition(std_string) except +
 
         void addMaterial(Material, int) except +

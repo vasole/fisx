@@ -36,7 +36,7 @@ from libcpp.map cimport map as std_map
 
 from Elements cimport *
 from Detector cimport *
-from FisxCythonTools import toBytes, toBytesKeys, toBytesKeysAndValues, toString,  toStringKeys, toStringKeysAndValues
+from FisxCythonTools import toBytes, toBytesKeys, toBytesKeysAndValues, toString,  toStringKeys, toStringKeysAndValues, toStringList
 
 cdef class PyDetector:
     cdef Detector *thisptr
@@ -316,7 +316,10 @@ cdef class PyElements:
             self.thisptr.setShellRadiativeTransitionsFile(toBytes(shell), toBytes(radiativeRatesFile))
 
     def getElementNames(self):
-        return self.thisptr.getElementNames()
+        return toStringList(self.thisptr.getElementNames())
+
+    def getMaterialNames(self):
+        return toStringList(self.thisptr.getMaterialNames())
 
     def getComposition(self, materialOrFormula):
         if sys.version < "3.0":

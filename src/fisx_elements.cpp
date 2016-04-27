@@ -1170,6 +1170,20 @@ const Material & Elements::getMaterial(const std::string & materialName)
     return this->materialList[i];
 }
 
+std::vector<std::string> Elements::getMaterialNames()
+{
+    std::vector<Material>::size_type i;
+    std::vector<std::string> result;
+
+    result.resize(this->materialList.size());
+    for (i = 0; i < this->materialList.size(); i++)
+    {
+        result[i] = this->materialList[i].getName();
+    }
+
+    return result;
+}
+
 Material Elements::getMaterialCopy(const std::string & materialName)
 {
     std::string msg;

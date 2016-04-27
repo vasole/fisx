@@ -111,7 +111,10 @@ cdef class PyElements:
             self.thisptr.setShellRadiativeTransitionsFile(toBytes(shell), toBytes(radiativeRatesFile))
 
     def getElementNames(self):
-        return self.thisptr.getElementNames()
+        return toStringList(self.thisptr.getElementNames())
+
+    def getMaterialNames(self):
+        return toStringList(self.thisptr.getMaterialNames())
 
     def getComposition(self, materialOrFormula):
         if sys.version < "3.0":

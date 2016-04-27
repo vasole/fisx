@@ -47,6 +47,9 @@ if sys.version < "3.0":
     def toStringKeysAndValues(inputDict, encoding="utf-8"):
         return inputDict
 
+    def toStringList(inputList, encoding="utf-8"):
+        return inputList
+
 else:
     def toBytes(inputArgument, encoding="utf-8"):
         if hasattr(inputArgument, "encode"):
@@ -81,3 +84,7 @@ else:
     def toStringKeys(inputDict, encoding="utf-8"):
         return dict((key.decode(encoding), value) if hasattr(key, "decode") \
                     else (key, value) for key, value in inputDict.items())
+
+    def toStringList(inputList, encoding="utf-8"):
+        return list([key.decode(encoding) if hasattr(key, "decode") \
+                      else key for key in inputList])

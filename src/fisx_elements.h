@@ -271,6 +271,11 @@ public:
     const Material & getMaterial(const std::string & materialName);
 
     /*!
+    Retrieve the names of the materials already defined in the library.
+    */
+    std::vector<std::string> getMaterialNames();
+
+    /*!
     Retrieve a copy of the instance of the material identified by materialName
     */
     Material getMaterialCopy(const std::string & materialName);
