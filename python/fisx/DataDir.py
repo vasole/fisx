@@ -57,7 +57,16 @@ if not os.path.exists(FISX_DATA_DIR):
         FISX_DATA_DIR = os.path.join(tmp_dir, "fisx", basename)
 
 if not os.path.exists(FISX_DATA_DIR):
-    raise IOError('%s directory not found' % basename)
+    FISX_DATA_DIR = os.getenv("FISX_DATA_DIR")
+    if FISX_DATA_DIR is not None:
+        if not os.path.exists(FISX_DATA_DIR):
+            raise IOError('%s directory set from environent not found' % FISX_DATA_DIR)
+        else:
+            txt = "WARNING: Taking FISX_DATA_DIR from environement.\n"
+            txt += "Use it at your own risk."
+            print(txt)
+    else:
+        raise IOError('%s directory not found' % basename)
 
 # do the same for the directory containing HTML files
 if not os.path.exists(FISX_DOC_DIR):
@@ -83,5 +92,12 @@ if not os.path.exists(FISX_DOC_DIR):
         old_tmp_dir = tmp_dir
         tmp_dir = os.path.dirname(tmp_dir)
         FISX_DOC_DIR = os.path.join(tmp_dir, "fisx", basename)
+
 if not os.path.exists(FISX_DOC_DIR):
-    raise IOError('%s directory not found' % basename)
+    FISX_DOC_DIR = os.getenv("FISX_DOC_DIR")
+    if FISX_DOC_DIR is not None:
+        if not os.path.exists(FISX_DOC_DIR):
+            raise IOError('%s directory not found' % basename)
+    else:
+        # use the data dir as doc dir
+        FISX_DOC_DIR = FISX_DATA_DIR
