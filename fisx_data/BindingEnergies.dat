@@ -1,3 +1,9 @@
+#F BindingEnergies.dat
+#U00
+#U01 Compilation of energies obtained from Table I in:
+#U02 F.P. Larkins, Semiempirical Auger-Electron energies for elements 10 <= Z <= 100
+#U03 Atomic Data and Nuclear Data Tables 20 (1977) 311-387
+#U04
 
 #S 1 Binding energies in keV
 #N 29
