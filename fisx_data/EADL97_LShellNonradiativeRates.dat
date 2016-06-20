@@ -1,11 +1,25 @@
 #F EADL97_LShellNonradiativeRates.dat
 #U00 This file is a conversion to specfile format of 
 #U01 directly extracted EADL97 nonradiative transition probabilities.
-#U02 EADL itself can be found at:
-#U03           http://www-nds.iaea.org/epdl97/libsall.htm
-#U04 The code used to generate this file has been:
-#U05 GenerateEADLShellNonradiativeRates.py
+#U02 to simplify its use with the fisx and PyMca software packages.
+#U03
+#U04 Neither those packages or their author(s) claim any ownership of
+#U05 the data and they do not warrant the integrity of the data following 
+#U07 the conversion process.
 #U06
+#U07 EADL itself can be found at:
+#U08           http://www-nds.iaea.org/epdl97/libsall.htm
+#U09 The code used to generate this file has been:
+#U10 GenerateEADLShellNonradiativeRates.py
+#U11
+#U12 The proper way to quote these data is:
+#U13 D.E. Cullen, et al., "Tables and Graphs of Atomic Subshell and 
+#U14 Relaxation Data Derived from the LLNL Evaluated Atomic Data Library
+#U15 (EADL), Z = 1 - 100," Lawrence Livermore National Laboratory, UCRL-50400,
+#U16  Vol. 30, October 1991
+#U17 The author of this data, D.E. Cullen, has stated that redistribution of this
+#U18 data is permitted provided the previous credits are maintained.
+#U19 
 
 #S 1 L1-Shell nonradiative rates
 #N 261
