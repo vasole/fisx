@@ -1,3 +1,14 @@
+#F K Shell Constants
+#U00
+#U01 These fluorescence yields have been generated using the semiempirical
+#U02 formula of W. Bambynek:
+#U03
+#U03 W. Bambynek, Proc. Conf. on X-ra and Inner Shell Processes in Atoms,
+#U04 Molecules and Solids, Aug. 20-24, Leipzig, Germany, 1984.
+#U05
+#U06 The generated values are in good agreement with the theoretical values
+#U07 published by Chen et al. in Phys. Rev. A 21 (1980) 436-441.
+#U08
 
 #S 1 K Shell Fluorescence Yields
 #N 2
