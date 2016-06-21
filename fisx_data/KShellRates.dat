@@ -1,3 +1,14 @@
+#F KShellRates.dat
+#U00
+#U01 Adaptation from table I of the reference:
+#U02
+#U03 J.H. Scofield, "Exchange Corrections of K X-ray Emission
+#U04 Rates", Physical Review A 9 (1974) 1041 - 1049
+#U05
+#U06 The TOTAL column is taken from the reference. The individual
+#U07 shells of the reference are divided by the total in order to
+#U08 directly get probabilities and missing data are interpolated.
+#U09
 
 #S 1 K x-ray emission rates
 #N 10

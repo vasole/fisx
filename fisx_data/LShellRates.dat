@@ -1,3 +1,15 @@
+#F LShellRates.dat
+#U00
+#U01 Adaptation from tables of the reference:
+#U02
+#U03 J.H. Scofield, "Relativistic Hartree-Slater Values for 
+#U04 K and L X-ray Emission Rates", Atomic Data and Nuclear
+#U05 Data Tables 14 (1964) 121 - 137
+#U06
+#U07 The TOTAL column is taken from the reference. The individual
+#U08 shells of the reference are divided by the total in order to
+#U09 directly get probabilities and missing values are interpolated.
+#U10
 
 #S 1 L1 x-ray emission rates
 #N 20

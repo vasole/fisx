@@ -1,3 +1,11 @@
+#F MShellRates.dat
+#U00
+#U01 Table generated from data available in the reference:
+#U02 C.P. Bahlla, "Radiative Transition Probabilities for Vacancies
+#U03 in M sub-shells". J. Phys. B: Atom. Molec. Phys. 3 (1970) 916-924. 
+#U04
+#U05 Data are written in form of probabilities and missing values are interpolated.
+#U06
 
 #S 1 M1 emission rates
 #N 20
