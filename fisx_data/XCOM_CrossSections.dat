@@ -4,6 +4,12 @@
 #U02
 #U03 XCOM itself can be found at:
 #U04   http://www.nist.gov/pml/data/xcom/index.cfm
+#U05
+#U06 The original XCOM reference is:
+#U07 M.J. Berger and J.H. Hubbel referene, "XCOM: Photon cross sections
+#U08 on a personal computer", US Department of Commerce, National Bureau
+#U09 of Standards NDSIR (1987) 87-3597
+#U07
 
 #S 1 H
 #N 7
