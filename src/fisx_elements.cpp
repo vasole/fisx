@@ -1878,7 +1878,7 @@ std::map<std::string,std::map<std::string, double> > Elements::getEscape( \
                     // and not per incident photon.
                     // It is not a correct approximation, but this avoids the calculation
                     // of exponential integral functions.
-                    rate /= (1.0 - std::exp(-muIncident * thickness / sinAlphaIn));
+                    rate /= intrinsicEfficiency;
                 }
                 result[tmpString] ["rate"] = rate;
                 result[tmpString] ["energy"] = energy - fluorescentEnergy;
