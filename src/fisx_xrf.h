@@ -173,19 +173,9 @@ public:
                                            const Elements & elements);
 
     /*!
-    Methods coordinating all the calculation
-    void detectedEmission()
-    void expectedEmission():
-    void expectedFluorescence();
-    void expectedScattering();
-    void peakRatios();
+    Get geometric efficiency term. Solid angle subtended by the detector at the sample divided by 4 * pi
     */
     double getGeometricEfficiency(const int & layerIndex = 0) const;
-
-    std::map<std::string, std::map<std::string, double> > getFluorescence(const std::string & element, \
-                const Elements & elementsLibrary, const int & sampleLayerIndex = 0, \
-                const std::string & lineFamily = "", const int & secondary = 0, \
-                const int & useGeometricEfficiency = 1);
 
 
     /*!
