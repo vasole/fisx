@@ -804,7 +804,6 @@ cdef class PyMath:
         Calculate the complementary error function erfc(x)
         """
         return self.thisptr.erfc(x)
-
 #/*##########################################################################
 #
 # The fisx library for X-Ray Fluorescence
