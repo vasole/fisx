@@ -614,8 +614,7 @@ std::map<std::string, std::vector<double> > EPDL97::getMassAttenuationCoefficien
 std::map< std::string, std::vector<double> > EPDL97::getMassAttenuationCoefficients(const int & z) const
 {
 
-    int i, idx, iMu, nValues, j;
-    std::string shellList[10] = {"K", "L1", "L2", "L3", "M1", "M2", "M3", "M4", "M5", "all other"};
+    int i, idx, iMu, nValues;
     std::map<std::string, std::vector<double> > result;
     std::map<std::string, int>::const_iterator c_it;
     std::string key;

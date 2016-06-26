@@ -68,13 +68,3 @@ cdef class PyMath:
         Calculate the complementary error function erfc(x)
         """
         return self.thisptr.erfc(x)
-
-    def hypermet(self, x, gaussArea, position, fwhm,
-                 shortTailArea=0.0, shortTailSlope=0.03,
-                 longTailArea=0.0, longTailSlope=1.0,
-                 stepHeight=0.0):
-        """
-        Calculate the HYPERMET function of x.
-        """
-        return self.thisptr.hypermet(x, gaussArea, position, fwhm,
-                                     shortTailArea, shortTailSlope, longTailArea, longTailSlope, stepHeight)

@@ -173,19 +173,9 @@ public:
                                            const Elements & elements);
 
     /*!
-    Methods coordinating all the calculation
-    void detectedEmission()
-    void expectedEmission():
-    void expectedFluorescence();
-    void expectedScattering();
-    void peakRatios();
+    Get geometric efficiency term. Solid angle subtended by the detector at the sample divided by 4 * pi
     */
     double getGeometricEfficiency(const int & layerIndex = 0) const;
-
-    std::map<std::string, std::map<std::string, double> > getFluorescence(const std::string & element, \
-                const Elements & elementsLibrary, const int & sampleLayerIndex = 0, \
-                const std::string & lineFamily = "", const int & secondary = 0, \
-                const int & useGeometricEfficiency = 1);
 
 
     /*!
@@ -252,60 +242,6 @@ public:
 
     double getEnergyThreshold(const std::string & elementName, const std::string & family, \
                                 const Elements & elementsLibrary) const;
-
-
-    /*!
-    Return the expected fluorescent spectrum per unit photon
-
-    channel vector of channel values at which the spectrum is to be evaluated
-
-    detectorParameters is <string, double> map that may contain the following keys:
-
-    Zero : Energy calibration parameter. Energy at channel 0. Term A in Energy (keV) = A + B * channel.
-    Gain : Term B in Energy (keV) = A + B * channel
-    Noise : Electronic noise in keV
-    Fano : Fano factor
-    QuantumEnergy : Average energy (in keV) to create a "signal quantum" (an electron-hole pair in Si)
-                    In scintillator detectors is ~100 eV and in gas detectors ~30 eV.
-
-    If any of those keys is not present, the associated value will be taken from the configuration.
-
-    shapeParameters is a map that may contain the following keys:
-
-    ShortTailArea : Area in the short exponential tail respect to the main gaussian area
-    ShortTailSlope : The slope of the short exponential tail in main gaussian sigma units
-    LongTailArea : Area in the long exponential tail respect to the main gaussian area
-    LongTailSlope : The slope of the long exponential tail in main gaussian sigma units
-    StepHeight : Height of the step tail relative to the main gaussian height
-    Eta : Pseudo-voigt function parameter. (1.0 - Eta) * GaussianTerm + Eta * LorentzianTerm
-
-    If Eta is present, the other parameters are ignored. A value of Eta equal to 0.0 or an empty map
-    will force a Gaussian response regardless of the remaining parameters.
-
-    peakFamilyAreas is a map that contains the total area associated to a certain peak family.
-    In order to foresee "per layer" calculations the keys have the from "Element Family number" where
-    number is optional. For instance:
-
-    Cr K : Total Chromium K-shell area
-    Cr K 0 : Total Chromium K-shell area coming from layer 0.
-
-    Obviously both types of keys should not be used for the same element and family.
-
-    */
-    std::map<std::string, std::vector<double> > getSpectrum(const std::vector<double> & channel, \
-                const std::map<std::string, double> & detectorParameters = (std::map<std::string, double> ()), \
-                const std::map<std::string, double> & shapeParameters = (std::map<std::string, double> ()), \
-                const std::map<std::string, double> & peakFamilyArea = (std::map<std::string, double> ()), \
-                const expectedLayerEmissionType & emissionRatios = (expectedLayerEmissionType())) const;
-
-    /*!
-    Alternative method in a more traditional way.
-    */
-    void getSpectrum(double * channel, double * energy, double *spectrum, int nChannels, \
-                const std::map<std::string, double> & detectorParameters = (std::map<std::string, double> ()), \
-                const std::map<std::string, double> & shapeParameters = (std::map<std::string, double> ()), \
-                const std::map<std::string, double> & peakFamilyArea = (std::map<std::string, double> ()), \
-                const expectedLayerEmissionType & emissionRatios = (expectedLayerEmissionType())) const;
 
 private:
     /*!

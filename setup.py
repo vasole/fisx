@@ -87,7 +87,9 @@ if FISX_DOC_DIR is None:
 
 def getFisxVersion():
     cppDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "src")
-    content = open(os.path.join(cppDir, "fisx_version.h"), "r").readlines()
+    f = open(os.path.join(cppDir, "fisx_version.h"), "r")
+    content = f.readlines()
+    f.close()
     for line in content:
         if "FISX_VERSION_STR" in line:
             version = line.split("FISX_VERSION_STR")[-1].replace("\n","")
