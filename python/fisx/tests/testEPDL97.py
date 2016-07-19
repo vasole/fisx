@@ -173,11 +173,12 @@ def getSuite(auto=True):
     else:
         # use a predefined order
         testSuite.addTest(testEPDL97("testEPDL97Import"))
-        testSuite.addTest(testEPDL97("testEPDL97BindingVersusPyMcaEPDL97Binding"))
-        testSuite.addTest(\
-            testEPDL97("testEPDL97MuVersusPyMcaEPDL97Mu"))
-        testSuite.addTest(\
-            testEPDL97("testEPDL97PartialVersusPyMcaPartial"))
+        if PYMCA:
+            testSuite.addTest(testEPDL97("testEPDL97BindingVersusPyMcaEPDL97Binding"))
+            testSuite.addTest(\
+                testEPDL97("testEPDL97MuVersusPyMcaEPDL97Mu"))
+            testSuite.addTest(\
+                testEPDL97("testEPDL97PartialVersusPyMcaPartial"))
     return testSuite
 
 def test(auto=False):
