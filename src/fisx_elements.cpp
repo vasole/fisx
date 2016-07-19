@@ -32,6 +32,7 @@
 #include <cmath>
 #include <sstream>
 #include <algorithm>
+#include <cstdlib>
 #include "fisx_elements.h"
 
 namespace fisx
@@ -40,7 +41,17 @@ namespace fisx
 
 const std::string Elements::defaultDataDir()
 {
-    return FISX_DATA_DIR;
+    char *path;
+
+    path = std::getenv("FISX_DATA_DIR");
+    if (path != NULL)
+    {
+        return std::string(path);
+    }
+    else
+    {
+        return FISX_DATA_DIR;
+    }
 }
 
 Elements::Elements(std::string epdl97Directory, std::string bindingEnergiesFileName, std::string crossSectionsFile)
@@ -59,7 +70,15 @@ Elements::Elements(std::string epdl97Directory, std::string bindingEnergiesFileN
 Elements::Elements(std::string epdl97Directory)
 {
     // pure EPDL97 initialization
-    this->initialize(epdl97Directory, "");
+    if (epdl97Directory.size() < 1)
+    {
+        std::cout << "HERE" << Elements::defaultDataDir() << std::endl;
+        this->initialize(Elements::defaultDataDir(), "");
+    }
+    else
+    {
+        this->initialize(epdl97Directory, "");
+    }
 }
 
 Elements::Elements(std::string directoryName, short pymca)
