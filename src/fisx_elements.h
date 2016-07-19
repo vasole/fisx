@@ -70,7 +70,7 @@ public:
     /*!
     Initialize the library from the EADL and EPDL97 data files found in the provided directory.
     */
-    Elements(std::string dataDirectory = FISX_DATA_DIR);
+    Elements(std::string dataDirectory="");
 
     /*!
     Initialize the library from the data files found in the provided directory.

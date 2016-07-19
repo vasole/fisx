@@ -72,7 +72,6 @@ Elements::Elements(std::string epdl97Directory)
     // pure EPDL97 initialization
     if (epdl97Directory.size() < 1)
     {
-        std::cout << "HERE" << Elements::defaultDataDir() << std::endl;
         this->initialize(Elements::defaultDataDir(), "");
     }
     else
