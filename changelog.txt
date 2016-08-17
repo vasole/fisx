@@ -1,3 +1,7 @@
+VERSION 1.1.1
+
+Correct error on internal method name (issue #18)
+
 VERSION 1.1.0
 
 Forced release to comply with PyPI.
