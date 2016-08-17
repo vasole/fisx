@@ -97,7 +97,7 @@ cdef class PyElements:
             radiativeRatesFile = getDataFile(shell+"ShellRates.dat")
             self.thisptr.setShellRadiativeTransitionsFile(toBytes(shell), toBytes(radiativeRatesFile))
 
-    def __initializeAsPyMcaOLD(self):
+    def __initializeAsPyMcaOld(self):
         """
         Configure the instance to use the same set of data as PyMca.
         """
