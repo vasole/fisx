@@ -1257,7 +1257,7 @@ static PyObject *__pyx_pf_4fisx_5_fisx_9PyElement_34getShellConstants(struct __p
 static PyObject *__pyx_pf_4fisx_5_fisx_9PyElement_36getXRayLinesFromVacancyDistribution(struct __pyx_obj_4fisx_5_fisx_PyElement *__pyx_v_self, std::map<std::string,double>  __pyx_v_vacancyDict); /* proto */
 static int __pyx_pf_4fisx_5_fisx_10PyElements___cinit__(struct __pyx_obj_4fisx_5_fisx_PyElements *__pyx_v_self, PyObject *__pyx_v_directoryName, PyObject *__pyx_v_bindingEnergiesFile, PyObject *__pyx_v_crossSectionsFile, PyObject *__pyx_v_pymca); /* proto */
 static PyObject *__pyx_pf_4fisx_5_fisx_10PyElements_2initializeAsPyMca(struct __pyx_obj_4fisx_5_fisx_PyElements *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_4fisx_5_fisx_10PyElements_4__initializeAsPyMcaOLD(struct __pyx_obj_4fisx_5_fisx_PyElements *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_4fisx_5_fisx_10PyElements_4__initializeAsPyMcaOld(struct __pyx_obj_4fisx_5_fisx_PyElements *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_4fisx_5_fisx_10PyElements_6getElementNames(struct __pyx_obj_4fisx_5_fisx_PyElements *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_4fisx_5_fisx_10PyElements_8getMaterialNames(struct __pyx_obj_4fisx_5_fisx_PyElements *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_4fisx_5_fisx_10PyElements_10getComposition(struct __pyx_obj_4fisx_5_fisx_PyElements *__pyx_v_self, PyObject *__pyx_v_materialOrFormula); /* proto */
@@ -5831,7 +5831,7 @@ static PyObject *__pyx_pf_4fisx_5_fisx_10PyElements_2initializeAsPyMca(struct __
  *             radiativeRatesFile = getDataFile(shell+"ShellRates.dat")
  *             self.thisptr.setShellRadiativeTransitionsFile(toBytes(shell), toBytes(radiativeRatesFile))             # <<<<<<<<<<<<<<
  * 
- *     def __initializeAsPyMcaOLD(self):
+ *     def __initializeAsPyMcaOld(self):
  */
     __pyx_t_10 = __Pyx_GetModuleGlobalName(__pyx_n_s_toBytes); if (unlikely(!__pyx_t_10)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 303; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_10);
@@ -5946,26 +5946,26 @@ static PyObject *__pyx_pf_4fisx_5_fisx_10PyElements_2initializeAsPyMca(struct __
 /* "python\cython\_fisx.pyx":305
  *             self.thisptr.setShellRadiativeTransitionsFile(toBytes(shell), toBytes(radiativeRatesFile))
  * 
- *     def __initializeAsPyMcaOLD(self):             # <<<<<<<<<<<<<<
+ *     def __initializeAsPyMcaOld(self):             # <<<<<<<<<<<<<<
  *         """
  *         Configure the instance to use the same set of data as PyMca.
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4fisx_5_fisx_10PyElements_5__initializeAsPyMcaOLD(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static char __pyx_doc_4fisx_5_fisx_10PyElements_4__initializeAsPyMcaOLD[] = "\n        Configure the instance to use the same set of data as PyMca.\n        ";
-static PyObject *__pyx_pw_4fisx_5_fisx_10PyElements_5__initializeAsPyMcaOLD(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_4fisx_5_fisx_10PyElements_5__initializeAsPyMcaOld(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static char __pyx_doc_4fisx_5_fisx_10PyElements_4__initializeAsPyMcaOld[] = "\n        Configure the instance to use the same set of data as PyMca.\n        ";
+static PyObject *__pyx_pw_4fisx_5_fisx_10PyElements_5__initializeAsPyMcaOld(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("__initializeAsPyMcaOLD (wrapper)", 0);
-  __pyx_r = __pyx_pf_4fisx_5_fisx_10PyElements_4__initializeAsPyMcaOLD(((struct __pyx_obj_4fisx_5_fisx_PyElements *)__pyx_v_self));
+  __Pyx_RefNannySetupContext("__initializeAsPyMcaOld (wrapper)", 0);
+  __pyx_r = __pyx_pf_4fisx_5_fisx_10PyElements_4__initializeAsPyMcaOld(((struct __pyx_obj_4fisx_5_fisx_PyElements *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4fisx_5_fisx_10PyElements_4__initializeAsPyMcaOLD(struct __pyx_obj_4fisx_5_fisx_PyElements *__pyx_v_self) {
+static PyObject *__pyx_pf_4fisx_5_fisx_10PyElements_4__initializeAsPyMcaOld(struct __pyx_obj_4fisx_5_fisx_PyElements *__pyx_v_self) {
   PyObject *__pyx_v_os = NULL;
   PyObject *__pyx_v_DataDir = NULL;
   PyObject *__pyx_v_directoryName = NULL;
@@ -5997,7 +5997,7 @@ static PyObject *__pyx_pf_4fisx_5_fisx_10PyElements_4__initializeAsPyMcaOLD(stru
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("__initializeAsPyMcaOLD", 0);
+  __Pyx_RefNannySetupContext("__initializeAsPyMcaOld", 0);
 
   /* "python\cython\_fisx.pyx":309
  *         Configure the instance to use the same set of data as PyMca.
@@ -6118,7 +6118,7 @@ static PyObject *__pyx_pf_4fisx_5_fisx_10PyElements_4__initializeAsPyMcaOLD(stru
  */
     __pyx_t_6 = PyErr_ExceptionMatches(__pyx_builtin_ImportError);
     if (__pyx_t_6) {
-      __Pyx_AddTraceback("fisx._fisx.PyElements.__initializeAsPyMcaOLD", __pyx_clineno, __pyx_lineno, __pyx_filename);
+      __Pyx_AddTraceback("fisx._fisx.PyElements.__initializeAsPyMcaOld", __pyx_clineno, __pyx_lineno, __pyx_filename);
       if (__Pyx_GetException(&__pyx_t_1, &__pyx_t_5, &__pyx_t_7) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 315; __pyx_clineno = __LINE__; goto __pyx_L5_except_error;}
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_GOTREF(__pyx_t_5);
@@ -6683,7 +6683,7 @@ static PyObject *__pyx_pf_4fisx_5_fisx_10PyElements_4__initializeAsPyMcaOLD(stru
   /* "python\cython\_fisx.pyx":305
  *             self.thisptr.setShellRadiativeTransitionsFile(toBytes(shell), toBytes(radiativeRatesFile))
  * 
- *     def __initializeAsPyMcaOLD(self):             # <<<<<<<<<<<<<<
+ *     def __initializeAsPyMcaOld(self):             # <<<<<<<<<<<<<<
  *         """
  *         Configure the instance to use the same set of data as PyMca.
  */
@@ -6698,7 +6698,7 @@ static PyObject *__pyx_pf_4fisx_5_fisx_10PyElements_4__initializeAsPyMcaOLD(stru
   __Pyx_XDECREF(__pyx_t_8);
   __Pyx_XDECREF(__pyx_t_9);
   __Pyx_XDECREF(__pyx_t_16);
-  __Pyx_AddTraceback("fisx._fisx.PyElements.__initializeAsPyMcaOLD", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("fisx._fisx.PyElements.__initializeAsPyMcaOld", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_os);
@@ -25202,7 +25202,7 @@ static void __pyx_tp_dealloc_4fisx_5_fisx_PyElements(PyObject *o) {
 
 static PyMethodDef __pyx_methods_4fisx_5_fisx_PyElements[] = {
   {"initializeAsPyMca", (PyCFunction)__pyx_pw_4fisx_5_fisx_10PyElements_3initializeAsPyMca, METH_NOARGS, __pyx_doc_4fisx_5_fisx_10PyElements_2initializeAsPyMca},
-  {"__initializeAsPyMcaOLD", (PyCFunction)__pyx_pw_4fisx_5_fisx_10PyElements_5__initializeAsPyMcaOLD, METH_NOARGS, __pyx_doc_4fisx_5_fisx_10PyElements_4__initializeAsPyMcaOLD},
+  {"__initializeAsPyMcaOld", (PyCFunction)__pyx_pw_4fisx_5_fisx_10PyElements_5__initializeAsPyMcaOld, METH_NOARGS, __pyx_doc_4fisx_5_fisx_10PyElements_4__initializeAsPyMcaOld},
   {"getElementNames", (PyCFunction)__pyx_pw_4fisx_5_fisx_10PyElements_7getElementNames, METH_NOARGS, 0},
   {"getMaterialNames", (PyCFunction)__pyx_pw_4fisx_5_fisx_10PyElements_9getMaterialNames, METH_NOARGS, 0},
   {"getComposition", (PyCFunction)__pyx_pw_4fisx_5_fisx_10PyElements_11getComposition, METH_O, 0},
