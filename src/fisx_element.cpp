@@ -742,21 +742,21 @@ std::map<std::string, double> \
                         i1w += 1;
                     }
                     i2w = i1w + 1;
+                    x0w = c_it->second[i1w];
+                    x1w = c_it->second[i2w];
+                    // check for duplicates
+                    if ((x1w - x0w) < 1.0E-10)
+                    {
+                        i1w += 1;
+                        i2w += 1;
+                        x0w = c_it->second[i1w];
+                        x1w = c_it->second[i2w];
+                    }
                     y0 = y_it->second[i1w];
                     y1 = y_it->second[i2w];
                     x0w = c_it->second[i1w];
                     x1w = c_it->second[i2w];
-                    if ((x1w - x0w) < 1.0E-05)
-                    {
-                        result[shell] = y1;
-                    }
-                    else
-                    {
-                        B = 1.0 / log( x1w / x0w);
-                        A = log(x1w/energy) * B;
-                        B *= log( energy / x0w);
-                        result[shell] = exp(A * log(y0) + B * log(y1));
-                    }
+                    result[shell] = exp(log(y0) + (log(y1 / y0) / log(x1w / x0w)) * log(energy/x0w));
                 }
             }
         }
