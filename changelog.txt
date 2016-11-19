@@ -1,3 +1,10 @@
+VERSION 1.1.2
+
+Correct inconsistency on M-shell data
+
+Correct problem calculating partial photoelectric cross-sections close to the
+Mo edge.
+
 VERSION 1.1.1
 
 Correct error on internal method name (issue #18)
