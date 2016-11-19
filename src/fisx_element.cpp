@@ -746,16 +746,25 @@ std::map<std::string, double> \
                     y1 = y_it->second[i2w];
                     x0w = c_it->second[i1w];
                     x1w = c_it->second[i2w];
-                    B = 1.0 / log( x1w / x0w);
-                    A = log(x1w/energy) * B;
-                    B *= log( energy / x0w);
-                    result[shell] = exp(A * log(y0) + B * log(y1));
+                    if ((x1w - x0w) < 1.0E-05)
+                    {
+                        result[shell] = y1;
+                    }
+                    else
+                    {
+                        B = 1.0 / log( x1w / x0w);
+                        A = log(x1w/energy) * B;
+                        B *= log( energy / x0w);
+                        result[shell] = exp(A * log(y0) + B * log(y1));
+                    }
                 }
             }
         }
         if (!Math::isFiniteNumber(result[shell]))
         {
+            std::cout << "Element " << this->name << std::endl;
             std::cout << "energy " << energy << std::endl;
+            std::cout << "shell " << shell << std::endl;
             std::cout << "i1 " << i1 << " i2 " << i2 << std::endl;
             std::cout << "A " << A << " B " << B << std::endl;
             std::cout << "x0 " << x0 << " x1 " << x1 << std::endl;
