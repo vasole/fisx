@@ -51,10 +51,10 @@ def use_cython():
     Check if cython is disabled from the command line or the environment.
     """
     if "WITH_CYTHON" in os.environ:
-        if os.environ["WITH_CYTHON"] == "False":
+        if os.environ["WITH_CYTHON"] in ["False", "0", 0]:
             print("No Cython requested by environment")
             return False
-    
+
     if ("--no-cython" in sys.argv):
         sys.argv.remove("--no-cython")
         os.environ["WITH_CYTHON"] = "False"
