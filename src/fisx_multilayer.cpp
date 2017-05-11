@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2016 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2017 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -526,12 +526,6 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                 // analogous to incident beam
                                 if (energyThreshold > sampleLayerEnergies[jLayer][iLambda])
                                     continue;
-                                // TODO: Make the intensity threshold accessible to the user
-                                if (sampleLayerRates[jLayer][iLambda] < (secondaryCalculationLimit * sampleLayerWeight[iLayer]))
-                                {
-                                    //std::cout << "Skipping due to weight " << std::endl;
-                                    continue;
-                                }
                                 bool calculate;
                                 calculate = true;
                                 if (excitationFactorsCache.find(elementName) != excitationFactorsCache.end())
@@ -552,6 +546,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                 }
                                 tmpExcitationFactors = excitationFactorsCache[elementName] \
                                                         [sampleLayerEnergies[jLayer][iLambda]];
+                                double criterium;
                                 for (c_it = result.begin(); c_it != result.end(); ++c_it)
                                 {
                                     if (tmpExcitationFactors.find(c_it->first) == tmpExcitationFactors.end())
@@ -561,6 +556,12 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                     mapIt = result[c_it->first].find("mu_1_i");
                                     if (mapIt == result[c_it->first].end())
                                         throw std::runtime_error(" mu_1_i key. Mass attenuation not present???");
+                                    criterium = tmpExcitationFactors[c_it->first]["rate"] * \
+                                                    sampleLayerRates[jLayer][iLambda];
+                                    criterium /= primaryExcitationFactors[c_it->first]["rate"] * \
+                                                     sampleLayerWeight[iLayer];
+                                    if (criterium < secondaryCalculationLimit)
+                                        continue;
                                     mu_1_i = mapIt->second;
                                     tmpDouble = Math::deBoerL0(mu_1_lambda / sinAlphaIn,
                                                                mu_1_i / sinAlphaOut,
@@ -597,6 +598,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                         }
                         else
                         {
+                            double criterium;
                             // continue;
                             mu_2_lambda = muTotal[jLayer];
                             density_2 = sampleLayerDensity[jLayer];
@@ -612,12 +614,6 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                     energy = sampleLayerEnergies[jLayer][iLambda];
                                     if (energyThreshold > energy)
                                         continue;
-                                    // TODO: Make the intensity threshold accessible to the user
-                                    if (sampleLayerRates[jLayer][iLambda] < (secondaryCalculationLimit * sampleLayerWeight[iLayer]))
-                                    {
-                                        //std::cout << "Skipping due to weight " << std::endl;
-                                        continue;
-                                    }
                                     bool calculate;
                                     calculate = true;
                                     if (excitationFactorsCache.find(elementName) != excitationFactorsCache.end())
@@ -723,12 +719,6 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                     energy = sampleLayerEnergies[jLayer][iLambda];
                                     if (energyThreshold > energy)
                                         continue;
-                                    // TODO: Make the intensity threshold accessible to the user
-                                    if (sampleLayerRates[jLayer][iLambda] < (secondaryCalculationLimit * sampleLayerWeight[iLayer]))
-                                    {
-                                        //std::cout << "Skipping due to weight " << std::endl;
-                                        continue;
-                                    }
                                     bool calculate;
                                     calculate = true;
                                     if (excitationFactorsCache.find(elementName) != excitationFactorsCache.end())
@@ -763,6 +753,12 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                         {
                                             continue;
                                         }
+                                        criterium = tmpExcitationFactors[c_it->first]["rate"] * \
+                                                    sampleLayerRates[jLayer][iLambda];
+                                        criterium /= primaryExcitationFactors[c_it->first]["rate"] * \
+                                                     sampleLayerWeight[iLayer];
+                                        if (criterium < secondaryCalculationLimit)
+                                            continue;
                                         mapIt = result[c_it->first].find("mu_1_i");
                                         if (mapIt == result[c_it->first].end())
                                             throw std::runtime_error(" mu_1_i key. Mass attenuation not present???");
