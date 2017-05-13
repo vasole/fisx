@@ -207,7 +207,7 @@ cdef class PyElement:
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2016 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2017 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -424,6 +424,18 @@ cdef class PyElements:
             return toStringKeys(self.thisptr.getMassAttenuationCoefficients(element, energy))
 
     def getMassAttenuationCoefficients(self, name, energy=None):
+        """
+        name can be an element, a formula or a material composition given as a dictionary:
+            key is the element name
+            fraction is the mass fraction of the element.
+
+        WARNING: The library renormalizes in order to make sure the sum of mass
+                 fractions is 1.
+
+        It gives back the mass attenuation coefficients at the given energies as a map where
+        the keys are the different physical processes and the values are lists of the 
+        calculated values via log-log interpolation in the internal table.
+        """
         if hasattr(name, "keys"):
             return self._getMaterialMassAttenuationCoefficients(toBytes(name), energy)
         elif energy is None:
@@ -435,6 +447,12 @@ cdef class PyElements:
             return self._getMultipleMassAttenuationCoefficients(toBytes(name), [energy])
 
     def getExcitationFactors(self, name, energy, weight=None):
+        """
+        getExcitationFactors(name, energy, weight=None)	
+        Given energy(s) and (optional) weight(s), for the specfified element, this method returns
+        the emitted X-ray already corrected for cascade and fluorescence yield.
+        It is the equivalent of the excitation factor in D.K.G. de Boer's paper.
+        """
         if hasattr(energy, "__len__"):
             if weight is None:
                 weight = [1.0] * len(energy)
@@ -476,6 +494,12 @@ cdef class PyElements:
             return [toStringKeysAndValues(x) for x in self.thisptr.getExcitationFactors(element, energies, weights)]
 
     def getPeakFamilies(self, nameOrVector, energy):
+        """
+        getPeakFamilies(nameOrVector, energy)
+
+        Given an energy and a reference to an elements library return dictionarys.
+        The key is the peak family ("Si K", "Pb L1", ...) and the value the binding energy.
+        """
         if type(nameOrVector) in [type([]), type(())]:
             if sys.version < "3.0":
                 return sorted(self._getPeakFamiliesFromVectorOfElements(nameOrVector, energy), key=itemgetter(1))
@@ -627,7 +651,7 @@ cdef class PyEPDL97:
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2016 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2017 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -674,15 +698,41 @@ cdef class PyLayer:
     def __dealloc__(self):
         del self.thisptr
 
+    def getComposition(self, PyElements elementsLib):
+        """
+        getComposition(elementsLib)
+
+        Given a reference to an elements library, it gives back a dictionary where the keys are the
+        elements and the values the mass fractions.
+        """
+        return self.thisptr.getComposition(deref(elementsLib.thisptr))
+
     def getTransmission(self, energies, PyElements elementsLib, double angle=90.):
+        """
+        getTransmission(energies, ElementsLibraryInstance, angle=90.)
+
+        Given a list of energies and a reference to an elements library returns
+        the layer transmission according to the incident angle (default 90.)
+        """
         if not hasattr(energies, "__len__"):
             energies = numpy.array([energies], numpy.float)
         return self.thisptr.getTransmission(energies, deref(elementsLib.thisptr), angle)
 
     def setMaterial(self, PyMaterial material):
+        """
+        setMaterial(MaterialInstance)
+
+        Set the material of the layer. It has to be an instance!
+        """
         self.thisptr.setMaterial(deref(material.thisptr))
 
     def getPeakFamilies(self, double energy, PyElements elementsLib):
+        """
+        getPeakFamilies(energy, ElementsLibraryInstance)
+
+        Given an energy and a reference to an elements library return dictionarys.
+        The key is the peak family ("Si K", "Pb L1", ...) and the value the binding energy.
+        """
         tmpResult = self.thisptr.getPeakFamilies(energy, deref(elementsLib.thisptr))
         return sorted(tmpResult, key=itemgetter(1))
 

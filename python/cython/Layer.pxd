@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2016 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2017 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -40,6 +40,8 @@ from Material cimport *
 cdef extern from "fisx_layer.h" namespace "fisx":
     cdef cppclass Layer:
         Layer(std_string, double, double, double)
+
+        std_map[std_string, double] getComposition(Elements)
 
         std_vector[double] getTransmission(std_vector[double], Elements, double)
 

@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2016 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2017 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -49,15 +49,41 @@ cdef class PyLayer:
     def __dealloc__(self):
         del self.thisptr
 
+    def getComposition(self, PyElements elementsLib):
+        """
+        getComposition(elementsLib)
+
+        Given a reference to an elements library, it gives back a dictionary where the keys are the
+        elements and the values the mass fractions.
+        """
+        return self.thisptr.getComposition(deref(elementsLib.thisptr))
+
     def getTransmission(self, energies, PyElements elementsLib, double angle=90.):
+        """
+        getTransmission(energies, ElementsLibraryInstance, angle=90.)
+
+        Given a list of energies and a reference to an elements library returns
+        the layer transmission according to the incident angle (default 90.)
+        """
         if not hasattr(energies, "__len__"):
             energies = numpy.array([energies], numpy.float)
         return self.thisptr.getTransmission(energies, deref(elementsLib.thisptr), angle)
 
     def setMaterial(self, PyMaterial material):
+        """
+        setMaterial(MaterialInstance)
+
+        Set the material of the layer. It has to be an instance!
+        """
         self.thisptr.setMaterial(deref(material.thisptr))
 
     def getPeakFamilies(self, double energy, PyElements elementsLib):
+        """
+        getPeakFamilies(energy, ElementsLibraryInstance)
+
+        Given an energy and a reference to an elements library return dictionarys.
+        The key is the peak family ("Si K", "Pb L1", ...) and the value the binding energy.
+        """
         tmpResult = self.thisptr.getPeakFamilies(energy, deref(elementsLib.thisptr))
         return sorted(tmpResult, key=itemgetter(1))
 
