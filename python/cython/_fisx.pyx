@@ -577,7 +577,10 @@ from EPDL97 cimport *
 cdef class PyEPDL97:
     cdef EPDL97 *thisptr
 
-    def __cinit__(self, name):
+    def __cinit__(self, name=None):
+        if name is None:
+            from fisx import DataDir
+            name = DataDir.FISX_DATA_DIR
         self.thisptr = new EPDL97(toBytes(name))
 
     def __dealloc__(self):
