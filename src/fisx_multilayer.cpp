@@ -198,6 +198,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                 // They are ordered by increasing increasing binding energy
                 std::string::size_type iString;
                 std::string ele;
+                std::string lastEle="dummytext";
                 std::string family;
                 std::map<std::string, std::map<std::string, double> > tmpResult;
                 std::map<std::string, std::map<std::string, double> >::const_iterator c_it;
@@ -208,13 +209,18 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                 for (iPeakFamily = 0 ; iPeakFamily < sampleLayerPeakFamilies[iLayer].size(); iPeakFamily++)
                 {
                     iString = sampleLayerPeakFamilies[iLayer][iPeakFamily].first.find(' ');
-                    ele = sampleLayerPeakFamilies[iLayer][iPeakFamily].first.substr(0, iString);
                     family = sampleLayerPeakFamilies[iLayer][iPeakFamily].first.substr(iString + 1, \
                                     sampleLayerPeakFamilies[iLayer][iPeakFamily].first.size() - iString - 1);
-                    // The secondary rates are already corrected for the beam intensity reaching the layer
-                    tmpResult = elementsLibrary.getExcitationFactors(ele, \
+                    ele = sampleLayerPeakFamilies[iLayer][iPeakFamily].first.substr(0, iString);
+                    if (ele != lastEle)
+                    {
+                        // The secondary rates NOT corrected for the beam intensity reaching the layer
+                        // The secondary rates NOT corrected for mass of lement fraction in layer
+                        tmpResult = elementsLibrary.getExcitationFactors(ele, \
                                                                      energies[iRay], \
-                                                                     weights[iRay] * sampleLayerWeight[iLayer]);
+                                                                     1.0);
+                        lastEle = ele;
+                    }
                     // and add the energies and rates to the sampleLayerLines
                     for (c_it = tmpResult.begin(); c_it != tmpResult.end(); ++c_it)
                     {
@@ -228,8 +234,10 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                             }
                             sampleLayerEnergies[iLayer].push_back(mapIt2->second);
                             mapIt2 = c_it->second.find("rate");
-                            sampleLayerRates[iLayer].push_back(mapIt2->second *
-                                                               sampleLayerComposition[ele]);
+                            // Store rates already corrected for the beam intensity reaching the layer
+                            // Store rates already corrected for the element mass fraction
+                            sampleLayerRates[iLayer].push_back(mapIt2->second * sampleLayerComposition[ele] * \
+                                                               weights[iRay] * sampleLayerWeight[iLayer]);
                             sampleLayerFamilies[iLayer].push_back(iString);
                             sampleLayerEnergyNames[iLayer].push_back(ele + \
                                                                      " " +\
@@ -558,8 +566,8 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                         throw std::runtime_error(" mu_1_i key. Mass attenuation not present???");
                                     criterium = tmpExcitationFactors[c_it->first]["rate"] * \
                                                     sampleLayerRates[jLayer][iLambda];
-                                    criterium /= primaryExcitationFactors[c_it->first]["rate"] * \
-                                                     sampleLayerWeight[iLayer];
+                                    criterium /= (primaryExcitationFactors[c_it->first]["rate"] * \
+                                                     sampleLayerWeight[iLayer]);
                                     if (criterium < secondaryCalculationLimit)
                                         continue;
                                     mu_1_i = mapIt->second;
@@ -598,6 +606,18 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                         }
                         else
                         {
+                            if ((sampleLayerWeight[jLayer] / sampleLayerWeight[iLayer]) < 1.0E-4)
+                            {
+                                // The incident reaching the layer originating the secondary excitation
+                                // is relatively much weaker. In the common energy range of XRF interest,
+                                // one will certainly recover less than of 50 % of the incident photons
+                                // reaching the jLayer originating the secondary excitation "beam".
+                                // An additional factor 100 is accounted for because of the possible ratio
+                                // of attenuation coefficient of the element at incident and secondary excitation
+                                // photon energies
+                                continue;
+                            }
+
                             double criterium;
                             // continue;
                             mu_2_lambda = muTotal[jLayer];
@@ -648,6 +668,13 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                         {
                                             continue;
                                         }
+                                        criterium = tmpExcitationFactors[c_it->first]["rate"] * \
+                                                    sampleLayerRates[jLayer][iLambda];
+                                        criterium /= (primaryExcitationFactors[c_it->first]["rate"] * \
+                                                     sampleLayerWeight[iLayer]);
+                                        if (criterium < secondaryCalculationLimit)
+                                            continue;
+
                                         mapIt = result[c_it->first].find("mu_1_i");
                                         if (mapIt == result[c_it->first].end())
                                             throw std::runtime_error(" mu_1_i key. Mass attenuation not present???");
@@ -705,12 +732,17 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                 // interlayer case b)
                                 double layerFactor;
                                 layerFactor = std::exp(-mu_2_lambda * density_2 * thickness_2/sinAlphaIn);
+                                /*
+                                This test has been removed in favour of the one dealing with the relative
+                                weights of each layer. Indeed, the relative amount of secondary excitation
+                                can be huge important. Other point is if we are going to detect something.
                                 if (layerFactor < 0.001)
                                 {
                                     // No need to calculate anything, the top layer attenuates too much the
                                     // incoming beam
                                     continue;
                                 }
+                                */
                                 for(iLambda = 0;
                                     iLambda < sampleLayerEnergies[jLayer].size(); \
                                     iLambda++)
@@ -755,8 +787,8 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                         }
                                         criterium = tmpExcitationFactors[c_it->first]["rate"] * \
                                                     sampleLayerRates[jLayer][iLambda];
-                                        criterium /= primaryExcitationFactors[c_it->first]["rate"] * \
-                                                     sampleLayerWeight[iLayer];
+                                        criterium /= (primaryExcitationFactors[c_it->first]["rate"] * \
+                                                     sampleLayerWeight[iLayer]);
                                         if (criterium < secondaryCalculationLimit)
                                             continue;
                                         mapIt = result[c_it->first].find("mu_1_i");
