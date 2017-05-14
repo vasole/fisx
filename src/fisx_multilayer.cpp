@@ -227,11 +227,14 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                         // be carefull not to add twice an element
                         if (c_it->first.compare(0, family.length(), family) == 0)
                         {
-                            mapIt2 = c_it->second.find("rate");
-                            if ((mapIt2->second * sampleLayerComposition[ele]) < 0.0001)
+                            if (secondaryCalculationLimit > 0.0)
                             {
-                                continue;
-                            };
+                                mapIt2 = c_it->second.find("rate");
+                                if ((mapIt2->second * sampleLayerComposition[ele]) < 0.0003)
+                                {
+                                    continue;
+                                };
+                            }
                             mapIt2 = c_it->second.find("energy");
                             if (mapIt2->second < minimumExcitationEnergy)
                             {
