@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2016 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2017 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -56,6 +56,22 @@ cdef class PyMath:
         The case the product density * thickness is 0.0 is for calculating the thick target limit
         """
         return self.thisptr.deBoerL0(mu1, mu2, muj, density, thickness)
+
+    def deBoerX(self, double p, double q, double d1, double d2, double mu_1_j, double mu_2_j, double mu_b_d_t = 0.0):
+        """
+        static double deBoerX(const double & p, const double & q, \
+                              const double & d1, const double & d2, \
+                              const double & mu_1_j, const double & mu_2_j, \
+                              const double & mu_b_j_d_t = 0.0);
+        For multilayers
+        p and q following article
+        d1 is the product density * thickness of fluorescing layer
+        d2 is the product density * thickness of layer j originating the secondary excitation
+        mu_1_j is the mass attenuation coefficient of fluorescing layer at j excitation energy
+        mu_2_j is the mass attenuation coefficient of layer j at j excitation energy
+        mu_b_d_t is the sum of the products mu * density * thickness of layers between layer i and j
+        """
+        return self.thisptr.deBoerX(p, q, d1, d2, mu_1_j, mu_2_j, mu_b_d_t)
 
     def erf(self, double x):
         """

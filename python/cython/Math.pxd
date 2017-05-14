@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2016 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2017 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -42,6 +42,8 @@ cdef extern from "fisx_math.h" namespace "fisx":
         double deBoerD(double) except +
 
         double deBoerL0(double, double, double, double, double) except +
+
+        double deBoerX(double, double, double, double, double, double, double) except +
 
         double erf(double)
 
