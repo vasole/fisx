@@ -227,6 +227,11 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                         // be carefull not to add twice an element
                         if (c_it->first.compare(0, family.length(), family) == 0)
                         {
+                            mapIt2 = c_it->second.find("rate");
+                            if ((mapIt2->second * sampleLayerComposition[ele]) < 0.0001)
+                            {
+                                continue;
+                            };
                             mapIt2 = c_it->second.find("energy");
                             if (mapIt2->second < minimumExcitationEnergy)
                             {
@@ -528,6 +533,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                     {
                         if (iLayer == jLayer)
                         {
+                            double criteriumMax=secondaryCalculationLimit;
                             // intralayer secondary
                             for(iLambda = 0; iLambda < sampleLayerEnergies[jLayer].size(); iLambda++)
                             {
@@ -568,7 +574,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                                     sampleLayerRates[jLayer][iLambda];
                                     criterium /= (primaryExcitationFactors[c_it->first]["rate"] * \
                                                      sampleLayerWeight[iLayer]);
-                                    if (criterium < secondaryCalculationLimit)
+                                    if (criterium <= criteriumMax)
                                         continue;
                                     mu_1_i = mapIt->second;
                                     tmpDouble = Math::deBoerL0(mu_1_lambda / sinAlphaIn,
@@ -601,6 +607,16 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                     result[c_it->first]["secondary"] += tmpDouble;
                                     result[c_it->first]["rate"] += tmpDouble * \
                                                                    result[c_it->first]["efficiency"];
+                                    if (criteriumMax > 0.0)
+                                    {
+                                        if ((tmpDouble/result[c_it->first]["primary"]) < 0.00001)
+                                        {
+                                            if (criterium > criteriumMax)
+                                            {
+                                                criteriumMax = criterium;
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -625,6 +641,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                             thickness_2 = sampleLayerThickness[jLayer];
                             if (iLayer < jLayer)
                             {
+                                double criteriumMax = secondaryCalculationLimit;
                                 // interlayer case a)
                                 for(iLambda = 0;
                                     iLambda < sampleLayerEnergies[jLayer].size(); \
@@ -672,7 +689,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                                     sampleLayerRates[jLayer][iLambda];
                                         criterium /= (primaryExcitationFactors[c_it->first]["rate"] * \
                                                      sampleLayerWeight[iLayer]);
-                                        if (criterium < secondaryCalculationLimit)
+                                        if (criterium <= criteriumMax)
                                             continue;
 
                                         mapIt = result[c_it->first].find("mu_1_i");
@@ -724,11 +741,22 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                         result[c_it->first]["secondary"] += tmpDouble;
                                         result[c_it->first]["rate"] += tmpDouble * \
                                                                        result[c_it->first]["efficiency"];
+                                        if (criteriumMax > 0.0)
+                                        {
+                                            if ((tmpDouble/result[c_it->first]["primary"]) < 0.0001)
+                                            {
+                                                if (criterium > criteriumMax)
+                                                {
+                                                    criteriumMax = criterium;
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             }
                             if (iLayer > jLayer)
                             {
+                                double criteriumMax = secondaryCalculationLimit;
                                 // interlayer case b)
                                 double layerFactor;
                                 layerFactor = std::exp(-mu_2_lambda * density_2 * thickness_2/sinAlphaIn);
@@ -789,7 +817,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                                     sampleLayerRates[jLayer][iLambda];
                                         criterium /= (primaryExcitationFactors[c_it->first]["rate"] * \
                                                      sampleLayerWeight[iLayer]);
-                                        if (criterium < secondaryCalculationLimit)
+                                        if (criterium <= criteriumMax)
                                             continue;
                                         mapIt = result[c_it->first].find("mu_1_i");
                                         if (mapIt == result[c_it->first].end())
@@ -837,6 +865,16 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                         result[c_it->first]["secondary"] += tmpDouble;
                                         result[c_it->first]["rate"] += tmpDouble * \
                                                                        result[c_it->first]["efficiency"];
+                                        if (criteriumMax > 0.0)
+                                        {
+                                            if ((tmpDouble/result[c_it->first]["primary"]) < 0.0001)
+                                            {
+                                                if (criterium > criteriumMax)
+                                                {
+                                                    criteriumMax = criterium;
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             }
