@@ -1807,6 +1807,11 @@ std::string Elements::toString(const double& number)
     return s;
 }
 
+std::map<std::string, double> Elements::getEmittedXRayLines(const std::string & elementName, const double & energy) const
+{
+    return this->getElement(elementName).getEmittedXRayLines(energy);
+}
+
 const std::map<std::string, double> & Elements::getNonradiativeTransitions(const std::string & elementName, \
                                                                      const std::string & subshell) const
 {
@@ -1987,5 +1992,76 @@ void Elements::emptyElementCascadeCache(const std::string & elementName)
     else
         throw std::invalid_argument("Invalid element: " + elementName);
 }
+
+void Elements::fillCache(const std::string & elementName, const std::vector< double> & energy)
+{
+    std::map<std::string, int>::const_iterator it;
+    int i;
+    if (this->isElementNameDefined(elementName))
+    {
+        it = this->elementDict.find(elementName);
+        i = it->second;
+        return this->elementList[i].fillCache(energy);
+    }
+    else
+        throw std::invalid_argument("Invalid element: " + elementName);
+}
+
+void Elements::setCacheEnabled(const std::string & elementName, const int & flag)
+{
+    std::map<std::string, int>::const_iterator it;
+    int i;
+    if (this->isElementNameDefined(elementName))
+    {
+        it = this->elementDict.find(elementName);
+        i = it->second;
+        return this->elementList[i].setCacheEnabled(flag);
+    }
+    else
+        throw std::invalid_argument("Invalid element: " + elementName);
+}
+
+void Elements::clearCache(const std::string & elementName)
+{
+    std::map<std::string, int>::const_iterator it;
+    int i;
+    if (this->isElementNameDefined(elementName))
+    {
+        it = this->elementDict.find(elementName);
+        i = it->second;
+        return this->elementList[i].clearCache();
+    }
+    else
+        throw std::invalid_argument("Invalid element: " + elementName);
+}
+
+const int Elements::isCacheEnabled(const std::string & elementName) const
+{
+    std::map<std::string, int>::const_iterator it;
+    int i;
+    if (this->isElementNameDefined(elementName))
+    {
+        it = this->elementDict.find(elementName);
+        i = it->second;
+        return this->elementList[i].isCacheEnabled();
+    }
+    else
+        throw std::invalid_argument("Invalid element: " + elementName);
+}
+
+int Elements::getCacheSize(const std::string & elementName) const
+{
+    std::map<std::string, int>::const_iterator it;
+    int i;
+    if (this->isElementNameDefined(elementName))
+    {
+        it = this->elementDict.find(elementName);
+        i = it->second;
+        return this->elementList[i].getCacheSize();
+    }
+    else
+        throw std::invalid_argument("Invalid element: " + elementName);
+}
+
 
 } // namespace fisx

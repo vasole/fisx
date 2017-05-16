@@ -316,6 +316,32 @@ public:
     void fillCascadeCache();
     void emptyCascadeCache();
 
+    /*!
+    Clear the calculation cache and fill it at the selected energies
+    */
+    void fillCache(const std::vector< double> & energy);
+
+    /*!
+    Enable or disable the use of the stored calculations (if any).
+    It does not clear the cache when disabling.
+    */
+    void setCacheEnabled(const int & flag = 1);
+
+    /*!
+    Clear the calculation cache
+    */
+    void clearCache();
+
+    /*!
+    Return 1 if the calculation cache is enabled
+    */
+    const int isCacheEnabled() const;
+
+    /*!
+    Return the number of energies for which the calculations are stored
+    */
+    int getCacheSize() const;
+
 private:
     std::string name;
     int    atomicNumber;
@@ -335,6 +361,12 @@ private:
     void initPartialPhotoelectricCoefficients();
     std::map<std::string, std::vector<double> > muPartialPhotoelectricEnergy;
     std::map<std::string, std::vector<double> > muPartialPhotoelectricValue;
+
+    // A cache for storing calculations
+    static const int cacheMaximumSize = 10000;
+    bool calculationCacheEnabledFlag;
+    std::map< double, std::map< std::string, double> > muCache;
+    std::map< double, std::map<std::string, std::map<std::string, double> > > excitationFactorsCache;
 
     // Shell instance to handle cascade
     std::map<std::string, Shell> shellInstance;

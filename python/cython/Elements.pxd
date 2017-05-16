@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2016 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2017 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -99,6 +99,8 @@ cdef extern from "fisx_elements.h" namespace "fisx":
         std_map[std_string, std_map [std_string, double]] getEscape(std_map[std_string, double],\
                                               double, double, double, int, double, double) except +
 
+        std_map[std_string, double] getEmittedXRayLines(std_string, double) except +
+
         std_map[std_string, double] getRadiativeTransitions(std_string, std_string) except +
 
         std_map[std_string, double] getNonradiativeTransitions(std_string, std_string) except +
@@ -108,5 +110,15 @@ cdef extern from "fisx_elements.h" namespace "fisx":
         void setElementCascadeCacheEnabled(std_string, int) except +
 
         void emptyElementCascadeCache(std_string) except +
+
+        void fillCache(std_string, std_vector[double]) except +
+
+        void setCacheEnabled(std_string, int) except +
+
+        void clearCache(std_string) except +
+
+        int isCacheEnabled(std_string) except +
+
+        int getCacheSize(std_string) except+
 
         void removeMaterials()

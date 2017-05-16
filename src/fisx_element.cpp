@@ -50,6 +50,9 @@ Element::Element()
 
     // cascade cache
     this->cascadeCacheEnabledFlag = false;
+
+    // calculation cache
+    this->setCacheEnabled(0);
 }
 
 Element::Element(std::string name, int z = 0)
@@ -61,7 +64,12 @@ Element::Element(std::string name, int z = 0)
     // Unset density
     this->density = 1.0;
     this->initPartialPhotoelectricCoefficients();
+
+    // cascade cache
     this->cascadeCacheEnabledFlag = false;
+
+    // calculation cache
+    this->setCacheEnabled(0);
 }
 
 void Element::setName(const std::string & name)
@@ -211,6 +219,7 @@ void Element::setMassAttenuationCoefficients(const std::vector<double> & energie
             }
         }
     }
+    this->clearCache();
 
     if (this->mu.size() > 0)
     {
@@ -275,11 +284,21 @@ std::map<std::string, double> Element::getMassAttenuationCoefficients(const doub
     //std::string shellList[10] = {"K", "L1", "L2", "L3", "M1", "M2", "M3", "M4", "M5", "all other"};
     std::map<std::string, std::vector<double> >::const_iterator c_it;
     std::string key;
+    std::map< double, std::map< std::string, double> >::const_iterator c_it2;
     std::map<std::string, double> result;
 
     if (this->muEnergy.size() < 1)
     {
         throw std::runtime_error("Mass attenuation coefficients not initialized yet!");
+    }
+
+    if (this->isCacheEnabled())
+    {
+        c_it2 = this->muCache.find(energy);
+        if (c_it2 != this->muCache.end())
+        {
+            return c_it2->second;
+        }
     }
 
     // TODO: if the partial are not given, use the total photoelectric
@@ -535,6 +554,7 @@ void Element::initPartialPhotoelectricCoefficients()
                                    "M1", "M2", "M3", "M4", "M5", "all other"};
     long i;
 
+    this->clearCache();
     for (i=0; i < 10; i++)
     {
         // This creates (if it does not exist) and clears if not empty
@@ -580,7 +600,7 @@ void Element::setPartialPhotoelectricMassAttenuationCoefficients(const std::stri
     }
 
     // checks finished, we can go ahead
-
+    this->clearCache();
     this->muPartialPhotoelectricEnergy[shell].clear();
     this->muPartialPhotoelectricValue[shell].clear();
 
@@ -892,6 +912,7 @@ void Element::setRadiativeTransitions(std::string subshell, std::map<std::string
         throw std::invalid_argument("Requested shell is not a K, L or M subshell");
     }
     this->shellInstance[subshell].setRadiativeTransitions(values);
+    this->clearCache();
 }
 
 const std::map<std::string, double> & Element::getRadiativeTransitions(const std::string & subshell) const
@@ -920,6 +941,7 @@ void Element::setNonradiativeTransitions(std::string subshell, std::vector<std::
         throw std::invalid_argument("Requested shell is not a K, L or M subshell");
     }
     this->shellInstance[subshell].setNonradiativeTransitions(labels, values);
+    this->clearCache();
 }
 
 void Element::setNonradiativeTransitions(std::string subshell, std::map<std::string, double> values)
@@ -937,6 +959,7 @@ void Element::setNonradiativeTransitions(std::string subshell, std::map<std::str
         throw std::invalid_argument("Requested shell is not a K, L or M subshell");
     }
     this->shellInstance[subshell].setNonradiativeTransitions(values);
+    this->clearCache();
 }
 
 const std::map<std::string, double> & Element::getNonradiativeTransitions(const std::string & subshell) const
@@ -964,6 +987,8 @@ void Element::setShellConstants(std::string subshell, std::map<std::string, doub
         throw std::invalid_argument(msg);
     }
     this->shellInstance[subshell].setShellConstants(constants);
+    this->emptyCascadeCache();
+    this->clearCache();
 }
 
 const std::map<std::string, double> & Element::getFluorescenceRatios(const std::string & subshell) const
@@ -1387,136 +1412,26 @@ std::vector<std::map<std::string, std::map<std::string, double> > >Element::getP
                             const std::vector<double> & weights) const
 {
     double weight;
-    std::map<std::string, double>vacancyDistribution;
     std::vector<double>::size_type i;
     std::vector<std::map<std::string, std::map<std::string, double> > > result;
     std::map<std::string, std::map<std::string, double> >::iterator it;
-    static std::map<std::string, double> lastEnergy = std::map<std::string, double>() ;
-    static std::map<std::string, std::map<std::string, std::map<std::string, double> > >lastPhotoelectricExcitationFactors;
-    bool useCache;
 
+    if (energy.size() == 0)
+    {
+        result.clear();
+        return result;
+    }
     if (weights.size() == 1)
         weight = weights[0];
     else
         weight = 1.0 / energy.size();
-    result.clear();
-    if ((lastEnergy.size() == 0) || (this->cascadeCacheEnabledFlag == 0))
+
+    result.resize(energy.size());
+    for(i = 0; i < energy.size(); i++)
     {
-        lastPhotoelectricExcitationFactors.clear();
-        lastEnergy.clear();
-    }
-    if ((energy.size() > this->shellInstance.size()) && (this->cascadeCacheEnabledFlag == false) )
-    {
-        std::cout << "USING TEMPORARY CACHE " << std::endl;
-        std::map<std::string, std::map<std::string, std::map<std::string, double> > > cache;
-        std::map<std::string, std::map<std::string, std::map<std::string, double> > >::const_iterator cacheKey;
-        // calculate cascade for a single vacancy on each shell
-        for(i = 0; i < energy.size(); i++)
-        {
-            if (weights.size() > 1)
-            {
-                weight = weights[i];
-            }
-            std::map<std::string, std::map<std::string, double> > singleResult;
-            singleResult.clear();
-            vacancyDistribution = this->getInitialPhotoelectricVacancyDistribution(energy[i]);
-            for (std::map<std::string, double>::const_iterator c_it = vacancyDistribution.begin();
-                c_it != vacancyDistribution.end(); ++c_it)
-            {
-                if (c_it->second <= 0.0)
-                {
-                    // no vacancies created in that shell
-                    continue;
-                }
-                cacheKey = cache.find(c_it->first);
-                if (cacheKey == cache.end())
-                {
-                    // key to be added to the cache
-                    std::map<std::string, double> tmpDistribution;
-                    tmpDistribution.clear();
-                    tmpDistribution[c_it->first] = 1.0;
-                    cache[c_it->first] = this->getXRayLinesFromVacancyDistribution(tmpDistribution, 1, 1);
-                }
-                for(std::map<std::string, std::map<std::string, double> >::const_iterator rayIt = \
-                    cache[c_it->first].begin(); rayIt != cache[c_it->first].end(); ++rayIt)
-                {
-                    if (singleResult.find(rayIt->first) == singleResult.end())
-                    {
-                        singleResult[rayIt->first] = cache[c_it->first][rayIt->first];
-                        singleResult[rayIt->first]["rate"] *= vacancyDistribution[c_it->first];
-                    }
-                    else
-                    {
-                        singleResult[rayIt->first] ["rate"] += (cache[c_it->first][rayIt->first]["rate"]) * \
-                                                               vacancyDistribution[c_it->first];
-                    }
-                }
-            }
-            result.push_back(singleResult);
-            for(it = result[i].begin(); it != result[i].end(); ++it)
-            {
-                it->second["factor"] = it->second["rate"] * weight;
-                it->second["rate"] = it->second["factor"] *\
-                                this->getMassAttenuationCoefficients(energy[i])["photoelectric"];
-            }
-        }
-    }
-    else
-    {
-        for(i = 0; i < energy.size(); i++)
-        {
-            if (weights.size() > 1)
-                weight = weights[i];
-            useCache = false;
-            if (this->cascadeCacheEnabledFlag)
-            {
-                if ((lastEnergy.find(this->name) != lastEnergy.end()) && \
-                    (lastPhotoelectricExcitationFactors.find(this->name) != lastPhotoelectricExcitationFactors.end()))
-                {
-                    if (energy[i] == lastEnergy[this->name])
-                    {
-                        useCache = true;
-                    }
-                }
-            }
-            if (useCache)
-            {
-                // recalculating
-                //result.push_back(lastPhotoelectricExcitationFactors);
-                if (false)
-                {
-                    //test
-                    vacancyDistribution = this->getInitialPhotoelectricVacancyDistribution(energy[i]);
-                    result.push_back(this->getXRayLinesFromVacancyDistribution(vacancyDistribution, 1, 1));
-                    // CHECK
-                    for(it = result.back().begin(); it != result.back().end(); ++it)
-                    {
-                        std::cout << " ENERGIES = " << energy[i] << "  " << lastEnergy[this->name] << std::endl;
-                        std::cout << this->name << it->first << "->" << it->second["rate"] << " ????? ";
-                        std::cout << lastPhotoelectricExcitationFactors[this->name][it->first]["rate"] << std::endl;
-                    //result.push_back(lastPhotoelectricExcitationFactors);
-                    }
-                }
-                else
-                {
-                    result.push_back(lastPhotoelectricExcitationFactors[this->name]);
-                }
-            }
-            else
-            {
-                vacancyDistribution = this->getInitialPhotoelectricVacancyDistribution(energy[i]);
-                lastPhotoelectricExcitationFactors[this->name] = \
-                        this->getXRayLinesFromVacancyDistribution(vacancyDistribution, 1, 1);
-                lastEnergy[this->name] = energy[i];
-                result.push_back(lastPhotoelectricExcitationFactors[this->name]);
-            }
-            for(it = result[i].begin(); it != result[i].end(); ++it)
-            {
-                it->second["factor"] = it->second["rate"] * weight;
-                it->second["rate"] = it->second["factor"] *\
-                                this->getMassAttenuationCoefficients(energy[i])["photoelectric"];
-            }
-        }
+        if (weights.size() > 1)
+            weight = weights[i];
+        result[i] = this->getPhotoelectricExcitationFactors(energy[i], weight);
     }
     return result;
 }
@@ -1525,12 +1440,39 @@ std::map<std::string, std::map<std::string, double> > Element::getPhotoelectricE
                                                     const double & energy,
                                                     const double & weight) const
 {
-    std::vector<double> energies;
-    std::vector<double> weights;
+    std::map<std::string, double>vacancyDistribution;
+    std::map<std::string, std::map<std::string, double> > result;
+    std::map<std::string, std::map<std::string, double> >::iterator it;
+    std::map<double, std::map<std::string, std::map<std::string, double> > >::const_iterator c_it;
+    result.clear();
 
-    energies.push_back(energy);
-    weights.push_back(weight);
-    return this->getPhotoelectricExcitationFactors(energies, weights)[0];
+    if (this->isCacheEnabled())
+    {
+        if (this->excitationFactorsCache.size())
+        {
+            c_it = this->excitationFactorsCache.find(energy);
+            if (c_it != this->excitationFactorsCache.end())
+            {
+                result = c_it->second;
+                for(it = result.begin(); it != result.end(); ++it)
+                {
+                    it->second["factor"] = it->second["factor"] * weight;
+                    it->second["rate"] = it->second["rate"] * weight;
+                }
+                return result;
+            }
+        }
+    }
+    //we have to calculate it
+    vacancyDistribution = this->getInitialPhotoelectricVacancyDistribution(energy);
+    result = this->getXRayLinesFromVacancyDistribution(vacancyDistribution, 1, 1);
+    for(it = result.begin(); it != result.end(); ++it)
+    {
+        it->second["factor"] = it->second["rate"] * weight;
+        it->second["rate"] = it->second["factor"] *\
+                        this->getMassAttenuationCoefficients(energy)["photoelectric"];
+    }
+    return result;
 }
 
 
@@ -1598,7 +1540,6 @@ std::pair<long, long> Element::getInterpolationIndices(const std::vector<double>
     return result;
 }
 
-
 void Element::setCascadeCacheEnabled(const int & flag)
 {
     if (flag == 0)
@@ -1646,7 +1587,20 @@ void Element::emptyCascadeCache()
 
 int Element::isCascadeCacheFilled() const
 {
-    if (this->cascadeCache.size() > 0)
+    return this->cascadeCache.size();
+}
+
+void Element::setCacheEnabled(const int & flag)
+{
+    if (flag == 0)
+        this->calculationCacheEnabledFlag = false;
+    else
+        this->calculationCacheEnabledFlag = true;
+}
+
+const int Element::isCacheEnabled() const
+{
+    if (this->calculationCacheEnabledFlag)
     {
         return 1;
     }
@@ -1654,6 +1608,38 @@ int Element::isCascadeCacheFilled() const
     {
         return 0;
     }
+}
+
+void Element::clearCache()
+{
+    this->excitationFactorsCache.clear();
+    this->muCache.clear();
+}
+
+void Element::fillCache(const std::vector<double> & energy)
+{
+    std::vector<double>::size_type i, maxSize;
+
+    this->clearCache();
+
+    if (energy.size() < this->cacheMaximumSize)
+    {
+        maxSize = energy.size();
+    }
+    else
+    {
+        maxSize = this->cacheMaximumSize;
+    }
+    for (i = 0; i < maxSize; i++)
+    {
+        this->muCache[energy[i]] = this->getMassAttenuationCoefficients(energy[i]);
+        this->excitationFactorsCache[energy[i]] = this->getPhotoelectricExcitationFactors(energy[i], 1.0);
+    }
+}
+
+int Element::getCacheSize() const
+{
+    return this->muCache.size();
 }
 
 } // namespace fisx

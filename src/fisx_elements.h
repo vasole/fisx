@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2016 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2017 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -118,6 +118,16 @@ public:
     Retrieve the names of the elements already defined in the library.
     */
     std::vector<std::string> getElementNames();
+
+
+    /*!
+    Convenience method to simplify access to element properties from binding (ex. python)
+
+    Given an element and an excitation energy (in keV), return a map where the key is the line name and the content
+    the energy. The method getPeakFamilies is more complete.
+    */
+    std::map<std::string, double> getEmittedXRayLines(const std::string & elementName, \
+                                                      const double & energy= 1000.) const;
 
 
     /*!
@@ -409,6 +419,33 @@ public:
     int isElementCascadeCacheFilled(const std::string & elementName) const;
     void fillElementCascadeCache(const std::string & elementName);
     void emptyElementCascadeCache(const std::string & elementName);
+
+    /*!
+    Optimization methods to keep the calculations at a set of energies in cache
+    Clear the calculation cache of given element and fill it at the selected energies
+    */
+    void fillCache(const std::string & elementName, const std::vector< double> & energy);
+
+    /*!
+    Enable or disable the use of the stored calculations (if any).
+    It does not clear the cache when disabling.
+    */
+    void setCacheEnabled(const std::string & elementName, const int & flag = 1);
+
+    /*!
+    Clear the calculation cache
+    */
+    void clearCache(const std::string & elementName);
+
+    /*!
+    Return 1 if the calculation cache is enabled
+    */
+    const int isCacheEnabled(const std::string & elementName) const;
+
+    /*!
+    Return the number of energies for which the calculations are stored
+    */
+    int getCacheSize(const std::string & elementName) const;
 
     /*!
     Utility to convert from string to double.

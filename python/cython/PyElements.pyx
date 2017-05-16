@@ -335,6 +335,12 @@ cdef class PyElements:
         else:
             return toStringKeys(self.thisptr.getShellConstants(toBytes(elementName), toBytes(subshell)))
 
+    def getEmittedXRayLines(self, elementName, double energy=1000.):
+        if sys.version < "3.0":
+            return self.thisptr.getEmittedXRayLines(elementName, energy)
+        else:
+            return toStringKeys(self.thisptr.getEmittedXRayLines(toBytes(elementName), energy))
+
     def getRadiativeTransitions(self, elementName, subshell):
         if sys.version < "3.0":
             return self.thisptr.getRadiativeTransitions(elementName, subshell)
@@ -352,6 +358,40 @@ cdef class PyElements:
 
     def emptyElementCascadeCache(self, elementName):
         self.thisptr.emptyElementCascadeCache(toBytes(elementName))
+
+    def fillCache(self, elementName, std_vector[double] energy):
+        """
+        Optimization methods to keep the calculations at a set of energies
+        in cache.
+        Clear the calculation cache of given element and fill it at the
+        selected energies
+        """
+        self.thisptr.fillCache(toBytes(elementName), energy)
+
+    def setCacheEnabled(self, elementName, int flag = 1):
+        """
+        Enable or disable the use of the stored calculations (if any).
+        It does not clear the cache when disabling.
+        """
+        self.thisptr.setCacheEnabled(toBytes(elementName), flag)
+
+    def clearCache(self, elementName):
+        """
+        Clear the calculation cache
+        """
+        self.thisptr.clearCache(toBytes(elementName))
+
+    def isCacheEnabled(self, elementName):
+        """
+        Return 1 or 0 if the calculation cache is enabled or not
+        """
+        return self.thisptr.isCacheEnabled(toBytes(elementName))
+
+    def getCacheSize(self, elementName):
+        """
+        Return the number of energies for which the calculations are stored
+        """
+        return self.thisptr.getCacheSize(toBytes(elementName))
 
     def removeMaterials(self):
         self.thisptr.removeMaterials()
