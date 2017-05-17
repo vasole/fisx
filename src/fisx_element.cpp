@@ -1637,6 +1637,35 @@ void Element::fillCache(const std::vector<double> & energy)
     }
 }
 
+void Element::updateCache(const std::vector< double> & energy)
+{
+    std::vector<double>::size_type i, eSize;
+
+    eSize = energy.size();
+    for (i = 0; i < eSize; i++)
+    {
+        if (this->muCache.size() < this->cacheMaximumSize)
+        {
+            if (this->muCache.find(energy[i]) == this->muCache.end())
+            {
+                this->muCache[energy[i]] = this->getMassAttenuationCoefficients(energy[i]);
+            }
+            if (this->excitationFactorsCache.find(energy[i]) == this->excitationFactorsCache.end())
+            {
+                this->excitationFactorsCache[energy[i]] = this->getPhotoelectricExcitationFactors(energy[i], 1.0);
+            }
+        }
+    }
+    if (this->muCache.size() >= this->cacheMaximumSize)
+    {
+        std::cout << "Mass attenuation coefficients cache full" << std::endl;
+    }
+    if (this->excitationFactorsCache.size() >= this->cacheMaximumSize)
+    {
+        std::cout << "Excitation factors cache full" << std::endl;
+    }
+}
+
 int Element::getCacheSize() const
 {
     return this->muCache.size();

@@ -2007,6 +2007,21 @@ void Elements::fillCache(const std::string & elementName, const std::vector< dou
         throw std::invalid_argument("Invalid element: " + elementName);
 }
 
+void Elements::updateCache(const std::string & elementName, const std::vector< double> & energy)
+{
+    std::map<std::string, int>::const_iterator it;
+    int i;
+    if (this->isElementNameDefined(elementName))
+    {
+        it = this->elementDict.find(elementName);
+        i = it->second;
+        return this->elementList[i].updateCache(energy);
+    }
+    else
+        throw std::invalid_argument("Invalid element: " + elementName);
+}
+
+
 void Elements::setCacheEnabled(const std::string & elementName, const int & flag)
 {
     std::map<std::string, int>::const_iterator it;

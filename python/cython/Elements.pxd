@@ -113,6 +113,8 @@ cdef extern from "fisx_elements.h" namespace "fisx":
 
         void fillCache(std_string, std_vector[double]) except +
 
+        void updateCache(std_string, std_vector[double]) except +
+
         void setCacheEnabled(std_string, int) except +
 
         void clearCache(std_string) except +

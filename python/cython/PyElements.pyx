@@ -368,6 +368,13 @@ cdef class PyElements:
         """
         self.thisptr.fillCache(toBytes(elementName), energy)
 
+    def updateCache(self, elementName, std_vector[double] energy):
+        """
+        Update the element cache with those energy values not already present.
+        The existing values will be kept.
+        """
+        self.thisptr.updateCache(toBytes(elementName), energy)
+
     def setCacheEnabled(self, elementName, int flag = 1):
         """
         Enable or disable the use of the stored calculations (if any).

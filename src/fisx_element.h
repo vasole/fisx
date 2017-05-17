@@ -328,6 +328,13 @@ public:
     void setCacheEnabled(const int & flag = 1);
 
     /*!
+    Update the cache with those energy values not already present.
+    The existing values will be kept.
+    */
+    void updateCache(const std::vector< double> & energy);
+
+
+    /*!
     Clear the calculation cache
     */
     void clearCache();
