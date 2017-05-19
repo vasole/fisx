@@ -88,12 +88,14 @@ public:
     */
     void setBeamFilters(const std::vector<Layer> & filters);
 
+
     /*!
     Set the sample description.
     It consists on a set of layers of different materials, densities and thicknesses.
     The top layer will be taken as reference layer. This can be changed calling setRefenceLayer
     */
     void setSample(const std::vector<Layer> & layers, const int & referenceLayer = 0);
+
 
     /*!
     Convenience method for single layer samples.
@@ -107,18 +109,20 @@ public:
     */
     void setSample(const Layer & layer);
 
+
+
     /*!
     It consists on a set of layers of different materials, densities and thicknesses and
     "funny" factors.
     */
     void setAttenuators(const std::vector<Layer> & attenuators);
 
+
     /*!
     Set the detector. For the time being it is very simple.
     It has active area/diameter, material, density, thickness and distance.
     */
     void setDetector(const Detector & detector);
-
 
     /*!
     Set the excitation geometry.
@@ -151,7 +155,7 @@ public:
     /*!
     Get the current configuration
     */
-    const XRFConfig & getConfiguration();
+    const XRFConfig & getConfiguration() const;
 
     /*!
     Set the configuration
@@ -242,6 +246,37 @@ public:
 
     double getEnergyThreshold(const std::string & elementName, const std::string & family, \
                                 const Elements & elementsLibrary) const;
+
+    /*!
+    Get the beam
+    */
+    const Beam & getBeam() const {return this->configuration.getBeam();};
+
+    /*!
+    Get the beam filters to be applied
+    */
+    const std::vector<Layer> & getBeamFilters() const {return this->configuration.getBeamFilters();};
+
+    /*!
+    Get the sample description
+    */
+    const std::vector<Layer> & getSample() const {return this->configuration.getSample();};
+
+    /*!
+    Get the attenuator layers
+    */
+    const std::vector<Layer> & getAttenuators() const {return this->configuration.getAttenuators();};
+
+    /*!
+    Get the detector
+    */
+    const Detector & getDetector() const {return this->configuration.getDetector();};
+
+
+    const double & getAlphaIn() const {return this->configuration.getAlphaIn();};
+    const double & getAlphaOut() const {return this->configuration.getAlphaOut();};
+    const double & getScatteringAngle() const {return this->configuration.getScatteringAngle();};
+    const int & getReferenceLayer() const {return this->configuration.getReferenceLayer();};
 
 private:
     /*!

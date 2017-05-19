@@ -96,6 +96,7 @@ void XRF::setBeamFilters(const std::vector<Layer> &layers)
     this->configuration.setBeamFilters(layers);
 }
 
+
 void XRF::setSample(const std::vector<Layer> & layers, const int & referenceLayer)
 {
     this->configuration.setSample(layers, referenceLayer);
@@ -116,7 +117,6 @@ void XRF::setSample(const Layer & layer)
     vLayer.push_back(layer);
     this->configuration.setSample(vLayer, 0);
 }
-
 
 void XRF::setAttenuators(const std::vector<Layer> & attenuators)
 {
@@ -243,6 +243,12 @@ double XRF::getEnergyThreshold(const std::string & elementName, const std::strin
         return binding["M1"]; // It can be 0.0
     }
     return 0.0;
+}
+
+const XRFConfig & XRF::getConfiguration() const
+{
+    return this->configuration;
+
 }
 
 std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, double> > > > \

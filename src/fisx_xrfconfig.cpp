@@ -413,7 +413,7 @@ void XRFConfig::setBeam(const Beam & beam)
     this->beam = beam;
 }
 
-const Beam & XRFConfig::getBeam()
+const Beam & XRFConfig::getBeam() const
 {
     return this->beam;
 }
