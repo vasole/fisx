@@ -17,15 +17,14 @@ requirements:
   run:
     - python
     - numpy
-    - pymca
 
 test:
   requires:
-    - pymca
+    - numpy
   imports:
     - fisx
 
 about:
   license: MIT
-  home: http://pymca.sourceforge.net
+  home: http://github.com/vasole/fisx
   summary: Resources for synchrotron data analysis
