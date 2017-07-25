@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2016 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2017 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -606,6 +606,26 @@ void Element::setPartialPhotoelectricMassAttenuationCoefficients(const std::stri
 
     this->muPartialPhotoelectricEnergy[shell] = std::vector<double>(energy);
     this->muPartialPhotoelectricValue[shell] = std::vector<double>(partialPhotoelectric);
+    if (shell != "all other")
+    {
+        for (i = 1; i < length; i++)
+        {
+            if (this->muPartialPhotoelectricEnergy[shell][i] < this->bindingEnergy[shell])
+            {
+                this->muPartialPhotoelectricValue[shell][i] = 0.0;
+            }
+            else
+            {
+                // case of repeated values corresponding to an edge where the edge energy is above the set binding energy
+                // for instance, exciting lead at 15.19 keV
+                if (this->muPartialPhotoelectricEnergy[shell][i] == this->muPartialPhotoelectricEnergy[shell][i - 1])
+                {
+                    this->muPartialPhotoelectricEnergy[shell][i] += 0.000001;
+                    this->muPartialPhotoelectricValue[shell][i - 1] = this->muPartialPhotoelectricValue[shell][i];
+                }
+            }
+        }
+    }
     //std::cout << this->muPartialPhotoelectricEnergy[shell][1100] << " " << this->muPartialPhotoelectricValue[shell][1100] << std::endl;
 }
 
@@ -651,8 +671,16 @@ std::map<std::string, double> \
         i2 = indices.second;
         x0 = c_it->second[i1];
         x1 = c_it->second[i2];
-        //std::cout << "partials i1, i2 " << i1 << " " << i2 <<std::endl;
-        //std::cout << "partials x0, x1 " << x0 << " " << x1 <<std::endl;
+        /*
+        if (energy == 15.19)
+        {
+
+            std::cout << shell << " partials i1, i2 " << i1 << " " << i2 <<std::endl;
+            std::cout << " partials x0, x1 " << x0 << " " << x1 <<std::endl;
+            std::cout << " values y[i1] " << y_it->second[i1];
+            std::cout << " values y[i2] " << y_it->second[i2] << std::endl;
+        }
+        */
         if (energy == x1)
         {
             if ((i2 + 1) < ((int) c_it->second.size()))
@@ -755,7 +783,7 @@ std::map<std::string, double> \
                 {
                     // according to the binding energies, the shell is excited, but the
                     // respective mass attenuation is zero. We have to extrapolate
-                    //  std::cout << "case b2" << std::endl;
+                    // std::cout << "case b2" << std::endl;
                     i1w = i1;
                     while(y_it->second[i1w] <= 0.0)
                     {
@@ -777,6 +805,16 @@ std::map<std::string, double> \
                     x0w = c_it->second[i1w];
                     x1w = c_it->second[i2w];
                     result[shell] = exp(log(y0) + (log(y1 / y0) / log(x1w / x0w)) * log(energy/x0w));
+                    /*
+                    if (energy == 15.19)
+                    {
+                        std::cout << shell << " partials i1w, i2w " << i1w << " " << i2w <<std::endl;
+                        std::cout << " partials x0, x1 " << x0w << " " << x1w <<std::endl;
+                        std::cout << " values y[i1] " << y_it->second[i1w];
+                        std::cout << " values y[i2] " << y_it->second[i2w] << std::endl;
+                        std::cout << " Final " << result[shell] << std::endl;
+                    }
+                    */
                 }
             }
         }
