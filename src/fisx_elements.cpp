@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2016 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2017 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -719,6 +719,7 @@ void Elements::setMassAttenuationCoefficients(const std::string & name,
     std::map<std::string, std::vector<double> > massAttenuationCoefficients;
     std::map<std::string, std::vector<double> >::iterator it;
     std::map<std::string, std::pair<double, int> > extractedEdgeEnergies;
+    std::vector<std::vector<double>::size_type> shellIndexList;
     std::string shellList[10] = {"K", "L1", "L2", "L3", "M1", "M2", "M3", "M4", "M5", "all other"};
     Element *element;
     std::vector<double> newEnergyGrid;
@@ -775,14 +776,63 @@ void Elements::setMassAttenuationCoefficients(const std::string & name,
         j--;
     }
 
+    // partial cross sections
+    // we extract the edges from supplied mass attenuation coefficients
+    // the result contains the indices of the first instance of the energy
+    extractedEdgeEnergies = (*element).extractEdgeEnergiesFromMassAttenuationCoefficients(energy, \
+                                                                                          photoelectric);
+
+    shellIndexList.clear();
+    for (shellIndex = 0; shellIndex < 10; shellIndex++)
+    {
+        shell = shellList[shellIndex];
+        if (extractedEdgeEnergies.find(shell) != extractedEdgeEnergies.end())
+        {
+            // we have the index prior to starting to excite that shell but that index corresponds to
+            // the old, non extended, energy grid
+            idx = extractedEdgeEnergies[shell].second;
+            shellIndexList.push_back(idx);
+        }
+    }
+
     newEnergyGrid.resize(j + energy.size());
     for (i = 0; i < j; i++)
     {
         newEnergyGrid[i] = massAttenuationCoefficients["energy"][i];
     }
-    for (i=j; i < newEnergyGrid.size() ; i++)
+
+    for (i = j; i < newEnergyGrid.size() ; i++)
     {
         newEnergyGrid[i] = energy[i - j];
+        // Check compatibility
+        for (shellIndex = 0; shellIndex < 10; shellIndex++)
+        {
+            shell = shellList[shellIndex];
+            if (extractedEdgeEnergies.find(shell) != extractedEdgeEnergies.end())
+            {
+                if ((i - j - 1) == extractedEdgeEnergies[shell].second)
+                {
+                    // We are just above an edge according to the input mass attenuation coefficients
+                    // We have to check if that energy is compatible with the binding energy.
+                    // If the energy was below the binding energy of that shell, we have to make sure the point is considered
+                    // (Problem with excitation of Pb at 14 keV when using XCOM cross sections)
+                    std::map<std::string, double> tmpMap = this->getBindingEnergies(name);
+                    if (extractedEdgeEnergies[shell].first < tmpMap[shell])
+                    {
+                        // I should interpolate in the supplied grid to get the proper value
+                        newEnergyGrid[i] = tmpMap[shell];
+                        continue;
+                    }
+                }
+            }
+        }
+        if (j > 0)
+        {
+            if (newEnergyGrid[i] < newEnergyGrid[i - 1])
+            {
+                newEnergyGrid[i] = newEnergyGrid[i - 1] + 0.000001;
+            }
+        }
     }
 
     // we have got the extended energy grid
@@ -802,15 +852,20 @@ void Elements::setMassAttenuationCoefficients(const std::string & name,
         throw std::runtime_error(msg);
     }
 
+/*
     // test the energies
     for (i = j; i < newEnergyGrid.size(); i++)
     {
-        if (fabs(massAttenuationCoefficients["energy"][i] - energy[i - j]) > 1.0e-10)
+        if (fabs(massAttenuationCoefficients["energy"][i] - energy[i - j]) > 0.010)
         {
+            std::cout << "Inconsistent energy grid for element " << name << std::endl;
+            std::cout << " Energy = " << massAttenuationCoefficients["energy"][i] << std::endl;
+            std::cout << " Input e = " << energy[i - j] << std::endl;
             msg = "Inconsistent energy grid for element " + name;
-            throw std::runtime_error(msg);
+            //throw std::runtime_error(msg);
         }
     }
+*/
 
     // coherent
     for (i = j; i < newEnergyGrid.size(); i++)
