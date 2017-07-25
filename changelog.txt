@@ -1,3 +1,13 @@
+VERSION 1.1.3
+
+Implement a calculation cache.
+
+Implement a configurable threshold on emission rate of an x-ray line to
+consider secondary excitation originated from that emission line.
+
+Correct problem calculating partial photoelectric cross sections in the
+vicinity of absoprtion edges.
+
 VERSION 1.1.2
 
 Correct inconsistency on M-shell data
