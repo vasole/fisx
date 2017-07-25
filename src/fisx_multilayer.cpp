@@ -215,7 +215,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                     if (ele != lastEle)
                     {
                         // The secondary rates NOT corrected for the beam intensity reaching the layer
-                        // The secondary rates NOT corrected for mass of lement fraction in layer
+                        // The secondary rates NOT corrected for mass of element fraction in layer
                         tmpResult = elementsLibrary.getExcitationFactors(ele, \
                                                                      energies[iRay], \
                                                                      1.0);
@@ -228,6 +228,11 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                         if (c_it->first.compare(0, family.length(), family) == 0)
                         {
                             mapIt2 = c_it->second.find("rate");
+                            if ((mapIt2->second * sampleLayerComposition[ele]) <= 0.0)
+                            {
+                                // std::cout << " Lower equal zero " << mapIt2->second << std::endl;
+                                continue;
+                            }
                             if (secondaryCalculationLimit > 0.0)
                             {
                                 if ((mapIt2->second * sampleLayerComposition[ele]) < secondaryCalculationLimit)
@@ -578,7 +583,11 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                     criterium /= (primaryExcitationFactors[c_it->first]["rate"] * \
                                                      sampleLayerWeight[iLayer]);
                                     if (criterium <= criteriumMax)
+                                    {
+                                        // std::cout << " criterium = " << criterium;
+                                        // std::cout << " criterium Max = " << criteriumMax << std::endl;
                                         continue;
+                                    }
                                     mu_1_i = mapIt->second;
                                     tmpDouble = Math::deBoerL0(mu_1_lambda / sinAlphaIn,
                                                                mu_1_i / sinAlphaOut,
@@ -746,7 +755,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                                                        result[c_it->first]["efficiency"];
                                         if (criteriumMax > 0.0)
                                         {
-                                            if ((tmpDouble/result[c_it->first]["primary"]) < 0.0001)
+                                            if ((tmpDouble/result[c_it->first]["primary"]) < 0.00001)
                                             {
                                                 if (criterium > criteriumMax)
                                                 {
@@ -870,7 +879,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                                                        result[c_it->first]["efficiency"];
                                         if (criteriumMax > 0.0)
                                         {
-                                            if ((tmpDouble/result[c_it->first]["primary"]) < 0.0001)
+                                            if ((tmpDouble/result[c_it->first]["primary"]) < 0.00001)
                                             {
                                                 if (criterium > criteriumMax)
                                                 {
