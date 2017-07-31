@@ -456,7 +456,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                 // calculate escape ratio assuming normal incidence on detector surface
                                 escapeRates = detector.getEscape(energy, \
                                                                  elementsLibrary, \
-                                                                 c_it->first, \
+                                                                 elementName + c_it->first, \
                                                                  updateEscape);
                                 updateEscape = 0;
                             }
@@ -902,9 +902,9 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                     if (detector.hasMaterialComposition() || (detector.getMaterialName().size() > 0 ))
                     {
                         // calculate (if needed) escape ratio
-                        escapeRates = detector.getEscape(energy, \
+                        escapeRates = detector.getEscape(result[c_it->first]["energy"], \
                                                          elementsLibrary, \
-                                                         c_it->first, \
+                                                         elementName + c_it->first, \
                                                          updateEscape);
                         if (escapeRates.size())
                         {
