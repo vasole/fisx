@@ -923,6 +923,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                     }
                                     actualResult[key][iLayer][tmpString]["energy"] = mapIt->second;
                                     actualResult[key][iLayer][tmpString]["rate"] = 0.0;
+                                    actualResult[key][iLayer][tmpString]["ratio"] = 0.0;
                                     actualResult[key][iLayer][tmpString]["primary"] = 0.0;
                                     actualResult[key][iLayer][tmpString]["secondary"] = 0.0;
                                 }
@@ -933,6 +934,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                 }
                                 totalEscape += mapIt->second;
                                 actualResult[key][iLayer][tmpString]["rate"] += mapIt->second * result[c_it->first]["rate"];
+                                actualResult[key][iLayer][tmpString]["ratio"] = mapIt->second;
                                 // The only meaning of filling "primary" and "secondary" for a escape peak is in order to
                                 // be able to evaluate the ratio without having to refer to the actual parent line.
                                 actualResult[key][iLayer][tmpString]["primary"] += mapIt->second * result[c_it->first]["primary"];
