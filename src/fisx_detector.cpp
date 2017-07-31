@@ -74,6 +74,10 @@ void Detector::setMaximumNumberOfEscapePeaks(const int & nPeaks)
     this->escapePeakCache.clear();
 }
 
+void Detector::clearEscapePeakCache()
+{
+    this->escapePeakCache.clear();
+}
 
 double Detector::getActiveArea() const
 {
@@ -128,7 +132,7 @@ std::map<std::string, std::map<std::string, double> > Detector::getEscape(const 
 {
     if (update != 0)
         this->escapePeakCache.clear();
-    if (label.size())
+    if (false) //(label.size())
     {
         if (this->escapePeakCache.find(label) == this->escapePeakCache.end())
         {
@@ -138,7 +142,8 @@ std::map<std::string, std::map<std::string, double> > Detector::getEscape(const 
                                                                      this->escapePeakEnergyThreshold, \
                                                                      this->escapePeakIntensityThreshold, \
                                                                      this->escapePeakNThreshold, \
-                                                                     this->escapePeakAlphaIn);
+                                                                     this->escapePeakAlphaIn,
+                                                                     this->getThickness());
         }
         return this->escapePeakCache[label];
     }
@@ -149,7 +154,8 @@ std::map<std::string, std::map<std::string, double> > Detector::getEscape(const 
                                          this->escapePeakEnergyThreshold, \
                                          this->escapePeakIntensityThreshold, \
                                          this->escapePeakNThreshold, \
-                                         this->escapePeakAlphaIn);
+                                         this->escapePeakAlphaIn,
+                                         this->getThickness());
     }
 }
 

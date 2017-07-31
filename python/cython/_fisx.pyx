@@ -84,6 +84,27 @@ cdef class PyDetector:
                 return toStringKeysAndValues(self.thisptr.getEscape(energy, deref(elementsLib.thisptr), label, 1))
             else:
                 return toStringKeysAndValues(self.thisptr.getEscape(energy, deref(elementsLib.thisptr), label, 0))
+
+    def getEscapePeakEnergyThreshold(self):
+        return self.thisptr.getEscapePeakEnergyThreshold()
+
+    def getEscapePeakIntensityThreshold(self):
+        return self.thisptr.getEscapePeakIntensityThreshold()
+
+    def getEscapePeakNThreshold(self):
+        return self.thisptr.getEscapePeakNThreshold()
+
+    def getEscapePeakAlphaIn(self):
+        return self.thisptr.getEscapePeakAlphaIn()
+
+    def getThickness(self):
+        return self.thisptr.getThickness()
+
+    def getDensity(self):
+        return self.thisptr.getDensity()
+
+    def getComposition(self, PyElements elementsLib):
+        return self.thisptr.getComposition(deref(elementsLib.thisptr))
 #/*##########################################################################
 #
 # The fisx library for X-Ray Fluorescence
@@ -534,6 +555,14 @@ cdef class PyElements:
         return self.thisptr.getEscape(composition, energy, energyThreshold, intensityThreshold, nThreshold,
                                       alphaIn, thickness)
 
+    def updateEscapeCache(self, std_map[std_string, double] composition, std_vector[double] energyList, double energyThreshold=0.010,
+                                        double intensityThreshold=1.0e-7,
+                                        int nThreshold=4 ,
+                                        double alphaIn=90.,
+                                        double thickness=0.0):
+        return self.thisptr.updateEscapeCache(composition, energyList, energyThreshold, intensityThreshold, nThreshold,
+                                      alphaIn, thickness)
+									  
     def getShellConstants(self, elementName, subshell):
         if sys.version < "3.0":
             return self.thisptr.getShellConstants(elementName, subshell)

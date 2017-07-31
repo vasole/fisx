@@ -56,3 +56,17 @@ cdef extern from "fisx_detector.h" namespace "fisx":
         std_map[std_string, std_map[std_string, double]] getEscape(double, Elements, std_string, int) except +
 
         void setMaximumNumberOfEscapePeaks(int) except +
+
+        double getEscapePeakEnergyThreshold()
+
+        double getEscapePeakIntensityThreshold()
+
+        int getEscapePeakNThreshold()
+
+        double getEscapePeakAlphaIn()
+
+        double getThickness()
+
+        double getDensity()
+
+        std_map[std_string, double] getComposition(Elements) except +

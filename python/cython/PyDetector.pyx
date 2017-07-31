@@ -84,3 +84,24 @@ cdef class PyDetector:
                 return toStringKeysAndValues(self.thisptr.getEscape(energy, deref(elementsLib.thisptr), label, 1))
             else:
                 return toStringKeysAndValues(self.thisptr.getEscape(energy, deref(elementsLib.thisptr), label, 0))
+
+    def getEscapePeakEnergyThreshold(self):
+        return self.thisptr.getEscapePeakEnergyThreshold()
+
+    def getEscapePeakIntensityThreshold(self):
+        return self.thisptr.getEscapePeakIntensityThreshold()
+
+    def getEscapePeakNThreshold(self):
+        return self.thisptr.getEscapePeakNThreshold()
+
+    def getEscapePeakAlphaIn(self):
+        return self.thisptr.getEscapePeakAlphaIn()
+
+    def getThickness(self):
+        return self.thisptr.getThickness()
+
+    def getDensity(self):
+        return self.thisptr.getDensity()
+
+    def getComposition(self, PyElements elementsLib):
+        return self.thisptr.getComposition(deref(elementsLib.thisptr))

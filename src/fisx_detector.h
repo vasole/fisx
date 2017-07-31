@@ -88,6 +88,19 @@ public:
     const double & getDistance() const;
 
     /*!
+    Make sure the internal escape peak cache is empty
+    */
+    void clearEscapePeakCache();
+
+    /*!
+    Getter to internal variable
+    */
+    const double getEscapePeakEnergyThreshold() const {return this->escapePeakEnergyThreshold;};
+    const double getEscapePeakIntensityThreshold() const {return this->escapePeakIntensityThreshold;};
+    const int getEscapePeakNThreshold() const {return this->escapePeakNThreshold;};
+    const double getEscapePeakAlphaIn() const {return this->escapePeakAlphaIn;};
+
+    /*!
     Returns escape peak energy and rate per detected photon of given energy.
 
     The optional arguments label and update serve for caching purposes.

@@ -409,7 +409,17 @@ public:
                                         const double & alphaIn = 90.,\
                                         const double & thickness = 0.0) const;
 
-
+    /*!
+    Calculate the expected escape and stores it into cache.
+    The cache will be emptied if needed.
+    */
+    void updateEscapeCache(const std::map<std::string, double> & composition, \
+                                        const std::vector<double> & energy, \
+                                        const double & energyThreshold = 0.010, \
+                                        const double & intensityThreshold = 1.0e-7, \
+                                        const int & nThreshold = 4 , \
+                                        const double & alphaIn = 90.,\
+                                        const double & thickness = 0.0);
 
     /*!
     Optimization methods to keep the complete emission cascade following a single vacancy in a shell
@@ -442,6 +452,11 @@ public:
     Clear the calculation cache
     */
     void clearCache(const std::string & elementName);
+
+    /*!
+    Clear the escape peak calculation cache
+    */
+    void clearEscapeCache(void);
 
     /*!
     Return 1 if the calculation cache is enabled
@@ -487,6 +502,22 @@ private:
     std::map<std::string, std::string> shellConstantsFile;
     std::map<std::string, std::string> shellRadiativeTransitionsFile;
     std::map<std::string, std::string> shellNonradiativeTransitionsFile;
+
+    // A cache of escape peaks
+    std::map< double, std::map<std::string,std::map<std::string, double> > > detectorEscapeCache;
+    std::map< std::string, double> detectorCompositionUsedInCache;
+    double detectorEnergyThresholdUsedInCache;
+    double detectorIntensityThresholdUsedInCache;
+    int detectorNThresholdUsedInCache;
+    double detectorAlphaInUsedInCache;
+    double detectorThicknessUsedInCache;
+    bool isEscapeCacheCompatible(\
+                                        const std::map<std::string, double> & composition,
+                                        const double & energyThreshold, \
+                                        const double & intensityThreshold, \
+                                        const int & nThreshold , \
+                                        const double & alphaIn , \
+                                        const double & thickness) const;
 
     struct sortVectorOfExcited {
         bool operator()(const std::pair<std::string, double> &left, const std::pair<std::string,int> &right) {

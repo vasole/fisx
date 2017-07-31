@@ -1908,6 +1908,26 @@ std::map<std::string,std::map<std::string, double> > Elements::getEscape( \
     std::string tmpString;
     double intrinsicEfficiency;
 
+    if (this->isEscapeCacheCompatible(composition,energyThreshold,intensityThreshold, \
+                                        nThreshold , alphaIn, thickness))
+    {
+        std::map< double, std::map<std::string,std::map<std::string, double> > >::const_iterator it;
+        it = this->detectorEscapeCache.find(energy);
+        if ( it != this->detectorEscapeCache.end())
+        {
+            std::cout << "USING CACHE" <<  energy << std::endl;
+            return it->second;
+        }
+        else
+        {
+            std::cout << "ENERGY NOT THERE" << std::endl;
+        }
+    }
+    else
+    {
+        std::cout << "NOT COMPATIBLE" << std::endl;
+    }
+
     if (alphaIn == 90.)
         sinAlphaIn = 1.0;
     else
@@ -2104,6 +2124,98 @@ void Elements::clearCache(const std::string & elementName)
     else
         throw std::invalid_argument("Invalid element: " + elementName);
 }
+
+void Elements::clearEscapeCache(void)
+{
+    this->detectorEscapeCache.clear();
+}
+
+
+bool Elements::isEscapeCacheCompatible(\
+                                        const std::map<std::string, double> & composition,
+                                        const double & energyThreshold, \
+                                        const double & intensityThreshold, \
+                                        const int & nThreshold , \
+                                        const double & alphaIn , \
+                                        const double & thickness) const
+{
+        std::cout << 0 << std::endl;
+    if (this->detectorEscapeCache.size() > 0)
+    {
+        std::cout << 1 << std::endl;
+        if (energyThreshold == this->detectorEnergyThresholdUsedInCache)
+        {
+        std::cout << 2 << std::endl;
+            if (intensityThreshold == this->detectorIntensityThresholdUsedInCache)
+            {
+        std::cout << 3 << std::endl;
+        std::cout << " input " << nThreshold << " cached " << this->detectorNThresholdUsedInCache << std::endl;
+                if(nThreshold == this->detectorNThresholdUsedInCache)
+                {
+        std::cout << 4 << std::endl;
+                    if (alphaIn == this->detectorAlphaInUsedInCache)
+                    {
+        std::cout << 5 << std::endl;
+        std::cout << " input " << thickness << " cached " << this->detectorThicknessUsedInCache << std::endl;
+                        if (thickness == this->detectorThicknessUsedInCache)
+                        {
+        std::cout << 6 << std::endl;
+                            // we have to compare the composition
+                            if (composition.size() == this->detectorCompositionUsedInCache.size())
+                            {
+        std::cout << 7 << std::endl;
+                                if (std::equal(composition.begin(), composition.end(), this->detectorCompositionUsedInCache.begin()))
+                                {
+        std::cout << 8 << std::endl;
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return false;
+}
+
+void Elements::updateEscapeCache(\
+                                        const std::map<std::string, double> & composition,
+                                        const std::vector<double> & energyList, \
+                                        const double & energyThreshold, \
+                                        const double & intensityThreshold, \
+                                        const int & nThreshold , \
+                                        const double & alphaIn , \
+                                        const double & thickness)
+{
+    std::vector<double>::size_type i;
+    double energy;
+
+    if (!this->isEscapeCacheCompatible(composition, energyThreshold, \
+                                        intensityThreshold, nThreshold, alphaIn, thickness))
+    {
+        // not compatible, clear the detector cache
+        this->clearEscapeCache();
+    }
+    for (i = 0; i < energyList.size(); ++i)
+    {
+        energy = energyList[i];
+        if (this->detectorEscapeCache.find(energy) == this->detectorEscapeCache.end())
+        {
+            std::cout << "filling energy " << energy << std::endl;
+            this->detectorEscapeCache[energy] = this->getEscape(composition, energy, energyThreshold, \
+                                                                intensityThreshold, nThreshold, alphaIn, thickness);
+        }
+        this->detectorCompositionUsedInCache = composition;
+        this->detectorEnergyThresholdUsedInCache = energyThreshold;
+        this->detectorIntensityThresholdUsedInCache = intensityThreshold;
+        this->detectorNThresholdUsedInCache = nThreshold;
+        std::cout << "Storing cache " << nThreshold << std::endl;
+        this->detectorAlphaInUsedInCache = alphaIn;
+        this->detectorThicknessUsedInCache = thickness;
+    }
+}
+
 
 const int Elements::isCacheEnabled(const std::string & elementName) const
 {

@@ -99,6 +99,9 @@ cdef extern from "fisx_elements.h" namespace "fisx":
         std_map[std_string, std_map [std_string, double]] getEscape(std_map[std_string, double],\
                                               double, double, double, int, double, double) except +
 
+        void updateEscapeCache(std_map[std_string, double],\
+                                       std_vector[double], double, double, int, double, double) except +
+        
         std_map[std_string, double] getEmittedXRayLines(std_string, double) except +
 
         std_map[std_string, double] getRadiativeTransitions(std_string, std_string) except +
