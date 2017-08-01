@@ -1915,17 +1915,17 @@ std::map<std::string,std::map<std::string, double> > Elements::getEscape( \
         it = this->detectorEscapeCache.find(energy);
         if ( it != this->detectorEscapeCache.end())
         {
-            std::cout << "USING CACHE" <<  energy << std::endl;
+            // std::cout << "USING CACHE" <<  energy << std::endl;
             return it->second;
         }
         else
         {
-            std::cout << "ENERGY NOT THERE" << std::endl;
+            // std::cout << "ENERGY NOT THERE" << energy << std::endl;
         }
     }
     else
     {
-        std::cout << "NOT COMPATIBLE" << std::endl;
+        // std::cout << "NOT COMPATIBLE" << std::endl;
     }
 
     if (alphaIn == 90.)
@@ -2139,34 +2139,34 @@ bool Elements::isEscapeCacheCompatible(\
                                         const double & alphaIn , \
                                         const double & thickness) const
 {
-        std::cout << 0 << std::endl;
+    // std::cout << 0 << std::endl;
     if (this->detectorEscapeCache.size() > 0)
     {
-        std::cout << 1 << std::endl;
+        // std::cout << 1 << std::endl;
         if (energyThreshold == this->detectorEnergyThresholdUsedInCache)
         {
-        std::cout << 2 << std::endl;
+            // std::cout << 2 << std::endl;
             if (intensityThreshold == this->detectorIntensityThresholdUsedInCache)
             {
-        std::cout << 3 << std::endl;
-        std::cout << " input " << nThreshold << " cached " << this->detectorNThresholdUsedInCache << std::endl;
+                // std::cout << 3 << std::endl;
+                // std::cout << " input " << nThreshold << " cached " << this->detectorNThresholdUsedInCache << std::endl;
                 if(nThreshold == this->detectorNThresholdUsedInCache)
                 {
-        std::cout << 4 << std::endl;
+                    // std::cout << 4 << std::endl;
                     if (alphaIn == this->detectorAlphaInUsedInCache)
                     {
-        std::cout << 5 << std::endl;
-        std::cout << " input " << thickness << " cached " << this->detectorThicknessUsedInCache << std::endl;
+                        //std::cout << 5 << std::endl;
+                        //std::cout << " input " << thickness << " cached " << this->detectorThicknessUsedInCache << std::endl;
                         if (thickness == this->detectorThicknessUsedInCache)
                         {
-        std::cout << 6 << std::endl;
+                            //std::cout << 6 << std::endl;
                             // we have to compare the composition
                             if (composition.size() == this->detectorCompositionUsedInCache.size())
                             {
-        std::cout << 7 << std::endl;
+                                // std::cout << 7 << std::endl;
                                 if (std::equal(composition.begin(), composition.end(), this->detectorCompositionUsedInCache.begin()))
                                 {
-        std::cout << 8 << std::endl;
+                                    // std::cout << 8 << std::endl;
                                     return true;
                                 }
                             }
@@ -2202,7 +2202,7 @@ void Elements::updateEscapeCache(\
         energy = energyList[i];
         if (this->detectorEscapeCache.find(energy) == this->detectorEscapeCache.end())
         {
-            std::cout << "filling energy " << energy << std::endl;
+            // std::cout << "filling energy " << energy << std::endl;
             this->detectorEscapeCache[energy] = this->getEscape(composition, energy, energyThreshold, \
                                                                 intensityThreshold, nThreshold, alphaIn, thickness);
         }
@@ -2210,7 +2210,7 @@ void Elements::updateEscapeCache(\
         this->detectorEnergyThresholdUsedInCache = energyThreshold;
         this->detectorIntensityThresholdUsedInCache = intensityThreshold;
         this->detectorNThresholdUsedInCache = nThreshold;
-        std::cout << "Storing cache " << nThreshold << std::endl;
+        // std::cout << "Storing cache " << nThreshold << std::endl;
         this->detectorAlphaInUsedInCache = alphaIn;
         this->detectorThicknessUsedInCache = thickness;
     }
