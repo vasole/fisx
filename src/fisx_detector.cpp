@@ -143,7 +143,7 @@ std::map<std::string, std::map<std::string, double> > Detector::getEscape(const 
                                                                      this->escapePeakIntensityThreshold, \
                                                                      this->escapePeakNThreshold, \
                                                                      this->escapePeakAlphaIn,
-                                                                     this->getThickness());
+                                                                     0);
         }
         return this->escapePeakCache[label];
     }
@@ -155,7 +155,7 @@ std::map<std::string, std::map<std::string, double> > Detector::getEscape(const 
                                          this->escapePeakIntensityThreshold, \
                                          this->escapePeakNThreshold, \
                                          this->escapePeakAlphaIn,
-                                         this->getThickness());
+                                         0);
     }
 }
 
