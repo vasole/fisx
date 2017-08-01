@@ -124,6 +124,10 @@ cdef extern from "fisx_elements.h" namespace "fisx":
 
         int isCacheEnabled(std_string) except +
 
+        int isEscapeCacheEnabled() except +
+
+        void setEscapeCacheEnabled(int) except+
+
         int getCacheSize(std_string) except+
 
         void removeMaterials()

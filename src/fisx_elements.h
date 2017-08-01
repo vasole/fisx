@@ -429,6 +429,8 @@ public:
     int isElementCascadeCacheFilled(const std::string & elementName) const;
     void fillElementCascadeCache(const std::string & elementName);
     void emptyElementCascadeCache(const std::string & elementName);
+    void setEscapeCacheEnabled(const int & flag = 1){this->escapeCacheEnabled = flag;};
+    int isEscapeCacheEnabled() const {return this->escapeCacheEnabled;};
 
     /*!
     Optimization methods to keep the calculations at a set of energies in cache
@@ -511,6 +513,7 @@ private:
     int detectorNThresholdUsedInCache;
     double detectorAlphaInUsedInCache;
     double detectorThicknessUsedInCache;
+    int escapeCacheEnabled;
     bool isEscapeCacheCompatible(\
                                         const std::map<std::string, double> & composition,
                                         const double & energyThreshold, \

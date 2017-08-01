@@ -2140,6 +2140,10 @@ bool Elements::isEscapeCacheCompatible(\
                                         const double & thickness) const
 {
     // std::cout << 0 << std::endl;
+    if (this->isEscapeCacheEnabled() == 0)
+    {
+        return false;
+    }
     if (this->detectorEscapeCache.size() > 0)
     {
         // std::cout << 1 << std::endl;
@@ -2190,6 +2194,11 @@ void Elements::updateEscapeCache(\
 {
     std::vector<double>::size_type i;
     double energy;
+
+    if (this->isEscapeCacheEnabled() == 0)
+    {
+        std::cout << "WARNING: Filling escape cache when escape cache is disabled" << std::endl;
+    }
 
     if (!this->isEscapeCacheCompatible(composition, energyThreshold, \
                                         intensityThreshold, nThreshold, alphaIn, thickness))
