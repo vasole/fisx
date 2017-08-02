@@ -61,7 +61,7 @@ script:
     - pip install --upgrade pip
 
     # Install from source package
-    - pip install --pre --find-links dist/--no-cache-dir --no-index fisx $PIP_INSTALL_EXTRA_ARGS
+    - pip install --pre --find-links dist/ --no-cache-dir --no-index fisx $PIP_INSTALL_EXTRA_ARGS
 
     # Print Python info
     - python ci/info_platform.py
