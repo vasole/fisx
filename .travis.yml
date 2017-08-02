@@ -16,52 +16,56 @@ matrix:
 
         - language: generic
           os: osx
-          env: BUILD_COMMAND=bdist_wheel
+          env:
+              - BUILD_COMMAND=bdist_wheel
+              - PYTHON_VERSION = 2
+
+        - language: generic
+          os: osx
+          env: 
+              - BUILD_COMMAND=bdist_wheel
+              - PYTHON_VERSION = 3
 
 cache:
     apt: true
 
+before_install:
+    # On MacOS: install python3 if needed
+    - if [ "$TRAVIS_OS_NAME" == "osx"];
+      then
+         source ./ci/before_install-${TRAVIS_OS_NAME}.sh;
+      fi
+
 install:
-    # Mac OS X specific bootstrap
-    - source ./ci/travis_osx.sh
-    - travis_osx_install_begin
 
     # Upgrade distribution modules
+    
+    - python -m pip install --upgrade pip
     - pip install --upgrade setuptools
-    - pip install --upgrade pip
 
     # Install build dependencies
-    - pip install wheel
-    - pip install --trusted-host www.edna-site.org --find-links http://www.edna-site.org/pub/wheelhouse/ numpy
+    - pip install --upgrade wheel
+    - pip install --upgrade numpy
 
     # Print Python info
     - python ./ci/info_platform.py
-    - pip freeze
+    - pip list
 
     # Generate source package or wheel
     - python setup.py $BUILD_COMMAND
     - ls dist
 
-    # Mac OS X specific cleanup
-    - travis_osx_install_end
-
 script:
-    # Mac OS X specific bootstrap
-    - travis_osx_run_begin
-
     # Upgrade distribution modules
     - pip install --upgrade setuptools
     - pip install --upgrade pip
 
     # Install from source package
-    - pip install --pre --find-links dist/ --trusted-host www.edna-site.org --find-links http://www.edna-site.org/pub/wheelhouse/ fisx
+    - pip install --pre --find-links dist/--no-cache-dir --no-index silx $PIP_INSTALL_EXTRA_ARGS
 
     # Print Python info
     - python ci/info_platform.py
-    - pip freeze
+    - pip list
 
     # Run the tests
     - python -m fisx.tests.testAll
-
-    # Mac OS X specific cleanup
-    - travis_osx_run_end
