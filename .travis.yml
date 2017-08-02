@@ -33,7 +33,7 @@ before_install:
     # On MacOS: install python3 if needed
     - if [ "$TRAVIS_OS_NAME" == "osx"];
       then
-         source ./ci/before_install-${TRAVIS_OS_NAME}.sh;
+         source ./ci/travis_osx.sh;
       fi
 
 install:
