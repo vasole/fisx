@@ -560,9 +560,9 @@ cdef class PyElements:
                                         int nThreshold=4 ,
                                         double alphaIn=90.,
                                         double thickness=0.0):
-        return self.thisptr.updateEscapeCache(composition, energyList, energyThreshold, intensityThreshold, nThreshold,
+        self.thisptr.updateEscapeCache(composition, energyList, energyThreshold, intensityThreshold, nThreshold,
                                       alphaIn, thickness)
-									  
+
     def getShellConstants(self, elementName, subshell):
         if sys.version < "3.0":
             return self.thisptr.getShellConstants(elementName, subshell)

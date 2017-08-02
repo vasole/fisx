@@ -12716,24 +12716,14 @@ static PyObject *__pyx_pw_4fisx_5_fisx_10PyElements_59updateEscapeCache(PyObject
 static PyObject *__pyx_pf_4fisx_5_fisx_10PyElements_58updateEscapeCache(struct __pyx_obj_4fisx_5_fisx_PyElements *__pyx_v_self, std::map<std::string,double>  __pyx_v_composition, std::vector<double>  __pyx_v_energyList, double __pyx_v_energyThreshold, double __pyx_v_intensityThreshold, int __pyx_v_nThreshold, double __pyx_v_alphaIn, double __pyx_v_thickness) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
-  PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("updateEscapeCache", 0);
 
   /* "python/cython/_fisx.pyx":563
  *                                         double alphaIn=90.,
  *                                         double thickness=0.0):
- *         return self.thisptr.updateEscapeCache(composition, energyList, energyThreshold, intensityThreshold, nThreshold,             # <<<<<<<<<<<<<<
+ *         self.thisptr.updateEscapeCache(composition, energyList, energyThreshold, intensityThreshold, nThreshold,             # <<<<<<<<<<<<<<
  *                                       alphaIn, thickness)
  * 
- */
-  __Pyx_XDECREF(__pyx_r);
-
-  /* "python/cython/_fisx.pyx":564
- *                                         double thickness=0.0):
- *         return self.thisptr.updateEscapeCache(composition, energyList, energyThreshold, intensityThreshold, nThreshold,
- *                                       alphaIn, thickness)             # <<<<<<<<<<<<<<
- * 
- *     def getShellConstants(self, elementName, subshell):
  */
   try {
     __pyx_v_self->thisptr->updateEscapeCache(__pyx_v_composition, __pyx_v_energyList, __pyx_v_energyThreshold, __pyx_v_intensityThreshold, __pyx_v_nThreshold, __pyx_v_alphaIn, __pyx_v_thickness);
@@ -12741,19 +12731,6 @@ static PyObject *__pyx_pf_4fisx_5_fisx_10PyElements_58updateEscapeCache(struct _
     __Pyx_CppExn2PyErr();
     __PYX_ERR(0, 563, __pyx_L1_error)
   }
-
-  /* "python/cython/_fisx.pyx":563
- *                                         double alphaIn=90.,
- *                                         double thickness=0.0):
- *         return self.thisptr.updateEscapeCache(composition, energyList, energyThreshold, intensityThreshold, nThreshold,             # <<<<<<<<<<<<<<
- *                                       alphaIn, thickness)
- * 
- */
-  __pyx_t_1 = __Pyx_void_to_None(NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 563, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_r = __pyx_t_1;
-  __pyx_t_1 = 0;
-  goto __pyx_L0;
 
   /* "python/cython/_fisx.pyx":558
  *                                       alphaIn, thickness)
@@ -12764,8 +12741,9 @@ static PyObject *__pyx_pf_4fisx_5_fisx_10PyElements_58updateEscapeCache(struct _
  */
 
   /* function exit code */
+  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
+  goto __pyx_L0;
   __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_1);
   __Pyx_AddTraceback("fisx._fisx.PyElements.updateEscapeCache", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
