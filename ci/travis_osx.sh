@@ -1,6 +1,8 @@
 # Script for travis-CI Mac OS X specific setup.
 # source this script with PYTHON_VERSION env variable set
 
+if [ "$TRAVIS_OS_NAME" == "osx" ]; then
+
 VENV_DIR=./venv
 
 # Use brew for python3
@@ -14,6 +16,7 @@ then
     source $VENV_DIR/bin/activate
 fi
 
+fi
 # Alternative python installation using miniconda
 #curl -o miniconda_installer.sh "https://repo.continuum.io/miniconda/Miniconda$PYTHON_VERSION-latest-MacOSX-x86_64.sh"
 #bash miniconda_installer.sh -b -p miniconda
