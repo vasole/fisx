@@ -1,0 +1,3 @@
+debianTag="debian/%e%v"
+patchedTag="patches/%e%v"
+upstreamTag="upstream/%e%u"

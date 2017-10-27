@@ -1,0 +1,11 @@
+Tests: python2
+Depends: python-fisx
+
+Tests: python2-dbg
+Depends: python-fisx-dbg
+
+Tests: python3
+Depends: python3-fisx
+
+Tests: python3-dbg
+Depends: python3-fisx-dbg

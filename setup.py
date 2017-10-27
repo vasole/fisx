@@ -34,16 +34,20 @@ if "bdist_wheel" in sys.argv:
     from setuptools import setup, Extension
     from setuptools.command.build_py import build_py
     from distutils.command.install_data import install_data
+    from setuptools.command.sdist import sdist
 else:
     try:
         from setuptools import setup, Extension
         from setuptools.command.build_py import build_py
         from distutils.command.install_data import install_data
+        from setuptools.command.sdist import sdist
     except ImportError:
         from distutils.core import setup, Extension
         from distutils.sysconfig import get_python_lib
         from distutils.command.build_py import build_py
         from distutils.command.install_data import install_data
+        from distutils.command.sdist import sdist
+
 
 # check if cython is not to be used despite being present
 def use_cython():
@@ -74,6 +78,7 @@ else:
     build_ext = None
 
 import numpy
+
 # deal with required data
 
 #for the time being there is no doc directory
@@ -85,18 +90,13 @@ if FISX_DATA_DIR is None:
 if FISX_DOC_DIR is None:
     FISX_DOC_DIR = os.path.join('fisx', 'fisx_data')
 
-def getFisxVersion():
-    cppDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "src")
-    f = open(os.path.join(cppDir, "fisx_version.h"), "r")
-    content = f.readlines()
-    f.close()
-    for line in content:
-        if "FISX_VERSION_STR" in line:
-            version = line.split("FISX_VERSION_STR")[-1].replace("\n","")
-            version = version.replace(" ","")
-            return version[1:-1]
 
-__version__ = getFisxVersion()
+def get_version():
+    """Returns current version number from version.py file"""
+    import version
+    return version.strictversion
+
+__version__ = get_version()
 
 print("fisx X-Ray Fluorescence Toolkit %s\n" % __version__)
 
@@ -230,16 +230,66 @@ def buildExtension():
 
 ext_modules = [buildExtension()]
 
-cmdclass = {'install_data':smart_install_data,
-            'build_py':smart_build_py}
+
+class sdist_debian(sdist):
+    """
+    Tailor made sdist for debian
+    * remove auto-generated doc
+    * remove cython generated .c files
+    * remove cython generated .c files
+    * remove .bat files
+    * include .l man files
+    """
+    @staticmethod
+    def get_debian_name():
+        name = "python-fisx_%s" % (__version__)
+        return name
+
+    def prune_file_list(self):
+        sdist.prune_file_list(self)
+
+        # this is for Cython files specifically: remove C & html files
+        search_root = os.path.dirname(os.path.abspath(__file__))
+        for root, _, files in os.walk(search_root):
+            for afile in files:
+                if os.path.splitext(afile)[1].lower() == ".pyx":
+                    base_file = os.path.join(root, afile)[len(search_root) + 1:-4]
+                    self.filelist.exclude_pattern(pattern=base_file + ".c")
+                    self.filelist.exclude_pattern(pattern=base_file + ".cpp")
+                    self.filelist.exclude_pattern(pattern=base_file + ".html")
+
+    def make_distribution(self):
+        self.prune_file_list()
+        sdist.make_distribution(self)
+        dest = self.archive_files[0]
+        dirname, basename = os.path.split(dest)
+        base, ext = os.path.splitext(basename)
+        while ext in [".zip", ".tar", ".bz2", ".gz", ".Z", ".lz", ".orig"]:
+            base, ext = os.path.splitext(base)
+        if ext:
+            dest = "".join((base, ext))
+        else:
+            dest = base
+        # sp = dest.split("-")
+        # base = sp[:-1]
+        # nr = sp[-1]
+        debian_arch = os.path.join(dirname, self.get_debian_name() + ".orig.tar.gz")
+        os.rename(self.archive_files[0], debian_arch)
+        self.archive_files = [debian_arch]
+        print("Building debian .orig.tar.gz in %s" % self.archive_files[0])
+
+cmdclass = {'install_data': smart_install_data,
+            'build_py': smart_build_py,
+            'debian_src': sdist_debian}
 if build_ext:
     cmdclass['build_ext'] = build_ext
 
 description = "Quantitative X-Ray Fluorescence Analysis Support Library"
-long_description = open("README.rst").read()
+with open("README.rst") as f:
+    long_description = f.read()
 
 # tell distutils where to find the packages
-package_dir = {"":"python"}
+package_dir = {"": "python"}
 packages = ['fisx', 'fisx.tests']
 
 classifiers = ["Development Status :: 5 - Production/Stable",

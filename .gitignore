@@ -16,6 +16,9 @@
 *.swp
 *~
 
+# pycharm
+.idea/
+
 # Python .gitignore template follows
 # Byte-compiled / optimized / DLL files
 __pycache__/
