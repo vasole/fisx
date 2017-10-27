@@ -285,7 +285,8 @@ if build_ext:
     cmdclass['build_ext'] = build_ext
 
 description = "Quantitative X-Ray Fluorescence Analysis Support Library"
-long_description = open("README.rst").read()
+with open("README.rst") as f:
+    long_description = f.read()
 
 # tell distutils where to find the packages
 package_dir = {"": "python"}
