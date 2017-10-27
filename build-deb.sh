@@ -56,6 +56,12 @@ Build the Debian ${debian_version} package of the ${project} library.
 If the build succeed the directory dist/debian${debian_version} will
 contains the packages.
 
+You need to have a PGP key on your machine. To use a specific PGP key,
+you need to first set DEBEMAIL and DEBFULLNAME environment variables:
+
+export DEBEMAIL=john.smith@esrf.fr
+export DEBFULLNAME=\"John Smith (ESRF)\"
+
 optional arguments:
     --help     show this help text
     --install  install the packages generated at the end of
