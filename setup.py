@@ -242,7 +242,7 @@ class sdist_debian(sdist):
     """
     @staticmethod
     def get_debian_name():
-        name = "fisx_%s" % (__version__)
+        name = "python-fisx_%s" % (__version__)
         return name
 
     def prune_file_list(self):
