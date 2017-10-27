@@ -1,0 +1,39 @@
+#!/usr/bin/make -f
+
+export DH_VERBOSE=1
+export PYBUILD_VERBOSE=1
+
+export WITH_CYTHON=1
+export FISX_DATA_DIR=/usr/share/fisx/
+export PKGCOMMON=$(CURDIR)/debian/python-fisx-common/
+
+export PYBUILD_NAME=fisx
+export PYBUILD_AFTER_INSTALL=rm -rf {destdir}$(FISX_DATA_DIR)
+
+# Make does not offer a recursive wildcard function, so here's one:
+rwildcard=$(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2))
+
+# How to recursively find all files with the same name in a given folder
+ALL_PYX := $(call rwildcard,python/,*.pyx)
+#NOTA: No space before *
+
+override_dh_clean:
+	dh_clean
+	rm -rf python/fisx.egg-info/
+	rm -f $(patsubst %.pyx,%.cpp,${ALL_PYX})
+	rm -f $(patsubst %.pyx,%.c,${ALL_PYX})
+
+%:
+	dh $@ --with python2,python3 --buildsystem=pybuild
+
+override_dh_auto_install:
+	dh_auto_install
+	dh_numpy
+	dh_numpy3
+
+	# install the common files
+	python setup.py install_data --root $(PKGCOMMON)
+	rm -f $(PKGCOMMON)/$(FISX_DATA_DIR)/LICENSE
+
+override_dh_auto_test:
+	FISX_DATA_DIR=$(CURDIR)/fisx_data dh_auto_test
