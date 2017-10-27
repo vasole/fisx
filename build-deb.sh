@@ -118,7 +118,7 @@ clean_up()
 
 build_deb_8_plus () {
 	echo "Build for debian 8 or newer using actual packaging" 
-	tarname=${project}_${debianversion}.orig.tar.gz
+	tarname=${source_project}_${debianversion}.orig.tar.gz
 	clean_up
 	python setup.py debian_src
 	cp -f dist/${tarname} ${build_directory}
