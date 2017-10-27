@@ -1,0 +1,11 @@
+#!/bin/sh
+set -efu
+
+PYS=${PYS:-"$(pyversions -r 2>/dev/null)"}
+
+cd "$ADTTMP"
+
+for py in $PYS; do
+    echo "=== $py ==="
+    $py -m fisx.tests.testAll 2>&1
+done

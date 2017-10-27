@@ -1,0 +1,107 @@
+Source: python-fisx
+Maintainer: Debian Python Modules Team <python-modules-team@lists.alioth.debian.org>
+Uploaders: Picca Frédéric-Emmanuel <picca@debian.org>
+Section: python
+Testsuite: autopkgtest
+Priority: optional
+Build-Depends: cython,
+               cython-dbg,
+               cython3,
+               cython3-dbg,
+               debhelper (>= 9),
+               python-all-dbg,
+               python-all-dev,
+               python-numpy,
+               python-numpy-dbg,
+               python-setuptools,
+               python3-all-dbg,
+               python3-all-dev,
+               python3-numpy,
+               python3-numpy-dbg,
+               python3-setuptools
+Standards-Version: 3.9.8
+Vcs-Browser: https://anonscm.debian.org/cgit/python-modules/packages/python-fisx.git
+Vcs-Git: https://anonscm.debian.org/git/python-modules/packages/python-fisx.git
+Homepage: https://github.com/vasole/fisx
+
+Package: python-fisx
+Architecture: any
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+         ${python:Depends},
+         python-fisx-common
+Description: Quantitative X-Ray Fluorescence Analysis Support Library - (Python 2)
+ This software library implements formulas to calculate, given an
+ experimental setup, the expected x-ray fluorescence intensities. The
+ library accounts for secondary and tertiary excitation, K, L and M
+ shell emission lines and de-excitation cascade effects. The basic
+ implementation is written in C++ and a Python binding is provided.
+ .
+ This is the Python 2 version of the package.
+
+Package: python-fisx-dbg
+Architecture: any
+Section: debug
+Priority: extra
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+         ${python:Depends},
+         python-dbg,
+         python-fisx (= ${binary:Version}),
+         python-fisx-common,
+         python-numpy-dbg
+Description: Quantitative X-Ray Fluorescence Analysis Support Library - (Python 2 Debug)
+ This software library implements formulas to calculate, given an
+ experimental setup, the expected x-ray fluorescence intensities. The
+ library accounts for secondary and tertiary excitation, K, L and M
+ shell emission lines and de-excitation cascade effects. The basic
+ implementation is written in C++ and a Python binding is provided.
+ .
+ This is the Python 2 Debug version of the package.
+
+Package: python3-fisx
+Architecture: any
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+         ${python3:Depends},
+         python-fisx-common
+Description: Quantitative X-Ray Fluorescence Analysis Support Library - (Python 3)
+ This software library implements formulas to calculate, given an
+ experimental setup, the expected x-ray fluorescence intensities. The
+ library accounts for secondary and tertiary excitation, K, L and M
+ shell emission lines and de-excitation cascade effects. The basic
+ implementation is written in C++ and a Python binding is provided.
+ .
+ This is the Python 3 version of the package.
+
+Package: python3-fisx-dbg
+Architecture: any
+Section: debug
+Priority: extra
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+         ${python3:Depends},
+         python-fisx-common,
+         python3-dbg,
+         python3-fisx (= ${binary:Version}),
+         python3-numpy-dbg
+Description: Quantitative X-Ray Fluorescence Analysis Support Library - (Python 3 Debug)
+ This software library implements formulas to calculate, given an
+ experimental setup, the expected x-ray fluorescence intensities. The
+ library accounts for secondary and tertiary excitation, K, L and M
+ shell emission lines and de-excitation cascade effects. The basic
+ implementation is written in C++ and a Python binding is provided.
+ .
+ This is the Python 3 Debug version of the package.
+
+Package: python-fisx-common
+Architecture: all
+Depends: ${misc:Depends}
+Description: Quantitative X-Ray Fluorescence Analysis Support Library - (Common)
+ This software library implements formulas to calculate, given an
+ experimental setup, the expected x-ray fluorescence intensities. The
+ library accounts for secondary and tertiary excitation, K, L and M
+ shell emission lines and de-excitation cascade effects. The basic
+ implementation is written in C++ and a Python binding is provided.
+ .
+ This is the common files of the package.

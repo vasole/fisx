@@ -1,0 +1,96 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: fisx
+Upstream-Contact: V. Armando Sole <sole@esrf.fr>
+
+Files: debian/*
+Copyright: 2016 Picca Frédéric-Emmanuel <picca@debian.org>
+License: MIT/X11
+
+Files: fisx_data/BindingEnergies.dat
+       fisx_data/EADL97_*
+       fisx_data/LShellConstants.dat
+       fisx_data/LShellRates.dat
+       fisx_data/MShellConstants.dat
+       fisx_data/MShellRates.dat
+       fisx_data/KShellConstants.dat
+       fisx_data/KShellRates.dat
+Copyright: public-domain
+License: public-domain
+ public-domain
+
+Files: fisx_data/XCOM_CrossSections.dat
+Copyright: public-domain
+License: NIST
+
+Files: *
+Copyright: 2014-2016 European Synchrotron Radiation Facility
+License: MIT/X11
+
+License: MIT/X11
+ The fisx library for X-Ray Fluorescence
+ .
+ Copyright (c) 2014-2016 European Synchrotron Radiation Facility
+ .
+ This file is part of the fisx X-ray developed by V.A. Sole
+ .
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+ .
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
+ .
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ THE SOFTWARE.
+
+License: NIST
+ License Information for NIST data (other than Standard Reference Data (SRD))
+ .
+ This data was developed by employees of the National Institute of
+ Standards and Technology (NIST), an agency of the Federal
+ Government. Pursuant to title 15 United States Code Section 105,
+ works of NIST employees are not subject to copyright protection in
+ the United States and are considered to be in the public domain.
+ .
+ The data is provided by NIST as a public service and is expressly
+ provided “AS IS.” NIST MAKES NO WARRANTY OF ANY KIND, EXPRESS,
+ IMPLIED OR STATUTORY, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+ WARRANTY OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE,
+ NON-INFRINGEMENT AND DATA ACCURACY. NIST does not warrant or make any
+ representations regarding the use of the data or the results thereof,
+ including but not limited to the correctness, accuracy, reliability
+ or usefulness of the data. NIST SHALL NOT BE LIABLE AND YOU HEREBY
+ RELEASE NIST FROM LIABILITY FOR ANY INDIRECT, CONSEQUENTIAL, SPECIAL,
+ OR INCIDENTAL DAMAGES (INCLUDING DAMAGES FOR LOSS OF BUSINESS
+ PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION, AND THE
+ LIKE), WHETHER ARISING IN TORT, CONTRACT, OR OTHERWISE, ARISING FROM
+ OR RELATING TO THE DATA (OR THE USE OF OR INABILITY TO USE THIS
+ DATA), EVEN IF NIST HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+ DAMAGES.
+ .
+ To the extent that NIST may hold copyright in countries other than
+ the United States, you are hereby granted the non-exclusive
+ irrevocable and unconditional right to print, publish, prepare
+ derivative works and distribute the NIST data, in any medium, or
+ authorize others to do so on your behalf, on a royalty-free basis
+ throughout the World.
+ .
+ You may improve, modify, and create derivative works of the data or
+ any portion of the data, and you may copy and distribute such
+ modifications or works. Modified works should carry a notice stating
+ that you changed the data and should note the date and nature of any
+ such change. Please explicitly acknowledge the National Institute of
+ Standards and Technology as the source of the data.
+ .
+ Permission to use this data is contingent upon your acceptance of the
+ terms of this agreement and upon your providing appropriate
+ acknowledgments of NIST’s creation of the data.
+
