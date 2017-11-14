@@ -131,6 +131,8 @@ class smart_build_py(build_py):
             if lineToBeWritten.startswith("FISX_DATA_DIR"):
                 lineToBeWritten = "FISX_DATA_DIR = r'%s'\n" % FISX_DATA_DIR
             if line.startswith("FISX_DOC_DIR"):
+                if os.getcwd() in FISX_DOC_DIR:
+                   FISX_DOC_DIR = FISX_DOC_DIR.replace(os.getcwd()+"/","")
                 lineToBeWritten = "FISX_DOC_DIR = r'%s'\n" % FISX_DOC_DIR
             fid.write(lineToBeWritten)
         fid.close()
