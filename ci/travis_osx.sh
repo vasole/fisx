@@ -3,11 +3,11 @@
 
 if [ "$TRAVIS_OS_NAME" == "osx" ]; then
 
-VENV_DIR=./venv
 
 if [ "$PYTHON_VERSION" == "3" ];
 then
 # Use brew for python3
+    VENV_DIR=./venv
     brew upgrade python@3
     PYTHON_EXE=`brew list python@3 | grep "bin/python3$" | head -n 1`
     # Create virtual env
@@ -19,11 +19,7 @@ then
     #bash miniconda_installer.sh -b -p miniconda
     #export PATH="`pwd`/miniconda/bin":$PATH
 else
-    brew upgrade python@2
-    PYTHON_EXE=`brew list python@2 | grep "bin/python2$" | head -n 1`
-    # Create virtual env
-    $PYTHON_EXE -m venv $VENV_DIR
-    source $VENV_DIR/bin/activate
-fi
-
+    curl -o miniconda_installer.sh "https://repo.continuum.io/miniconda/Miniconda-latest-MacOSX-x86_64.sh"
+    bash miniconda_installer.sh -b -p miniconda
+    export PATH="`pwd`/miniconda/bin":$PATHfi
 fi
