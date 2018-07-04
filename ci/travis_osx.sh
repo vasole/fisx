@@ -21,4 +21,6 @@ then
     export PATH="`pwd`/miniconda/bin":$PATH
 fi
 
+curl https://bootstrap.pypa.io/get-pip.py | python
+
 fi
