@@ -20,7 +20,7 @@ then
     #export PATH="`pwd`/miniconda/bin":$PATH
 else
     brew upgrade python
-
+    alias pip='pip2'
 fi
 
 fi
