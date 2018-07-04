@@ -23,3 +23,5 @@ else
     bash miniconda_installer.sh -b -p miniconda
     export PATH="`pwd`/miniconda/bin":$PATHfi
 fi
+
+fi
