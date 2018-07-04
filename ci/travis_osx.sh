@@ -18,10 +18,6 @@ then
     #curl -o miniconda_installer.sh "https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh"
     #bash miniconda_installer.sh -b -p miniconda
     #export PATH="`pwd`/miniconda/bin":$PATH
-else
-    curl -o miniconda_installer.sh "https://repo.continuum.io/miniconda/Miniconda-latest-MacOSX-x86_64.sh"
-    bash miniconda_installer.sh -b -p miniconda
-    export PATH="`pwd`/miniconda/bin":$PATHfi
 fi
 
 fi
