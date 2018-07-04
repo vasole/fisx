@@ -4,7 +4,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2016 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2018 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -70,7 +70,9 @@ if use_cython():
     try:
         from Cython.Distutils import build_ext
         from Cython.Compiler.Version import version
-        if version < "0.17":
+        if (version < "0.28.3") and (sys.version_info > (3, 7)):
+            build_ext = None
+        elif version < "0.17":
             build_ext = None
     except:
         build_ext = None
