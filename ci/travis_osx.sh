@@ -20,7 +20,9 @@ then
     #export PATH="`pwd`/miniconda/bin":$PATH
 else
     brew upgrade python
-    alias pip='pip2'
+    python -m venv $VENV_DIR
+    source $VENV_DIR/bin/activate
+    curl https://bootstrap.pypa.io/get-pip.py | python
 fi
 
 fi
