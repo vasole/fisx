@@ -19,10 +19,11 @@ then
     #bash miniconda_installer.sh -b -p miniconda
     #export PATH="`pwd`/miniconda/bin":$PATH
 else
-    brew upgrade python
-    python -m venv $VENV_DIR
+    brew upgrade python@2
+    PYTHON_EXE=`brew list python@2 | grep "bin/python2$" | head -n 1`
+    # Create virtual env
+    $PYTHON_EXE -m venv $VENV_DIR
     source $VENV_DIR/bin/activate
-    curl https://bootstrap.pypa.io/get-pip.py | python
 fi
 
 fi
