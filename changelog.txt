@@ -1,3 +1,7 @@
+VERSION 1.1.5
+
+Fix Python 3.7 build
+
 VERSION 1.1.4
 
 Correct bug in getMultilayerFluorescence affecting the calculation of escape
