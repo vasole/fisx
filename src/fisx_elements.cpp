@@ -1550,6 +1550,7 @@ std::map<std::string, double> Elements::parseFormula(const std::string & formula
     }
 
     // look for parenthesis
+    parsingKey = false;
     spacesPresent = false;
     for(i=0; i < formula.size(); i++)
     {
@@ -1934,7 +1935,16 @@ std::map<std::string,std::map<std::string, double> > Elements::getEscape( \
     result.clear();
 
     if (thickness > 0.0)
+    {
         intrinsicEfficiency = (1.0 - std::exp(-muIncident * thickness / sinAlphaIn));
+    }
+    else
+    {
+        // this is just to get rid of a not very clever non-initialized warning because
+        // if thickness is not bigger than 0.0 intrinsicEfficiency will not be used in
+        // any case.
+        intrinsicEfficiency = 1.0;
+    }
     for (c_it = composition.begin(); c_it != composition.end(); c_it++)
     {
         element = c_it->first;
