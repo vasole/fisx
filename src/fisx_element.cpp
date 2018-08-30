@@ -533,6 +533,7 @@ std::map<std::string, std::pair<double, int> > \
         }
     }
 
+    /*
     if (false)
     {
         for (result_it = result.begin(); result_it != result.end(); ++result_it)
@@ -542,6 +543,7 @@ std::map<std::string, std::pair<double, int> > \
             std::cout << this->name << " Found shell " << key << " at " << energy << std::endl;
         }
     }
+    */
     return result;
 }
 
@@ -1280,10 +1282,9 @@ Element::getXRayLinesFromVacancyDistribution(const std::map<std::string, double>
                 if (cacheKey == cascadeCache.end())
                 {
                     std::cout << this->name << " Error processing vacancy on shell " << c_it->first << std::endl;
-                    throw std::runtime_error("Vacancy on a shell not present in the cache!");
+                    throw std::runtime_error("Vacancy in a shell not present in the cache!");
                     // the above is not good, there can be no emission following a vacancy (rate too low)
                     // it seems to be triggered by As L1 vacancies
-                    continue;
                 }
                 for(std::map<std::string, std::map<std::string, double> >::const_iterator rayIt = \
                     cacheKey->second.begin(); rayIt != cacheKey->second.end(); ++rayIt)
