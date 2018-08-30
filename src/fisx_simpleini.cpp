@@ -73,6 +73,7 @@ void SimpleIni::readFileName(std::string fileName)
     }
     this->sections.clear();
     this->sectionPositions.clear();
+    p0 = 0;
     position = 0;
     numberOfLines = -1;
     while (std::getline(fileInstance, line))
