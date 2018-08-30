@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2016 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2018 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -315,7 +315,7 @@ double Math::deBoerL0(const double & mu1, const double & mu2, const double & muj
 double Math::deBoerX(const double & p, const double & q, const double & d1, const double & d2, \
                      const double & mu1j, const double & mu2j, const double & mubj_dt)
 {
-     if(false)
+     if ((false))
      {
         double result;
         result =  Math::deBoerV(p, q, d1, d2, mu1j, mu2j, mubj_dt) - \
