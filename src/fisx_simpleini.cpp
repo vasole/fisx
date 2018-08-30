@@ -66,6 +66,11 @@ void SimpleIni::readFileName(std::string fileName)
     std::ifstream fileInstance(fileName.c_str(), std::ios::in | std::ios::binary);
     std::string msg;
 
+    if (!fileInstance.good())
+    {
+        msg = "File <" + fileName + "> mot accessible";
+        throw std::ios_base::failure(msg);;
+    }
     this->sections.clear();
     this->sectionPositions.clear();
     position = 0;
