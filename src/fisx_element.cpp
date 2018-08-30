@@ -1721,7 +1721,7 @@ void Element::updateCache(const std::vector< double> & energy)
     {
         this->setCacheEnabled(status);
         throw;
-    {
+    }
     if (this->muCache.size() >= this->cacheMaximumSize)
     {
         std::cout << "Mass attenuation coefficients cache full" << std::endl;
