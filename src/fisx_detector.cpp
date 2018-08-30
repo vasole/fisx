@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2016 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2018 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -130,22 +130,29 @@ std::map<std::string, std::map<std::string, double> > Detector::getEscape(const 
                                                             const std::string & label,
                                                             const int & update)
 {
-    if (update != 0)
-        this->escapePeakCache.clear();
-    if (false) //(label.size())
+    // To implement a cache at the detector level does not work because the same
+    // detector can use different elementsLibrary instances and to use different
+    // labels to identify them does not seem a good idea.
+    // It is preferable to fill the cache at the elements library level
+    if (label.size())
     {
-        if (this->escapePeakCache.find(label) == this->escapePeakCache.end())
+        if (update != 0)
+            this->escapePeakCache.clear();
+        if (this->escapePeakCache.find(label) != this->escapePeakCache.end())
         {
-            // calculate it
-            this->escapePeakCache[label] = elementsLibrary.getEscape(this->getComposition(elementsLibrary), \
-                                                                     energy, \
-                                                                     this->escapePeakEnergyThreshold, \
-                                                                     this->escapePeakIntensityThreshold, \
-                                                                     this->escapePeakNThreshold, \
-                                                                     this->escapePeakAlphaIn,
-                                                                     0);
+            if (this->escapePeakCache[label].find(energy) != this->escapePeakCache[label].end())
+            {
+                return this->escapePeakCache[label][energy];
+            }
         }
-        return this->escapePeakCache[label];
+        this->escapePeakCache[label][energy] = elementsLibrary.getEscape(this->getComposition(elementsLibrary), \
+                                                                 energy, \
+                                                                 this->escapePeakEnergyThreshold, \
+                                                                 this->escapePeakIntensityThreshold, \
+                                                                 this->escapePeakNThreshold, \
+                                                                 this->escapePeakAlphaIn,
+                                                                 0);
+        return this->escapePeakCache[label][energy];
     }
     else
     {

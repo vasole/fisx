@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2016 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2018 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -104,12 +104,13 @@ public:
     Returns escape peak energy and rate per detected photon of given energy.
 
     The optional arguments label and update serve for caching purposes.
+    To make use of the cache, the label must not be empty (it should be used to identify the elementsLibrary)
+    and update must be set to 0 because if it is set to 1 it will systematically empty the cascade cache.
     */
     std::map<std::string, std::map<std::string, double> > getEscape(const double & energy, \
                                                             const Elements & elementsLibrary, \
                                                             const std::string & label = "", \
                                                             const int & update = 1);
-
     void setMinimumEscapePeakEnergy(const double & energy);
     void setMinimumEscapePeakIntensity(const double & intensity);
     void setMaximumNumberOfEscapePeaks(const int & nPeaks);
@@ -122,7 +123,7 @@ private:
     double escapePeakIntensityThreshold;
     int escapePeakNThreshold;
     double escapePeakAlphaIn;
-    std::map< std::string, std::map<std::string, std::map<std::string, double> > > escapePeakCache;
+    std::map< std::string, std::map< double, std::map<std::string, std::map<std::string, double> > > >escapePeakCache;
     // TODO: Calibration, fano, noise, and so on.
 };
 
