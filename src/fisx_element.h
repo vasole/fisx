@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2016 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2018 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -370,7 +370,7 @@ private:
     std::map<std::string, std::vector<double> > muPartialPhotoelectricValue;
 
     // A cache for storing calculations
-    static const int cacheMaximumSize = 10000;
+    static const unsigned int cacheMaximumSize = 10000;
     bool calculationCacheEnabledFlag;
     std::map< double, std::map< std::string, double> > muCache;
     std::map< double, std::map<std::string, std::map<std::string, double> > > excitationFactorsCache;

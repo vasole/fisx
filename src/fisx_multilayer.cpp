@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2017 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2018 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -519,7 +519,8 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                     //std::cout << c_it->first << "primary = " << result[c_it->first]["primary"] << std::endl;
                     //std::cout << c_it->first << "energy = " << result[c_it->first]["energy"] << std::endl;
                     //std::cout << c_it->first << "mu_1_i = " << result[c_it->first]["mu_1_i"] << std::endl;
-                    if (false && (c_it->first == "KL2") && (iLayer == 0))
+                    /*
+                    if ((c_it->first == "KL2") && (iLayer == 0))
                     {
                         std::cout << c_it->first << "efficiency = " << result[c_it->first]["efficiency"] << std::endl;
                         std::cout << c_it->first << "primary = " << result[c_it->first]["primary"] << std::endl;
@@ -532,6 +533,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                         std::cout << c_it->first << "mu_1_lambda/sinALphain = " << mu_1_lambda / sinAlphaIn<< std::endl;
                         std::cout << c_it->first << "mu_1_i/sinALphaOut = " << mu_1_i / sinAlphaOut<< std::endl;
                     }
+                    */
                 }
 
                 if (secondary > 0)

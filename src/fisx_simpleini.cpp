@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2016 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2018 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -66,8 +66,14 @@ void SimpleIni::readFileName(std::string fileName)
     std::ifstream fileInstance(fileName.c_str(), std::ios::in | std::ios::binary);
     std::string msg;
 
+    if (!fileInstance.good())
+    {
+        msg = "File <" + fileName + "> mot accessible";
+        throw std::ios_base::failure(msg);;
+    }
     this->sections.clear();
     this->sectionPositions.clear();
+    p0 = 0;
     position = 0;
     numberOfLines = -1;
     while (std::getline(fileInstance, line))
