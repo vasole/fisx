@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2016 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2018 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -192,7 +192,6 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
     std::vector<std::string> elementList;
     std::vector<std::string> familyList;
     std::vector<int> layerList;
-    std::vector<std::string>::size_type i;
     std::string tmpString;
     std::vector<std::string> tmpStringVector;
 
