@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2017 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2018 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -810,7 +810,7 @@ void Elements::setMassAttenuationCoefficients(const std::string & name,
             shell = shellList[shellIndex];
             if (extractedEdgeEnergies.find(shell) != extractedEdgeEnergies.end())
             {
-                if ((i - j - 1) == extractedEdgeEnergies[shell].second)
+                if ((i - j - 1) == static_cast<unsigned int>(extractedEdgeEnergies[shell].second))
                 {
                     // We are just above an edge according to the input mass attenuation coefficients
                     // We have to check if that energy is compatible with the binding energy.
@@ -1918,14 +1918,6 @@ std::map<std::string,std::map<std::string, double> > Elements::getEscape( \
             // std::cout << "USING CACHE" <<  energy << std::endl;
             return it->second;
         }
-        else
-        {
-            // std::cout << "ENERGY NOT THERE" << energy << std::endl;
-        }
-    }
-    else
-    {
-        // std::cout << "NOT COMPATIBLE" << std::endl;
     }
 
     if (alphaIn == 90.)
@@ -1951,15 +1943,15 @@ std::map<std::string,std::map<std::string, double> > Elements::getEscape( \
         std::map<std::string, std::map<std::string, double> >::const_iterator it;
         std::map<std::string, double>::const_iterator mapIt;
         // factor uses mu["shell photoelectric"] / mu["total photoelectric"]
-        double factor;
+        // double factor;
         // rate uses mu["shell photoelectric"]
         // It is the product factor * mu["total photoelectric"]
         double rate;
         double fluorescentEnergy;
         for ( it = excitationFactors.begin(); it != excitationFactors.end(); ++it)
         {
-            mapIt = it->second.find("factor");
-            factor = mapIt->second;
+            // mapIt = it->second.find("factor");
+            // factor = mapIt->second;
             mapIt = it->second.find("rate");
             rate = mapIt->second;
             mapIt = it->second.find("energy");
