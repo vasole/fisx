@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2016 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2018 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -65,12 +65,14 @@ void XRFConfig::readConfigurationFromFile(const std::string & fileName)
     std::vector<std::string> splitString;
     Material material;
     Layer layer;
-    bool fisxFile;
     long counter;
     bool multilayerSample;
     double value;
 
+
     // find out if it is a fix or a PyMca configuration file
+    /* This not needed since a fisx file format is not defined yet
+    bool fisxFile;
     sectionContents.clear();
     sectionContents = iniFile.readSection("fisx", false);
     fisxFile = true;
@@ -78,11 +80,10 @@ void XRFConfig::readConfigurationFromFile(const std::string & fileName)
     {
         fisxFile = false;
     }
-    /*
     if (fisxFile)
     {
         std::cout << "Not implemented" << std::endl;
-        return;
+        throw std::invalid_argument("Only PyMca configuration files supported.");
     }
     */
 
@@ -98,7 +99,7 @@ void XRFConfig::readConfigurationFromFile(const std::string & fileName)
         sectionContents = iniFile.readSection("result.config", false);
         if(!sectionContents.size())
         {
-            throw std::invalid_argument("File not recognized as a fisx or PyMca configuration file.");
+            throw std::invalid_argument("File not recognized as a PyMca configuration file.");
         }
         std::cout << "fit result file" << std::endl;
     }
