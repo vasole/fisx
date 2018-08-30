@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2017 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2018 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -1657,6 +1657,7 @@ void Element::clearCache()
 void Element::fillCache(const std::vector<double> & energy)
 {
     std::vector<double>::size_type i, maxSize;
+    int status;
 
     this->clearCache();
 
@@ -1668,31 +1669,58 @@ void Element::fillCache(const std::vector<double> & energy)
     {
         maxSize = this->cacheMaximumSize;
     }
-    for (i = 0; i < maxSize; i++)
+    status = this->isCacheEnabled();
+    try
     {
-        this->muCache[energy[i]] = this->getMassAttenuationCoefficients(energy[i]);
-        this->excitationFactorsCache[energy[i]] = this->getPhotoelectricExcitationFactors(energy[i], 1.0);
+        // This is necessary because clang pushes return value optimization to the limit
+        // and creates the key into muCache prior to call getMassAttenuationCoefficients
+        this->setCacheEnabled(0);
+        for (i = 0; i < maxSize; i++)
+        {
+            this->muCache[energy[i]] = this->getMassAttenuationCoefficients(energy[i]);
+            this->excitationFactorsCache[energy[i]] = this->getPhotoelectricExcitationFactors(energy[i], 1.0);
+        }
+        this->setCacheEnabled(status);
+    }
+    catch(...)
+    {
+        this->setCacheEnabled(status);
+        throw;
     }
 }
 
 void Element::updateCache(const std::vector< double> & energy)
 {
     std::vector<double>::size_type i, eSize;
+    int status;
 
+    // This is necessary because clang pushes return value optimization to the limit
+    // and creates the key into muCache prior to call getMassAttenuationCoefficients
+    status = this->isCacheEnabled();
+    this->setCacheEnabled(0);
     eSize = energy.size();
-    for (i = 0; i < eSize; i++)
+    try
     {
-        if (this->muCache.size() < this->cacheMaximumSize)
+        for (i = 0; i < eSize; i++)
         {
-            if (this->muCache.find(energy[i]) == this->muCache.end())
+            if (this->muCache.size() < this->cacheMaximumSize)
             {
-                this->muCache[energy[i]] = this->getMassAttenuationCoefficients(energy[i]);
-            }
-            if (this->excitationFactorsCache.find(energy[i]) == this->excitationFactorsCache.end())
-            {
-                this->excitationFactorsCache[energy[i]] = this->getPhotoelectricExcitationFactors(energy[i], 1.0);
+                if (this->muCache.find(energy[i]) == this->muCache.end())
+                {
+                    this->muCache[energy[i]] = this->getMassAttenuationCoefficients(energy[i]);
+                }
+                if (this->excitationFactorsCache.find(energy[i]) == this->excitationFactorsCache.end())
+                {
+                    this->excitationFactorsCache[energy[i]] = this->getPhotoelectricExcitationFactors(energy[i], 1.0);
+                }
             }
         }
+        this->setCacheEnabled(status);
+    }
+    catch(...)
+    {
+        this->setCacheEnabled(status);
+        throw;
     }
     if (this->muCache.size() >= this->cacheMaximumSize)
     {
