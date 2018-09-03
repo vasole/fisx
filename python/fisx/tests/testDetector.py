@@ -77,7 +77,7 @@ class testDetector(unittest.TestCase):
         # Check the composition is returned as string and not bytes under
         # Python 3
         composition = detectorInstance.getComposition(elementsInstance)
-        if sys.version_info > (2, 7):
+        if sys.version_info >= (3, ):
             for key in composition:
                 self.assertTrue(isinstance(key, str),
                                 "Expected string, received %s" % type(key))
@@ -99,7 +99,7 @@ class testDetector(unittest.TestCase):
 
         # check the return of the getEscape method
         escape = detectorInstance.getEscape(100.0, elementsInstance)
-        if sys.version_info > (2, 7):
+        if sys.version_info >= (3, ):
             for key in escape:
                 self.assertTrue(isinstance(key, str),
                                 "Expected string, received %s" % type(key))
