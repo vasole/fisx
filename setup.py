@@ -150,7 +150,9 @@ class smart_install_data(install_data):
         print("fisx to be installed in %s" %  self.install_dir)
         return install_data.run(self)
 
-topLevel = os.path.dirname(os.path.abspath(__file__))
+topLevel = os.path.dirname(__file__)
+if not len(topLevel):
+    topLevel = "."
 fileList = glob.glob(os.path.join(topLevel, "fisx_data", "*.dat"))
 fileList.append(os.path.join(topLevel, "changelog.txt"))
 fileList.append(os.path.join(topLevel, "LICENSE"))
@@ -160,7 +162,7 @@ data_files = [(FISX_DATA_DIR, fileList)]
 
 # actual build stuff
 FORCE = False
-cython_dir = os.path.join(os.getcwd(), "python", "cython")
+cython_dir = os.path.join(topLevel, "python", "cython")
 if build_ext:
     #make sure everything is totally clean?
     fileList  = glob.glob(os.path.join(cython_dir, "*.cpp"))
@@ -207,11 +209,11 @@ else:
         outFile.close()
     src = [outSrc]
 
-src += glob.glob(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+src += glob.glob(os.path.join(topLevel,
                 'src', 'fisx_*.cpp'))
 
 include_dirs = [numpy.get_include(),
-                os.path.join(os.path.dirname(os.path.abspath(__file__)), "src")]
+                os.path.join(topLevel, "src")]
 
 if sys.platform == 'win32':
     extra_compile_args = ['/EHsc']
@@ -251,7 +253,7 @@ class sdist_debian(sdist):
         sdist.prune_file_list(self)
 
         # this is for Cython files specifically: remove C & html files
-        search_root = os.path.dirname(os.path.abspath(__file__))
+        search_root = topLevel
         for root, _, files in os.walk(search_root):
             for afile in files:
                 if os.path.splitext(afile)[1].lower() == ".pyx":
