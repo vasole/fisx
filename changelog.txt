@@ -1,3 +1,7 @@
+VERSION 1.1.6
+
+Fix clang problem related to compiler return value optimization.
+
 VERSION 1.1.5
 
 Fix Python 3.7 build
