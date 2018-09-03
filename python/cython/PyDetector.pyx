@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2017 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2018 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -73,17 +73,18 @@ cdef class PyDetector:
     def setMaximumNumberOfEscapePeaks(self, int n):
         self.thisptr.setMaximumNumberOfEscapePeaks(n)
 
-    def getEscape(self, double energy, PyElements elementsLib, std_string label="", int update=1):
+    def getEscape(self, double energy, PyElements elementsLib, label="", int update=1):
+        label_ = toBytes(label)
         if sys.version < "3.0":
             if update:
-                return self.thisptr.getEscape(energy, deref(elementsLib.thisptr), label, 1)
+                return self.thisptr.getEscape(energy, deref(elementsLib.thisptr), label_, 1)
             else:
-                return self.thisptr.getEscape(energy, deref(elementsLib.thisptr), label, 0)
+                return self.thisptr.getEscape(energy, deref(elementsLib.thisptr), label_, 0)
         else:
             if update:
-                return toStringKeysAndValues(self.thisptr.getEscape(energy, deref(elementsLib.thisptr), label, 1))
+                return toStringKeysAndValues(self.thisptr.getEscape(energy, deref(elementsLib.thisptr), label_, 1))
             else:
-                return toStringKeysAndValues(self.thisptr.getEscape(energy, deref(elementsLib.thisptr), label, 0))
+                return toStringKeysAndValues(self.thisptr.getEscape(energy, deref(elementsLib.thisptr), label_, 0))
 
     def getEscapePeakEnergyThreshold(self):
         return self.thisptr.getEscapePeakEnergyThreshold()
@@ -104,4 +105,7 @@ cdef class PyDetector:
         return self.thisptr.getDensity()
 
     def getComposition(self, PyElements elementsLib):
-        return self.thisptr.getComposition(deref(elementsLib.thisptr))
+        if sys.version < "3.0":
+            return self.thisptr.getComposition(deref(elementsLib.thisptr))
+        else:
+            return toStringKeysAndValues(self.thisptr.getComposition(deref(elementsLib.thisptr)))
