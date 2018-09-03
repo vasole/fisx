@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2016 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2018 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -80,6 +80,56 @@ class testElements(unittest.TestCase):
         self.assertTrue(elementsInstance is not None,
                         'Unsuccesful Elements() instantiation')
 
+    def testElementsResults(self):
+        elementsInstance = self.elements()
+        elementsInstance.initializeAsPyMca()
+        
+        elementNames = elementsInstance.getElementNames()
+        if sys.version_info >= (3,):
+            for item in elementNames:
+                self.assertTrue(isinstance(item, str),
+                                "getElementNames expected str received %s" % \
+                                type(item))
+            
+        for item in ElementList:
+            self.assertTrue(item in elementNames,
+                            "Element %s not found in library" % item)
+
+        # Check the composition is returned as string and not bytes under
+        # Python 3
+        composition = elementsInstance.getComposition("NaI")
+        if sys.version_info >= (3,):
+            for key in composition:
+                self.assertTrue(isinstance(key, str),
+                                "Expected string, received %s" % type(key))
+
+        # check the returned keys are correct
+        self.assertTrue(len(list(composition.keys())) == 2,
+                        "Incorrect number of keys returned")
+        for key in ["Na", "I"]:
+            self.assertTrue(key in composition,
+                            "key %s not found" % key)
+
+        for shell in ["K", "L", "M"]:
+            fileName = elementsInstance.getShellRadiativeTransitionsFile(shell)
+            self.assertTrue(isinstance(fileName, str),
+                            "Expected string, received %s" % type(fileName))
+
+        for shell in ["K", "L", "M"]:
+            fileName = elementsInstance.getShellNonradiativeTransitionsFile(shell)
+            self.assertTrue(isinstance(fileName, str),
+                            "Expected string, received %s" % type(fileName))
+
+        escapeDict = elementsInstance.getEscape(composition, 100.)
+        if sys.version_info >= (3,):
+            for key in escapeDict:
+                self.assertTrue(isinstance(key, str),
+                        "getEscape expected string key, received %s" % type(key))
+                if isinstance(escapeDict[key], dict):
+                    for key2 in escapeDict[key]:
+                        self.assertTrue(isinstance(key2, str),
+                            "Expected string subkey, received %s" % type(key2))
+
 def getSuite(auto=True):
     testSuite = unittest.TestSuite()
     if auto:
@@ -89,6 +139,7 @@ def getSuite(auto=True):
         # use a predefined order
         testSuite.addTest(testElements("testElementsImport"))
         testSuite.addTest(testElements("testElementsInstantiation"))
+        testSuite.addTest(testElements("testElementsResults"))
     return testSuite
 
 def test(auto=False):

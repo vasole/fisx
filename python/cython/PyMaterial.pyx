@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2016 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2018 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -46,6 +46,9 @@ cdef class PyMaterial:
     def __dealloc__(self):
         del self.thisptr
 
+    def getName(self):
+        return toString(self.thisptr.getName())
+
     def setName(self, name):
         name = toBytes(name)
         self.thisptr.setName(name)
@@ -61,4 +64,4 @@ cdef class PyMaterial:
         self.thisptr.setComposition(composition)
 
     def getComposition(self):
-        return self.thisptr.getComposition()
+        return toStringKeys(self.thisptr.getComposition())

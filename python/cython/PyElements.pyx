@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2017 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2018 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -321,20 +321,28 @@ cdef class PyElements:
         else:
             return toStringKeys(self.thisptr.getBindingEnergies(toBytes(elementName)))
 
-    def getEscape(self, std_map[std_string, double] composition, double energy, double energyThreshold=0.010,
+    def getEscape(self, composition, double energy, double energyThreshold=0.010,
                                         double intensityThreshold=1.0e-7,
                                         int nThreshold=4 ,
                                         double alphaIn=90.,
                                         double thickness=0.0):
-        return self.thisptr.getEscape(composition, energy, energyThreshold, intensityThreshold, nThreshold,
-                                      alphaIn, thickness)
+        if sys.version_info < (3, ):
+            return self.thisptr.getEscape(toBytesKeys(composition), energy, energyThreshold, intensityThreshold, nThreshold,
+                                         alphaIn, thickness)
+        else:
+            result = toStringKeys(self.thisptr.getEscape(toBytesKeys(composition), energy, energyThreshold,
+                                intensityThreshold, nThreshold, alphaIn, thickness))
+            keyList =list(result.keys())
+            for key in keyList:
+                result[key] = toStringKeys(result[key])
+            return result
 
-    def updateEscapeCache(self, std_map[std_string, double] composition, std_vector[double] energyList, double energyThreshold=0.010,
+    def updateEscapeCache(self, composition, std_vector[double] energyList, double energyThreshold=0.010,
                                         double intensityThreshold=1.0e-7,
                                         int nThreshold=4 ,
                                         double alphaIn=90.,
                                         double thickness=0.0):
-        self.thisptr.updateEscapeCache(composition, energyList, energyThreshold, intensityThreshold, nThreshold,
+        self.thisptr.updateEscapeCache(toBytesKeys(composition), energyList, energyThreshold, intensityThreshold, nThreshold,
                                       alphaIn, thickness)
 
     def getShellConstants(self, elementName, subshell):

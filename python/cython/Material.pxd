@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2016 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2018 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -36,6 +36,8 @@ from libcpp.map cimport map as std_map
 cdef extern from "fisx_material.h" namespace "fisx":
     cdef cppclass Material:
         Material(std_string, double, double, std_string) except +
+
+        std_string getName()
 
         void setName(std_string) except +
 
