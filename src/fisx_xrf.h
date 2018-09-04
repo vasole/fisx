@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2016 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2018 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -135,7 +135,7 @@ public:
 
     /*!
     Set the reference layer. The detector distance is measured from the reference layer surface.
-    If not specified, the lauer closest to the detector
+    If not specified, the layer closest to the detector
     */
     void setReferenceLayer(const int & index);
     void setRefenceLayer(const std::string & name);
