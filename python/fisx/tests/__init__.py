@@ -33,3 +33,11 @@ from fisx.tests.testDataDir import test as testDataDir
 from fisx.tests.testDetector import test as testDetector
 from fisx.tests.testElements import test as testElements
 
+def run_tests():
+    runner = testAll()
+    if not runner.run(suite()).wasSuccessful():
+        print("Test suite failed")
+        return 1
+    else:
+        print("Test suite succeeded")
+        return 0
