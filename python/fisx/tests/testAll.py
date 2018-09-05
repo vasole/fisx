@@ -56,4 +56,9 @@ if __name__ == '__main__':
         auto = False
     else:
         auto = True
-    sys.exit(not main(auto).wasSuccessful())
+    if main(auto).wasSuccessful():
+        print("Test suite was successful")
+        sys.exit(0)
+    else:
+        print("Test suite failed")
+        sys.exit(1)
