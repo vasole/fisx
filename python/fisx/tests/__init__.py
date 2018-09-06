@@ -35,7 +35,7 @@ from fisx.tests.testElements import test as testElements
 
 def run_tests():
     runner = testAll()
-    if not runner.run(suite()).wasSuccessful():
+    if not runner.run().wasSuccessful():
         print("Test suite failed")
         return 1
     else:
