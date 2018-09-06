@@ -208,8 +208,9 @@ def getSuite(auto=True):
             "testSimpleSpecfileReadingWithCRLF"))
         testSuite.addTest(\
             testSimpleSpecfile("testSimpleSpecfileReadingCompatibleWithUserLocale"))
-        testSuite.addTest(\
-            testSimpleSpecfile("testSimpleSpecfileVersusPyMca"))
+        if PYMCA:
+            testSuite.addTest(\
+                testSimpleSpecfile("testSimpleSpecfileVersusPyMca"))
     return testSuite
 
 def test(auto=False):
