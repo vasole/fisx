@@ -32,4 +32,4 @@ cimport cython
 from Version cimport fisxVersion as _fisxVersion
 
 def fisxVersion():
-    return _fisxVersion()
+    return toString(_fisxVersion())
