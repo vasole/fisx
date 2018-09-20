@@ -147,7 +147,7 @@ double Math::AS_5_1_56(const double & x)
     }
     num = x;
     den = x;
-    for (int i = 4; i > 0; --i)
+    for (int i = 3; i >= 0; --i)
     {
         num = (num + a[i]) * x;
         den = (den + b[i]) * x;
