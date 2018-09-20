@@ -145,12 +145,12 @@ double Math::AS_5_1_56(const double & x)
     {
 		throw std::invalid_argument("AS_5_1_56(x) Invalid argument. 1 <= x ");
     }
-    num = x;
-    den = x;
-    for (int i = 3; i >= 0; --i)
+    num = a[3] * x;
+    den = b[3] * x;
+    for (int i = 2; i >= 0; --i)
     {
-        num = (num + a[i]) * x;
-        den = (den + b[i]) * x;
+        num = (num * x )+ a[i];
+        den = (den * x )+ b[i];
     }
     result = (num / den);
     return result;
