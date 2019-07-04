@@ -1,3 +1,9 @@
+VERSION 1.1.7
+
+Minor bug fixes
+
+Python 3.8 wheels
+
 VERSION 1.1.6
 
 Fix clang problem related to compiler return value optimization.
