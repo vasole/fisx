@@ -1,8 +1,12 @@
+VERSION 1.1.8
+
+Python 3.8 wheels and generated code.
+
 VERSION 1.1.7
 
 Minor bug fixes
 
-Python 3.8 wheels
+Python 3.8beta wheels
 
 VERSION 1.1.6
 
