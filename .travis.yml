@@ -6,25 +6,22 @@ matrix:
           os: linux
           env: BUILD_COMMAND=sdist
 
-        - python: 3.5
-          os: linux
-          env: BUILD_COMMAND=sdist
-
         - python: 3.6
           os: linux
           env: BUILD_COMMAND=sdist
 
-        - language: generic
-          os: osx
-          env:
-              - BUILD_COMMAND=bdist_wheel
-              - PYTHON_VERSION=2
+        - python: 3.8
+          os: linux
+          env: BUILD_COMMAND=sdist
 
         - language: generic
           os: osx
           env: 
               - BUILD_COMMAND=bdist_wheel
               - PYTHON_VERSION=3
+branches:
+    only:
+        - master
 
 cache:
     apt: true
