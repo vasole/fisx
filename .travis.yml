@@ -19,6 +19,9 @@ matrix:
           env: 
               - BUILD_COMMAND=bdist_wheel
               - PYTHON_VERSION=3
+branches:
+    only:
+        - master
 
 cache:
     apt: true
