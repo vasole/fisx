@@ -100,7 +100,7 @@ std::string Element::getName() const
 
 void Element::setLongName(const std::string & longName)
 {
-    this->longName = name;
+    this->longName = longName;
 }
 
 std::string Element::getLongName() const
