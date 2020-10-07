@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2017 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2020 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -375,10 +375,42 @@ public:
     std::vector<std::pair<std::string, double> > getPeakFamilies(const std::vector<std::string> & elementList, \
                                              const double & energy) const;
 
+
+    /*!
+    Convenience function to simplify python use ...
+    */
+    const double & getAtomicMass(const std::string & name) const;
+
+    /*!
+    Convenience function to simplify python use ...
+    */
+    const int & getAtomicNumber(const std::string & name) const;
+
+
     /*!
     Convenience function to simplify python use ...
     */
     const std::map<std::string, double> & getBindingEnergies(const std::string & name) const;
+
+    /*!
+    Convenience function to simplify python use ...
+    */
+    double getDensity(const std::string & name) const;
+
+    /*!
+    Convenience function to simplify python use ...
+    */
+    std::string getLongName(const std::string & name) const;
+
+    /*!
+    Convenience function to simplify python use ...
+    */
+    int getColumn(const std::string & name) const;
+
+    /*!
+    Convenience function to simplify python use ...
+    */
+    int getRow(const std::string & name) const;
 
     /*!
     Return escape peak energy and rate per detected photon of given energy.
