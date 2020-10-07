@@ -192,7 +192,10 @@ void Elements::initialize(std::string epdl97Directory, std::string bindingEnergi
         this->elementList[i].setRow(defaultElementsInfo[i].row);
         this->elementList[i].setLongName(defaultElementsInfo[i].longName);
         this->elementList[i].setAtomicMass(defaultElementsInfo[i].atomicMass);
-        this->elementList[i].setDensity((defaultElementsInfo[i].density / 1000.));
+        if (defaultElementsInfo[i].density > 0.0000000001)
+        {
+            this->elementList[i].setDensity((defaultElementsInfo[i].density / 1000.));
+        }
         this->elementList[i].setBindingEnergies(epdl97.getBindingEnergies(atomicNumber));
         massAttenuationCoefficients = epdl97.getMassAttenuationCoefficients(atomicNumber);
         this->elementList[i].setMassAttenuationCoefficients(massAttenuationCoefficients["energy"],\
