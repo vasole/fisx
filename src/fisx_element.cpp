@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2018 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2020 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -39,11 +39,18 @@ Element::Element()
     // Default constructor required
     this->name = "Unknown";
 
+    // Give as long name the name as default
+    this->longName = name;
+
     // Undefined atomic number
     this->atomicNumber = 0;
 
     // Unset density
     this->density = 1.0;
+
+    // Unset position in periodic table
+    this->column = -1;
+    this->row = -1;
 
     // initialize keys
     this->initPartialPhotoelectricCoefficients();
@@ -61,8 +68,17 @@ Element::Element(std::string name, int z = 0)
     // can have any atomic number
     this->name = name;
     this->setAtomicNumber(z);
+
+    // Give as long name the name as default
+    this->longName = name;
+
     // Unset density
     this->density = 1.0;
+
+    // Unset position in periodic table
+    this->column = -1;
+    this->row = -1;
+
     this->initPartialPhotoelectricCoefficients();
 
     // cascade cache
@@ -82,15 +98,46 @@ std::string Element::getName() const
     return  this->name;
 }
 
+void Element::setLongName(const std::string & longName)
+{
+    this->longName = name;
+}
+
+std::string Element::getLongName() const
+{
+    return  this->longName;
+}
+
 void Element::setDensity(const double & density)
 {
     this->density = density;
 }
 
-double Element::getDensity()
+double Element::getDensity() const
 {
     return this->density;
 }
+
+void Element::setColumn(const int & column)
+{
+    this->column = column;
+}
+
+int Element::getColumn() const
+{
+    return this->column;
+}
+
+void Element::setRow(const int & row)
+{
+    this->row = row;
+}
+
+int Element::getRow() const
+{
+    return this->row;
+}
+
 
 
 // Binding energies

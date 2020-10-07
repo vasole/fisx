@@ -381,6 +381,26 @@ public:
     const std::map<std::string, double> & getBindingEnergies(const std::string & name) const;
 
     /*!
+    Convenience function to simplify python use ...
+    */
+    double getDensity(const std::string & name) const;
+
+    /*!
+    Convenience function to simplify python use ...
+    */
+    std::string getLongName(const std::string & name) const;
+
+    /*!
+    Convenience function to simplify python use ...
+    */
+    int getColumn(const std::string & name) const;
+
+    /*!
+    Convenience function to simplify python use ...
+    */
+    int getRow(const std::string & name) const;
+
+    /*!
     Return escape peak energy and rate per detected photon of given energy.
     Given a detector composition and an incident energy in keV, gives back a map of the form:
     result["element_transitionesc"]["energy"]

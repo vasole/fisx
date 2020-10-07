@@ -59,7 +59,7 @@ Elements::Elements(std::string epdl97Directory, std::string bindingEnergiesFileN
     // this is to simplify an initialization equivalent to that of PyMca:
     // - use EPDL97 to calculate partial photoelectric cross sections
     // - use a different binding energies file
-    // - use different mass atenuation coefficients (i.e. XCOM)
+    // - use different mass attenuation coefficients (i.e. XCOM)
     this->initialize(epdl97Directory, bindingEnergiesFileName);
     if (crossSectionsFile.size())
     {
@@ -188,7 +188,11 @@ void Elements::initialize(std::string epdl97Directory, std::string bindingEnergi
         symbol = defaultElementsInfo[i].symbol;
         atomicNumber = defaultElementsInfo[i].z;
         this->elementList[i] = Element(symbol, atomicNumber);
+        this->elementList[i].setColumn(defaultElementsInfo[i].column);
+        this->elementList[i].setRow(defaultElementsInfo[i].row);
+        this->elementList[i].setLongName(defaultElementsInfo[i].longName);
         this->elementList[i].setAtomicMass(defaultElementsInfo[i].atomicMass);
+        this->elementList[i].setDensity((defaultElementsInfo[i].density / 1000.));
         this->elementList[i].setBindingEnergies(epdl97.getBindingEnergies(atomicNumber));
         massAttenuationCoefficients = epdl97.getMassAttenuationCoefficients(atomicNumber);
         this->elementList[i].setMassAttenuationCoefficients(massAttenuationCoefficients["energy"],\
@@ -1817,6 +1821,26 @@ std::vector<std::pair<std::string, double> > Elements::getPeakFamilies( \
 const std::map<std::string, double> & Elements::getBindingEnergies(const std::string & element) const
 {
     return getElement(element).getBindingEnergies();
+}
+
+double Elements::getDensity(const std::string & element) const
+{
+    return getElement(element).getDensity();
+}
+
+std::string Elements::getLongName(const std::string & element) const
+{
+    return getElement(element).getLongName();
+}
+
+int Elements::getRow(const std::string & element) const
+{
+    return getElement(element).getRow();
+}
+
+int Elements::getColumn(const std::string & element) const
+{
+    return getElement(element).getColumn();
 }
 
 std::vector<std::pair<std::string, double> > Elements::getPeakFamilies( \

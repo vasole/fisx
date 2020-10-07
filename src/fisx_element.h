@@ -97,7 +97,37 @@ public:
     /*!
     Retrieves the given element density.
     */
-    double getDensity();
+    double getDensity() const;
+
+    /*!
+    Set element long name.
+    */
+    void setLongName(const std::string & name);
+
+    /*!
+    Retrieves the element long name.
+    */
+    std::string getLongName() const;
+
+    /*!
+    Set the column position in the periodic table
+    */
+    void setColumn(const int &);
+
+    /*!
+    Retrieves the element column position in the periodic table.
+    */
+    int getColumn() const;
+
+    /*!
+    Set the element row position in the periodic table
+    */
+    void setRow(const int &);
+
+    /*!
+    Retrieves the element row position in the periodic table.
+    */
+    int getRow() const;
 
     // binding energies
 
@@ -351,9 +381,13 @@ public:
 
 private:
     std::string name;
-    int    atomicNumber;
-    double density;
+    int atomicNumber;
+    int column;
+    int row;
     double atomicMass;
+    double density;
+    std::string longName;
+
 
     std::map<std::string, double> bindingEnergy;
     // Mass attenuation coefficients and energies
