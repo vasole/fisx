@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2018 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2020 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -125,6 +125,24 @@ cdef class PyElements:
 
     def getElementNames(self):
         return toStringList(self.thisptr.getElementNames())
+
+    def getAtomicMass(self, element):
+        return self.thisptr.getAtomicMass(toBytes(element))
+
+    def getAtomicNumber(self, element):
+        return self.thisptr.getAtomicNumber(toBytes(element))
+
+    def getDensity(self, element):
+        return self.thisptr.getDensity(toBytes(element))
+
+    def getLongName(self, element):
+        return toString(self.thisptr.getLongName(toBytes(element)))
+
+    def getColumn(self, element):
+        return self.thisptr.getColumn(toBytes(element))
+
+    def getRow(self, std_string element):
+        return self.thisptr.getRow(toBytes(element))
 
     def getMaterialNames(self):
         return toStringList(self.thisptr.getMaterialNames())
