@@ -375,6 +375,18 @@ public:
     std::vector<std::pair<std::string, double> > getPeakFamilies(const std::vector<std::string> & elementList, \
                                              const double & energy) const;
 
+
+    /*!
+    Convenience function to simplify python use ...
+    */
+    const double & getAtomicMass(const std::string & name) const;
+
+    /*!
+    Convenience function to simplify python use ...
+    */
+    const int & getAtomicNumber(const std::string & name) const;
+
+
     /*!
     Convenience function to simplify python use ...
     */

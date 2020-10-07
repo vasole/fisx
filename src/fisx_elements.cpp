@@ -1817,6 +1817,15 @@ std::vector<std::pair<std::string, double> > Elements::getPeakFamilies( \
     return result;
 };
 
+const double & Elements::getAtomicMass(const std::string & element) const
+{
+    return getElement(element).getAtomicMass();
+}
+
+const int & Elements::getAtomicNumber(const std::string & element) const
+{
+    return getElement(element).getAtomicNumber();
+}
 
 const std::map<std::string, double> & Elements::getBindingEnergies(const std::string & element) const
 {
