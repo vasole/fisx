@@ -80,6 +80,24 @@ class testElements(unittest.TestCase):
         self.assertTrue(elementsInstance is not None,
                         'Unsuccesful Elements() instantiation')
 
+    def testElementsDefaults(self):
+        elementsInstance = self.elements()
+        elementsInstance.initializeAsPyMca()
+        for item in ElementList:
+            density = elementsInstance.getDensity(item)
+            atomicNumber = elementsInstance.getAtomicNumber(item)
+            self.assertTrue(atomicNumber == (ElementList.index(item) + 1),
+                            "Incorrect atomic number for %s" % item)
+            if atomicNumber < 85:
+                self.assertTrue(abs(density-1.0) > 0.001,
+                            "Incorrect density for %s"  % item)
+            longName = elementsInstance.getLongName(item)
+            self.assertTrue(item != longName,
+                            "Element %s got default name" % item)
+            atomicMass = elementsInstance.getAtomicMass(item)
+            self.assertTrue(atomicMass > atomicNumber,
+                            "Incorrect atomic mass for element %s"  % item)
+
     def testElementsResults(self):
         elementsInstance = self.elements()
         elementsInstance.initializeAsPyMca()
@@ -139,6 +157,7 @@ def getSuite(auto=True):
         # use a predefined order
         testSuite.addTest(testElements("testElementsImport"))
         testSuite.addTest(testElements("testElementsInstantiation"))
+        testSuite.addTest(testElements("testElementsDefaults"))
         testSuite.addTest(testElements("testElementsResults"))
     return testSuite
 
