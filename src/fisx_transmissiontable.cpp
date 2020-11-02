@@ -173,11 +173,6 @@ double TransmissionTable::getTransmission(const double & energy) const
         return 1.0;
     }
 
-    if (energy <= 0.0)
-    {
-        return 1.0;
-    }
-
     i2 = this->transmissionTable.upper_bound(energy);
     if (i2 == this->transmissionTable.end())
     {

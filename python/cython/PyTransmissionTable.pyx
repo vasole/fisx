@@ -70,7 +70,7 @@ cdef class PyTransmissionTable:
                                           name,
                                           comment)
 
-    def setTransmissionTableFromLists(self,
+    def setTransmissionTable(self,
                              std_map[double, double] transmissionTable, \
                              name="",
                              comment=""):
