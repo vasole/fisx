@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2016 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2020 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -36,6 +36,7 @@ from ._fisx import PyDetector as Detector
 from ._fisx import PyXRF as XRF
 from ._fisx import PyMath as Math
 from ._fisx import PyMaterial as Material
+from ._fisx import PyTransmissionTable as TransmissionTable
 from ._fisx import fisxVersion
 
 __version__ = fisxVersion()

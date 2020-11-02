@@ -63,18 +63,22 @@ cdef class PyTransmissionTable:
                              std_vector[double] transmission, \
                              name="",
                              comment=""):
+        name = toBytes(name)
+        comment = toBytes(comment)
         self.thisptr.setTransmissionTable(energy,
                                           transmission, \
-                                          toBytes(name),
-                                          toBytes(comment))
+                                          name,
+                                          comment)
 
     def setTransmissionTableFromLists(self,
                              std_map[double, double] transmissionTable, \
                              name="",
                              comment=""):
+        name = toBytes(name)
+        comment = toBytes(comment)
         self.thisptr.setTransmissionTable(transmissionTable,
-                                          toBytes(name),
-                                          toBytes(comment))
+                                          name,
+                                          comment)
 
     def getTransmissionTable(self):
-        return self.thisptr.getTransmissionTable
+        return self.thisptr.getTransmissionTable()
