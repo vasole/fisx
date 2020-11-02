@@ -83,7 +83,7 @@ class testTransmissionTable(unittest.TestCase):
         self.assertTrue(instance.getComment() == "",
                         "Incorrect default comment")
         energyList = [0.1, 0.2, 0.3, 0.4, 0.5] 
-        tranmissionList = [0.1, 0.2, 0.3, 0.4, 0.5]
+        transmissionList = [0.1, 0.2, 0.3, 0.4, 0.5]
         instance.setName("My table")
         self.assertTrue(instance.getName() == "My table",
                         "Incorrect name")
@@ -94,20 +94,22 @@ class testTransmissionTable(unittest.TestCase):
                                                transmissionList,
                                                name="",
                                                comment="My comment")
-        self.assertTrue(instance.getName() == "My table",
-                        "Incorrect name")
-        self.assertTrue(instance.getComment() == "My comment",
-                        "Incorrect comment")
-        v = instance.getTransmission(0.9)
+        name = instance.getName()
+        self.assertTrue( name == "My table",
+                        "Incorrect name <%s>" % name)
+        comment = instance.getComment()
+        self.assertTrue( comment == "My comment",
+                        "Incorrect comment <%s>" % comment)
+        v = instance.getTransmission(0.09)
         self.assertTrue(v == 0.0,
                         "Incorrect transmission %f. Expected 0.0" % v)
         v = instance.getTransmission(1.0)
         self.assertTrue(v == 1.0,
-                        "Incorrect transmission %f. Expected 1s.0" % v)
+                        "Incorrect transmission %f. Expected 1.0" % v)
         e = [0.15, 0.22, 0.41]
         v = instance.getTransmission(e)
         for i in range(len(e)):
-            self.assertTrue(v[i] == e[i],
+            self.assertTrue(abs(v[i]-e[i]) < 1.0e-8,
                             "Incorrect transmission %f expected % f" % \
                                 (v[i], e[i]))
         
