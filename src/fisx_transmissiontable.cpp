@@ -83,12 +83,12 @@ void TransmissionTable::setTransmissionTable(const std::map<double, double> & ta
     }
 
     // verify the table was not already named
-    if ((this->name.size() > 0) and (name.size() > 0))
+    if ((this->name.size() > 0) && (name.size() > 0))
     {
         msg = "TransmissionTable::setTransmissionTable. Table cannot be renamed";
         throw std::invalid_argument(msg);
     }
-    if ((this->comment.size() > 0) and (comment.size() > 0))
+    if ((this->comment.size() > 0) && (comment.size() > 0))
     {
         msg = "TransmissionTable::setTransmissionTable. Table comment cannot be changed";
         throw std::invalid_argument(msg);
@@ -110,12 +110,12 @@ void TransmissionTable::setTransmissionTable(const std::vector<double> & energy,
 
     // check input
     // verify the table was not already named
-    if ((this->name.size() > 0) and (name.size() > 0))
+    if ((this->name.size() > 0) && (name.size() > 0))
     {
         msg = "TransmissionTable::setTransmissionTable. Table cannot be renamed";
         throw std::invalid_argument(msg);
     }
-    if ((this->comment.size() > 0) and (comment.size() > 0))
+    if ((this->comment.size() > 0) && (comment.size() > 0))
     {
         msg = "TransmissionTable::setTransmissionTable. Table comment cannot be changed";
         throw std::invalid_argument(msg);
