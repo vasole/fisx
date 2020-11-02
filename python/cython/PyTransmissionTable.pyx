@@ -82,3 +82,15 @@ cdef class PyTransmissionTable:
 
     def getTransmissionTable(self):
         return self.thisptr.getTransmissionTable()
+
+    def getTransmission(self, energy):
+        if hasattr(energy, "__len__"):
+            return self._getTransmissionMultiple(energy)
+        else:
+            return self._getTransmissionSingle(energy)
+        
+    def _getTransmissionSingle(self, double energy):
+        return self.thisptr.getTransmission(energy)
+
+    def _getTransmissionMultiple(self, std_vector[double] energy):
+        return self.thisptr.getTransmission(energy)
