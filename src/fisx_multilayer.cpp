@@ -50,13 +50,16 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
     const Beam & beam = this->configuration.getBeam();
     std::vector<std::vector<double> >actualRays = beam.getBeamAsDoubleVectors();
     std::vector<double>::size_type iRay;
-    const std::vector<Layer> & filters = this->configuration.getBeamFilters();;
+    const std::vector<Layer> & filters = this->configuration.getBeamFilters();
+    const std::vector<TransmissionTable> & userFilters = this->configuration.getUserBeamFilters();
     const std::vector<Layer> & sample = this->configuration.getSample();
     const std::vector<Layer> & attenuators = this->configuration.getAttenuators();
+    const std::vector<TransmissionTable> & userAttenuators = this->configuration.getUserAttenuators();
     const Layer* layerPtr;
     std::vector<Layer>::size_type iLayer;
     std::vector<Layer>::size_type jLayer;
     std::vector<Layer>::size_type bLayer;
+    std::vector<TransmissionTable>::size_type iTransmissionTable;
     Detector detector = this->configuration.getDetector();
     std::string msg;
     const double PI = acos(-1.0);
@@ -90,6 +93,16 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
             actualRays[1][iRay] *= doubleVector[iRay];
         }
     }
+    // account for user beam filters
+    for (iTransmissionTable = 0; iTransmissionTable < userFilters.size(); iTransmissionTable++)
+    {
+        doubleVector = userFilters[iTransmissionTable].getTransmission(energies);
+        for (iRay = 0; iRay < energies.size(); iRay++)
+        {
+            actualRays[1][iRay] *= doubleVector[iRay];
+        }
+    }
+
 
     // we can already calculate the geometric efficiency
     geometricEfficiency.resize(sample.size());
@@ -439,6 +452,12 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                                                                    elementsLibrary, \
                                                                                    90.0);
                             }
+                            // transmission through user attenuators
+                            for (iTransmissionTable = 0; iTransmissionTable < userAttenuators.size(); iTransmissionTable++)
+                            {
+                                detectionEfficiency *= userAttenuators[iTransmissionTable].getTransmission(energy);
+                            }
+
 
                             // detection efficiency decomposed in geometric and intrinsic
                             detectionEfficiency *= geometricEfficiency[iLayer];
