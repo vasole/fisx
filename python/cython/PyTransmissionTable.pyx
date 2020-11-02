@@ -52,7 +52,7 @@ cdef class PyTransmissionTable:
         self.thisptr.setName(name)
 
     def getComment(self):
-        return toString(self.thisptr.getName())
+        return toString(self.thisptr.getComment())
 
     def setComment(self, comment):
         comment = toBytes(comment)
