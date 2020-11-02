@@ -425,6 +425,11 @@ void XRFConfig::setBeamFilters(const std::vector<Layer> & filters)
     this->beamFilters = filters;
 }
 
+void XRFConfig::setUserBeamFilters(const std::vector<TransmissionTable> & transmissionTables)
+{
+    this->userBeamFilters = transmissionTables;
+}
+
 void XRFConfig::setSample(const std::vector<Layer> & layers, const int & referenceLayer)
 {
     if (referenceLayer >= (int) layers.size())
@@ -438,6 +443,11 @@ void XRFConfig::setSample(const std::vector<Layer> & layers, const int & referen
 void XRFConfig::setAttenuators(const std::vector<Layer> & attenuators)
 {
     this->attenuators = attenuators;
+}
+
+void XRFConfig::setUserAttenuators(const std::vector<TransmissionTable> & transmissionTables)
+{
+    this->userAttenuators = transmissionTables;
 }
 
 void XRFConfig::setDetector(const Detector & detector)
