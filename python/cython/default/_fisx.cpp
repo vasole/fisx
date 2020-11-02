@@ -2111,7 +2111,7 @@ static PyObject *__pyx_pf_4fisx_5_fisx_19PyTransmissionTable_6setName(struct __p
 static PyObject *__pyx_pf_4fisx_5_fisx_19PyTransmissionTable_8getComment(struct __pyx_obj_4fisx_5_fisx_PyTransmissionTable *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_4fisx_5_fisx_19PyTransmissionTable_10setComment(struct __pyx_obj_4fisx_5_fisx_PyTransmissionTable *__pyx_v_self, PyObject *__pyx_v_comment); /* proto */
 static PyObject *__pyx_pf_4fisx_5_fisx_19PyTransmissionTable_12setTransmissionTableFromLists(struct __pyx_obj_4fisx_5_fisx_PyTransmissionTable *__pyx_v_self, std::vector<double>  __pyx_v_energy, std::vector<double>  __pyx_v_transmission, PyObject *__pyx_v_name, PyObject *__pyx_v_comment); /* proto */
-static PyObject *__pyx_pf_4fisx_5_fisx_19PyTransmissionTable_14setTransmissionTableFromLists(struct __pyx_obj_4fisx_5_fisx_PyTransmissionTable *__pyx_v_self, std::map<double,double>  __pyx_v_transmissionTable, PyObject *__pyx_v_name, PyObject *__pyx_v_comment); /* proto */
+static PyObject *__pyx_pf_4fisx_5_fisx_19PyTransmissionTable_14setTransmissionTable(struct __pyx_obj_4fisx_5_fisx_PyTransmissionTable *__pyx_v_self, std::map<double,double>  __pyx_v_transmissionTable, PyObject *__pyx_v_name, PyObject *__pyx_v_comment); /* proto */
 static PyObject *__pyx_pf_4fisx_5_fisx_19PyTransmissionTable_16getTransmissionTable(struct __pyx_obj_4fisx_5_fisx_PyTransmissionTable *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_4fisx_5_fisx_19PyTransmissionTable_18getTransmission(struct __pyx_obj_4fisx_5_fisx_PyTransmissionTable *__pyx_v_self, PyObject *__pyx_v_energy); /* proto */
 static PyObject *__pyx_pf_4fisx_5_fisx_19PyTransmissionTable_20_getTransmissionSingle(struct __pyx_obj_4fisx_5_fisx_PyTransmissionTable *__pyx_v_self, double __pyx_v_energy); /* proto */
@@ -24897,7 +24897,7 @@ static PyObject *__pyx_pf_4fisx_5_fisx_19PyTransmissionTable_12setTransmissionTa
  *                                           name,
  *                                           comment)             # <<<<<<<<<<<<<<
  * 
- *     def setTransmissionTableFromLists(self,
+ *     def setTransmissionTable(self,
  */
   __pyx_t_5 = __pyx_convert_string_from_py_std__in_string(__pyx_v_comment); if (unlikely(PyErr_Occurred())) __PYX_ERR(1, 1277, __pyx_L1_error)
 
@@ -24943,14 +24943,14 @@ static PyObject *__pyx_pf_4fisx_5_fisx_19PyTransmissionTable_12setTransmissionTa
 /* "python/cython/_fisx.pyx":1279
  *                                           comment)
  * 
- *     def setTransmissionTableFromLists(self,             # <<<<<<<<<<<<<<
+ *     def setTransmissionTable(self,             # <<<<<<<<<<<<<<
  *                              std_map[double, double] transmissionTable, \
  *                              name="",
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4fisx_5_fisx_19PyTransmissionTable_15setTransmissionTableFromLists(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_pw_4fisx_5_fisx_19PyTransmissionTable_15setTransmissionTableFromLists(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_4fisx_5_fisx_19PyTransmissionTable_15setTransmissionTable(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_pw_4fisx_5_fisx_19PyTransmissionTable_15setTransmissionTable(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   std::map<double,double>  __pyx_v_transmissionTable;
   PyObject *__pyx_v_name = 0;
   PyObject *__pyx_v_comment = 0;
@@ -24959,7 +24959,7 @@ static PyObject *__pyx_pw_4fisx_5_fisx_19PyTransmissionTable_15setTransmissionTa
   int __pyx_clineno = 0;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("setTransmissionTableFromLists (wrapper)", 0);
+  __Pyx_RefNannySetupContext("setTransmissionTable (wrapper)", 0);
   {
     static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_transmissionTable,&__pyx_n_s_name,&__pyx_n_s_comment,0};
     PyObject* values[3] = {0,0,0};
@@ -24997,7 +24997,7 @@ static PyObject *__pyx_pw_4fisx_5_fisx_19PyTransmissionTable_15setTransmissionTa
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "setTransmissionTableFromLists") < 0)) __PYX_ERR(1, 1279, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "setTransmissionTable") < 0)) __PYX_ERR(1, 1279, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -25016,20 +25016,20 @@ static PyObject *__pyx_pw_4fisx_5_fisx_19PyTransmissionTable_15setTransmissionTa
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("setTransmissionTableFromLists", 0, 1, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 1279, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("setTransmissionTable", 0, 1, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 1279, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("fisx._fisx.PyTransmissionTable.setTransmissionTableFromLists", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("fisx._fisx.PyTransmissionTable.setTransmissionTable", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4fisx_5_fisx_19PyTransmissionTable_14setTransmissionTableFromLists(((struct __pyx_obj_4fisx_5_fisx_PyTransmissionTable *)__pyx_v_self), __pyx_v_transmissionTable, __pyx_v_name, __pyx_v_comment);
+  __pyx_r = __pyx_pf_4fisx_5_fisx_19PyTransmissionTable_14setTransmissionTable(((struct __pyx_obj_4fisx_5_fisx_PyTransmissionTable *)__pyx_v_self), __pyx_v_transmissionTable, __pyx_v_name, __pyx_v_comment);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4fisx_5_fisx_19PyTransmissionTable_14setTransmissionTableFromLists(struct __pyx_obj_4fisx_5_fisx_PyTransmissionTable *__pyx_v_self, std::map<double,double>  __pyx_v_transmissionTable, PyObject *__pyx_v_name, PyObject *__pyx_v_comment) {
+static PyObject *__pyx_pf_4fisx_5_fisx_19PyTransmissionTable_14setTransmissionTable(struct __pyx_obj_4fisx_5_fisx_PyTransmissionTable *__pyx_v_self, std::map<double,double>  __pyx_v_transmissionTable, PyObject *__pyx_v_name, PyObject *__pyx_v_comment) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -25040,7 +25040,7 @@ static PyObject *__pyx_pf_4fisx_5_fisx_19PyTransmissionTable_14setTransmissionTa
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("setTransmissionTableFromLists", 0);
+  __Pyx_RefNannySetupContext("setTransmissionTable", 0);
   __Pyx_INCREF(__pyx_v_name);
   __Pyx_INCREF(__pyx_v_comment);
 
@@ -25133,7 +25133,7 @@ static PyObject *__pyx_pf_4fisx_5_fisx_19PyTransmissionTable_14setTransmissionTa
   /* "python/cython/_fisx.pyx":1279
  *                                           comment)
  * 
- *     def setTransmissionTableFromLists(self,             # <<<<<<<<<<<<<<
+ *     def setTransmissionTable(self,             # <<<<<<<<<<<<<<
  *                              std_map[double, double] transmissionTable, \
  *                              name="",
  */
@@ -25145,7 +25145,7 @@ static PyObject *__pyx_pf_4fisx_5_fisx_19PyTransmissionTable_14setTransmissionTa
   __Pyx_XDECREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_AddTraceback("fisx._fisx.PyTransmissionTable.setTransmissionTableFromLists", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("fisx._fisx.PyTransmissionTable.setTransmissionTable", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_name);
@@ -32663,7 +32663,7 @@ static PyMethodDef __pyx_methods_4fisx_5_fisx_PyTransmissionTable[] = {
   {"getComment", (PyCFunction)__pyx_pw_4fisx_5_fisx_19PyTransmissionTable_9getComment, METH_NOARGS, 0},
   {"setComment", (PyCFunction)__pyx_pw_4fisx_5_fisx_19PyTransmissionTable_11setComment, METH_O, 0},
   {"setTransmissionTableFromLists", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_4fisx_5_fisx_19PyTransmissionTable_13setTransmissionTableFromLists, METH_VARARGS|METH_KEYWORDS, 0},
-  {"setTransmissionTableFromLists", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_4fisx_5_fisx_19PyTransmissionTable_15setTransmissionTableFromLists, METH_VARARGS|METH_KEYWORDS, 0},
+  {"setTransmissionTable", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_4fisx_5_fisx_19PyTransmissionTable_15setTransmissionTable, METH_VARARGS|METH_KEYWORDS, 0},
   {"getTransmissionTable", (PyCFunction)__pyx_pw_4fisx_5_fisx_19PyTransmissionTable_17getTransmissionTable, METH_NOARGS, 0},
   {"getTransmission", (PyCFunction)__pyx_pw_4fisx_5_fisx_19PyTransmissionTable_19getTransmission, METH_O, 0},
   {"_getTransmissionSingle", (PyCFunction)__pyx_pw_4fisx_5_fisx_19PyTransmissionTable_21_getTransmissionSingle, METH_O, 0},

@@ -96,8 +96,14 @@ void TransmissionTable::setTransmissionTable(const std::map<double, double> & ta
 
     // assign the values
     this->transmissionTable = table;
-    this->name = name;
-    this->comment = comment;
+    if (name.size() > 0)
+    {
+        this->name = name;
+    }
+    if (comment.size() > 0)
+    {
+        this->comment = comment;
+    }
 }
 
 void TransmissionTable::setTransmissionTable(const std::vector<double> & energy, \
@@ -147,8 +153,14 @@ void TransmissionTable::setTransmissionTable(const std::vector<double> & energy,
     {
         this->transmissionTable[energy[i]] = transmission[i];
     }
-    this->name = name;
-    this->comment = comment;
+    if (name.size() > 0)
+    {
+        this->name = name;
+    }
+    if (comment.size() > 0)
+    {
+        this->comment = comment;
+    }
 }
 
 
