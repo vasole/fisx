@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2018 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2020 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -88,6 +88,11 @@ public:
     */
     void setBeamFilters(const std::vector<Layer> & filters);
 
+    /*!
+    Set the user beam filters to be applied
+    */
+    void setUserBeamFilters(const std::vector<TransmissionTable> & userFilters);
+
 
     /*!
     Set the sample description.
@@ -116,6 +121,12 @@ public:
     "funny" factors.
     */
     void setAttenuators(const std::vector<Layer> & attenuators);
+
+
+    /*!
+    Set the user transmission tables to be applied as attenuators
+    */
+    void setUserAttenuators(const std::vector<TransmissionTable> & userAttenuators);
 
 
     /*!

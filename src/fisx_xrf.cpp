@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2018 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2020 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -96,6 +96,11 @@ void XRF::setBeamFilters(const std::vector<Layer> &layers)
     this->configuration.setBeamFilters(layers);
 }
 
+void XRF::setUserBeamFilters(const std::vector<TransmissionTable> & userFilters)
+{
+    this->recentBeam = true;
+    this->configuration.setUserBeamFilters(userFilters);
+}
 
 void XRF::setSample(const std::vector<Layer> & layers, const int & referenceLayer)
 {
@@ -121,6 +126,11 @@ void XRF::setSample(const Layer & layer)
 void XRF::setAttenuators(const std::vector<Layer> & attenuators)
 {
     this->configuration.setAttenuators(attenuators);
+}
+
+void XRF::setUserAttenuators(const std::vector<TransmissionTable> & userAttenuators)
+{
+    this->configuration.setUserAttenuators(userAttenuators);
 }
 
 void XRF::setDetector(const Detector & detector)
