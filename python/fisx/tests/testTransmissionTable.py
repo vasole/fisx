@@ -112,7 +112,25 @@ class testTransmissionTable(unittest.TestCase):
             self.assertTrue(abs(v[i]-e[i]) < 1.0e-8,
                             "Incorrect transmission %f expected % f" % \
                                 (v[i], e[i]))
-        
+
+        # change the transmission table
+        d = {0.1:0.1, 0.2:0.2}
+        instance.setTransmissionTable(d)
+        name = instance.getName()
+        self.assertTrue( name == "My table",
+                        "Incorrect name <%s>" % name)
+        self.assertTrue( comment == "My comment",
+                        "Incorrect comment <%s>" % comment)
+        v = instance.getTransmission(0.09)
+        self.assertTrue(v == 0.0,
+                        "Incorrect transmission %f. Expected 0.0" % v)
+        v = instance.getTransmission(1.0)
+        self.assertTrue(v == 1.0,
+                        "Incorrect transmission %f. Expected 1.0" % v)
+        v = instance.getTransmission(0.18)
+        self.assertTrue(abs(v - 0.18) < 1.0e-8,
+                        "Incorrect transmission %f. Expected 0.18" % v)
+ 
 def getSuite(auto=True):
     testSuite = unittest.TestSuite()
     if auto:
