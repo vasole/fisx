@@ -64,7 +64,6 @@ void TransmissionTable::setTransmissionTable(const std::map<double, double> & ta
                           const std::string & name, const std::string & comment)
 {
     std::string msg;
-        throw std::invalid_argument(msg);
     std::map<double, double>::const_iterator c_it;
 
     // verify that no value is negative
