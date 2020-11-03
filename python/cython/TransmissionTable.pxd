@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2020 European Synchrotron Radiation Facility
+# Copyright (c) 2020 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -25,21 +25,28 @@
 # THE SOFTWARE.
 #
 #############################################################################*/
-from ._fisx import PySimpleIni as SimpleIni
-from ._fisx import PySimpleSpecfile as SimpleSpecfile
-from ._fisx import PyEPDL97 as EPDL97
-from ._fisx import PyShell as Shell
-from ._fisx import PyElement as Element
-from ._fisx import PyElements as Elements
-from ._fisx import PyLayer as Layer
-from ._fisx import PyDetector as Detector
-from ._fisx import PyXRF as XRF
-from ._fisx import PyMath as Math
-from ._fisx import PyMaterial as Material
-from ._fisx import PyTransmissionTable as TransmissionTable
-from ._fisx import fisxVersion
+#import numpy as np
+#cimport numpy as np
+cimport cython
 
-__version__ = fisxVersion()
+from libcpp.string cimport string as std_string
+from libcpp.vector cimport vector as std_vector
+from libcpp.map cimport map as std_map
 
-def version():
-    return __version__
+cdef extern from "fisx_transmissiontable.h" namespace "fisx":
+    cdef cppclass TransmissionTable:
+        TransmissionTable()
+        std_string getComment()
+        std_string getName()
+        void setComment(std_string)
+        void setName(std_string)
+        std_vector[double] getTransmission(std_vector[double])
+        double getTransmission(double)
+        std_map[double, double] getTransmissionTable()
+        void setTransmissionTable(std_map[double, double],
+                                  std_string,
+                                  std_string) except +
+        void setTransmissionTable(std_vector[double],
+                                  std_vector[double],
+                                  std_string,
+                                  std_string) except +

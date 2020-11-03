@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2018 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2020 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -65,6 +65,7 @@ void XRFConfig::readConfigurationFromFile(const std::string & fileName)
     std::vector<std::string> splitString;
     Material material;
     Layer layer;
+    TransmissionTable transmissionTable;
     long counter;
     bool multilayerSample;
     double value;
@@ -123,7 +124,7 @@ void XRFConfig::readConfigurationFromFile(const std::string & fileName)
     std::cout << "Energy size = " << mapDoubles["energy"].size() << std::endl;
     std::cout << "weight size = " << mapDoubles["weight"].size() << std::endl;
     std::cout << "scatter = " << intVector.size() << std::endl;
-    std::cout << "falg = " << flagVector.size() << std::endl;
+    std::cout << "flag = " << flagVector.size() << std::endl;
     */
 
     if (mapDoubles["weight"].size() == 0)
@@ -174,6 +175,7 @@ void XRFConfig::readConfigurationFromFile(const std::string & fileName)
         }
     }
     this->setBeam(mapDoubles["energy"], mapDoubles["weight"], intVector);
+
     // GET THE MATERIALS
     iniFile.getSubsections("Materials", stringVector, false);
     this->materials.clear();
@@ -229,6 +231,118 @@ void XRFConfig::readConfigurationFromFile(const std::string & fileName)
             material = Material(splitString[1], density, thickness, comment);
             material.setComposition(compoundList, compoundFractions);
             this->materials.push_back(material);
+        }
+    }
+
+    // GET USER BEAM FILTERS
+    iniFile.getSubsections("UserBeamFilters", stringVector, false);
+    this->userBeamFilters.clear();
+    if (stringVector.size())
+    {
+        std::string comment;
+        double useFlag;
+        std::vector<double> energyList;
+        std::vector<double> transmissionList;
+        std::string key;
+        std::string::size_type j;
+        // Materials found
+        for (iStringVector = 0; iStringVector < stringVector.size(); iStringVector++)
+        {
+            sectionContents.clear();
+            sectionContents = iniFile.readSection(stringVector[iStringVector], true);
+            splitString.clear();
+            iniFile.parseStringAsMultipleValues(stringVector[iStringVector],
+                                            splitString,
+                                            std::string(),
+                                            '.');
+            useFlag = 0.0;
+            comment = "";
+            for (c_it = sectionContents.begin(); c_it != sectionContents.end(); ++c_it)
+            {
+                key = c_it->first;
+                for (j = 0; j < key.size(); j++)
+                {
+                    key[j] = std::toupper(key[j], loc);
+                }
+                if (key == "ENERGY")
+                {
+                    iniFile.parseStringAsMultipleValues(c_it->second, energyList, -1.0);
+                }
+                else if (key == "TRANSMISSION")
+                {
+                    iniFile.parseStringAsMultipleValues(c_it->second, transmissionList, -1.0);
+                }
+                else if (key == "USE")
+                {
+                    iniFile.parseStringAsSingleValue(c_it->second, useFlag, 0.0);
+                }
+                else
+                {
+                    comment = c_it->second;
+                }
+            }
+            if (useFlag > 0.0)
+            {
+                transmissionTable = TransmissionTable();
+                transmissionTable.setTransmissionTable(energyList, transmissionList, splitString[1], comment);
+                this->userBeamFilters.push_back(transmissionTable);
+            }
+        }
+    }
+
+    // GET USER ATTENUATORS
+    iniFile.getSubsections("UserAttenuators", stringVector, false);
+    this->userAttenuators.clear();
+    if (stringVector.size())
+    {
+        std::string comment;
+        double useFlag;
+        std::vector<double> energyList;
+        std::vector<double> transmissionList;
+        std::string key;
+        std::string::size_type j;
+        // Materials found
+        for (iStringVector = 0; iStringVector < stringVector.size(); iStringVector++)
+        {
+            sectionContents.clear();
+            sectionContents = iniFile.readSection(stringVector[iStringVector], true);
+            splitString.clear();
+            iniFile.parseStringAsMultipleValues(stringVector[iStringVector],
+                                            splitString,
+                                            std::string(),
+                                            '.');
+            useFlag = 0.0;
+            comment = "";
+            for (c_it = sectionContents.begin(); c_it != sectionContents.end(); ++c_it)
+            {
+                key = c_it->first;
+                for (j = 0; j < key.size(); j++)
+                {
+                    key[j] = std::toupper(key[j], loc);
+                }
+                if (key == "ENERGY")
+                {
+                    iniFile.parseStringAsMultipleValues(c_it->second, energyList, -1.0);
+                }
+                else if (key == "TRANSMISSION")
+                {
+                    iniFile.parseStringAsMultipleValues(c_it->second, transmissionList, -1.0);
+                }
+                else if (key == "USE")
+                {
+                    iniFile.parseStringAsSingleValue(c_it->second, useFlag, 0.0);
+                }
+                else
+                {
+                    comment = c_it->second;
+                }
+            }
+            if (useFlag > 0.0)
+            {
+                transmissionTable = TransmissionTable();
+                transmissionTable.setTransmissionTable(energyList, transmissionList, splitString[1], comment);
+                this->userAttenuators.push_back(transmissionTable);
+            }
         }
     }
 
@@ -341,6 +455,7 @@ void XRFConfig::readConfigurationFromFile(const std::string & fileName)
             }
         }
     }
+
     // for the time being it is not yet in the file
     this->referenceLayer = 0;
     // GET MULTILAYER SAMPLE IF NEEDED
@@ -425,6 +540,11 @@ void XRFConfig::setBeamFilters(const std::vector<Layer> & filters)
     this->beamFilters = filters;
 }
 
+void XRFConfig::setUserBeamFilters(const std::vector<TransmissionTable> & transmissionTables)
+{
+    this->userBeamFilters = transmissionTables;
+}
+
 void XRFConfig::setSample(const std::vector<Layer> & layers, const int & referenceLayer)
 {
     if (referenceLayer >= (int) layers.size())
@@ -438,6 +558,11 @@ void XRFConfig::setSample(const std::vector<Layer> & layers, const int & referen
 void XRFConfig::setAttenuators(const std::vector<Layer> & attenuators)
 {
     this->attenuators = attenuators;
+}
+
+void XRFConfig::setUserAttenuators(const std::vector<TransmissionTable> & transmissionTables)
+{
+    this->userAttenuators = transmissionTables;
 }
 
 void XRFConfig::setDetector(const Detector & detector)

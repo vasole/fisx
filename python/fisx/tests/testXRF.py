@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2016 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2020 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -175,6 +175,61 @@ class testXRF(unittest.TestCase):
                         self.assertTrue(discrepancy < 1.5,
                             "%s %s tertiary discrepancy = %.1f %%" % \
                             (key, peak, discrepancy))
+
+        # check user beamfilters
+        xrf.setUserBeamFilters([[[0.0, 100.], [0.5, 0.5], "half", "half intensity expected"]])
+        fluo2 = xrf.getMultilayerFluorescence(["Cr K", "Fe K", "Ni K"],
+                                             elementsInstance,
+                                             secondary=2,
+                                             useMassFractions=1)
+        for key in ["rate", "primary", "secondary"]:
+            before = fluo["Cr K"][0]["KL3"][key]
+            after = fluo2["Cr K"][0]["KL3"][key]
+            self.assertTrue(abs( before - 2.0 * after) < 1.0e-8,
+                            "Expected to measure half %s and not %f" % \
+                                (key, after / before))
+
+        # check removal of user beam filters
+        xrf.setUserBeamFilters([])
+        fluo2 = xrf.getMultilayerFluorescence(["Cr K", "Fe K", "Ni K"],
+                                             elementsInstance,
+                                             secondary=2,
+                                             useMassFractions=1)
+        for key in ["rate", "primary", "secondary"]:
+            before = fluo["Cr K"][0]["KL3"][key]
+            after = fluo2["Cr K"][0]["KL3"][key]
+            self.assertTrue(abs( before - after) < 1.0e-8,
+                            "Expected to measure a 1 ratio and not %f" % \
+                                (after / before))
+
+        # check user attenuators
+        xrf.setUserAttenuators([[[0.0, 100.], [.25, .25],
+                                 "quarter",
+                                 "quarter intensity expected"]])
+        fluo2 = xrf.getMultilayerFluorescence(["Cr K", "Fe K", "Ni K"],
+                                             elementsInstance,
+                                             secondary=2,
+                                             useMassFractions=1)
+        for key in ["rate"]:
+            before = fluo["Cr K"][0]["KL3"][key]
+            after = fluo2["Cr K"][0]["KL3"][key]
+            self.assertTrue(abs( before - 4.0 * after) < 1.0e-8,
+                        "Expected to measure 1/4 intensity and not %f" % \
+                            (after / before))
+
+        # check removal of user attenuators
+        xrf.setUserAttenuators([])
+        fluo2 = xrf.getMultilayerFluorescence(["Cr K", "Fe K", "Ni K"],
+                                             elementsInstance,
+                                             secondary=2,
+                                             useMassFractions=1)
+        
+        for key in ["rate"]:
+            before = fluo["Cr K"][0]["KL3"][key]
+            after = fluo2["Cr K"][0]["KL3"][key]
+            self.assertTrue(abs( before - after) < 1.0e-8,
+                        "Expected to measure a 1 ratio and not %f" % \
+                            (after / before))
 
 def getSuite(auto=True):
     testSuite = unittest.TestSuite()
