@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2016 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2020 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -36,6 +36,7 @@ from libcpp.map cimport map as std_map
 from Detector cimport *
 from Elements cimport *
 from Layer cimport *
+from TransmissionTable cimport *
 
 cdef extern from "fisx_xrf.h" namespace "fisx":
     cdef cppclass XRF:
@@ -45,8 +46,10 @@ cdef extern from "fisx_xrf.h" namespace "fisx":
         void setBeam(std_vector[double], std_vector[double], std_vector[int], std_vector[double]) except +
         void setBeam(double, double) except +
         void setBeamFilters(std_vector[Layer]) except +
+        void setUserBeamFilters(std_vector[TransmissionTable]) except +
         void setSample(std_vector[Layer], int) except +
         void setAttenuators(std_vector[Layer]) except +
+        void setUserAttenuators(std_vector[TransmissionTable]) except +
         void setGeometry(double, double, double) except +
         void setDetector(Detector) except +
         double getGeometricEfficiency(int) except +

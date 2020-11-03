@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2016 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2020 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -36,7 +36,8 @@ from libcpp.map cimport map as std_map
 
 from XRF cimport *
 from Layer cimport *
-    
+from TransmissionTable cimport *
+
 cdef class PyXRF:
     cdef XRF *thisptr
 
@@ -96,6 +97,53 @@ cdef class PyXRF:
                     container.push_back(Layer(toBytes(name), density, thickness, 1.0))
         self.thisptr.setBeamFilters(container)
 
+    def setUserBeamFilters(self, pyTransmissionTableList):
+        """
+        Provide a list of already instantiated transmision tables to be used
+        as filters between beam and sample
+        """
+        self._fillTransmissionTable(pyTransmissionTableList, "filter")
+
+    def _fillTransmissionTable(self, pyTransmissionTableList, function):        
+        if function not in ["filter", "attenuator"]:
+            raise ValueError("Please specify usage as filter or as attenuator")
+        if len(pyTransmissionTableList):
+            if hasattr(pyTransmissionTableList[0], "getTransmissionTable"):
+                instantiated = True
+            else:
+                instantiated = False
+        else:
+            instantiated = True
+        cdef std_vector[TransmissionTable] container
+        cdef TransmissionTable t
+        if instantiated:
+            for item in pyTransmissionTableList:
+                name = item.getName()
+                comment = item.getComment()
+                table = item.getTransmissionTable()
+                t = TransmissionTable()
+                t.setTransmissionTable(table, name, comment)
+                container.push_back(t)
+        else:
+            for item in pyTransmissionTableList:
+                t = TransmissionTable()
+                if len(item) == 4:
+                    t.setTransmissionTable(item[0],
+                                           item[1],
+                                           item[2],
+                                           item[3])
+                elif hasattr(item[0], "keys"):
+                    t.setTransmissionTable(item[0],
+                                           item[1],
+                                           item[2])
+                else:
+                    raise ValueError("Not appropriate input type or length")
+                container.push_back(t)
+        if function == "filter":
+            self.thisptr.setUserBeamFilters(container)
+        else:
+            self.thisptr.setUserAttenuators(container)
+
     def setSample(self, layerList, referenceLayer=0):
         """
         Due to wrapping constraints, the list must have the form:
@@ -134,6 +182,16 @@ cdef class PyXRF:
             for name, density, thickness in layerList:
                 container.push_back(Layer(toBytes(name), density, thickness, 1.0))
         self.thisptr.setAttenuators(container)
+
+    def setUserAttenuators(self, pyTransmissionTableList):
+        """
+        Provide a list of in which each item is either an already instantiated
+        PyTransmissionTable or each item is a list of the arguments of the
+        PyTransmissionTable method setTransmissionTable.
+        This transmission tables will be used as filters between sample and
+        detector
+        """
+        self._fillTransmissionTable(pyTransmissionTableList, "attenuator")
 
     def setDetector(self, PyDetector detector):
         self.thisptr.setDetector(deref(detector.thisptr))
