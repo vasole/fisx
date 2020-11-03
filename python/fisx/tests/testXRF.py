@@ -203,7 +203,7 @@ class testXRF(unittest.TestCase):
                                 (after / before))
 
         # check user attenuators
-        xrf.setUserAttenuators([[[0.0, 100.], [.25, .25],
+        xrf.setUserAttenuators([[{0.0:0.25, 100.:0.25},
                                  "quarter",
                                  "quarter intensity expected"]])
         fluo2 = xrf.getMultilayerFluorescence(["Cr K", "Fe K", "Ni K"],
