@@ -130,12 +130,12 @@ cdef class PyXRF:
                 if len(item) == 4:
                     t.setTransmissionTable(item[0],
                                            item[1],
-                                           item[2],
-                                           item[3])
+                                           toBytes(item[2]),
+                                           toBytes(item[3]))
                 elif hasattr(item[0], "keys"):
                     t.setTransmissionTable(item[0],
-                                           item[1],
-                                           item[2])
+                                           toBytes(item[1]),
+                                           toBytes(item[2]))
                 else:
                     raise ValueError("Not appropriate input type or length")
                 container.push_back(t)
