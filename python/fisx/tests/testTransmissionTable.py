@@ -119,6 +119,7 @@ class testTransmissionTable(unittest.TestCase):
         name = instance.getName()
         self.assertTrue( name == "My table",
                         "Incorrect name <%s>" % name)
+        comment = instance.getComment()
         self.assertTrue( comment == "My comment",
                         "Incorrect comment <%s>" % comment)
         v = instance.getTransmission(0.09)
@@ -130,7 +131,7 @@ class testTransmissionTable(unittest.TestCase):
         v = instance.getTransmission(0.18)
         self.assertTrue(abs(v - 0.18) < 1.0e-8,
                         "Incorrect transmission %f. Expected 0.18" % v)
- 
+
 def getSuite(auto=True):
     testSuite = unittest.TestSuite()
     if auto:
