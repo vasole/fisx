@@ -269,6 +269,11 @@ public:
     const std::vector<Layer> & getBeamFilters() const {return this->configuration.getBeamFilters();};
 
     /*!
+    Get the user beam filters to be applied
+    */
+    const std::vector<TransmissionTable> & getUserBeamFilters() const {return this->configuration.getUserBeamFilters();};
+
+    /*!
     Get the sample description
     */
     const std::vector<Layer> & getSample() const {return this->configuration.getSample();};
@@ -277,6 +282,11 @@ public:
     Get the attenuator layers
     */
     const std::vector<Layer> & getAttenuators() const {return this->configuration.getAttenuators();};
+
+    /*!
+    Get the user attenuators to be applied
+    */
+    const std::vector<TransmissionTable> & getUserAttenuators() const {return this->configuration.getUserAttenuators();};
 
     /*!
     Get the detector
