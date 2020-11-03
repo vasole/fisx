@@ -65,13 +65,9 @@ public:
     void setBeamFilters(const std::vector<Layer> & filters);
 
     /*!
-    Set the list of user beam filters defined as a transmission table.
+    Set the list of user beam filters defined as transmission tables.
     */
     void setUserBeamFilters(const std::vector<TransmissionTable> & userBeamFilters);
-    void setUserbeamFilters(const std::vector<double> & energies, \
-                            const std::vector<double> & transmissions, \
-                            const std::vector<std::string> & names, \
-                            const std::vector<std::string> & comments);
 
 
     /*!
@@ -109,13 +105,9 @@ public:
                         const std::vector<std::string> & comments);
 
     /*!
-    Set the list of user attenuators. Attenuators are layers between sample and detector.
+    Set the list of user attenuators as transmission tables between sample and detector.
     */
     void setUserAttenuators(const std::vector<TransmissionTable> & userAttenuators);
-    void setUserAttenuators(const std::vector<double> & energies, \
-                            const std::vector<double> & transmissions, \
-                            const std::vector<std::string> & names, \
-                            const std::vector<std::string> & comments);
 
     /*!
     Collimators are not implemented yet. The collimators are attenuators that take into account their distance to
