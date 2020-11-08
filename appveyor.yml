@@ -18,7 +18,7 @@ environment:
         - PYTHON_DIR: "C:\\Python36-x64"
 
         # Python 2.7
-        - PYTHON_DIR: "C:\\Python27-x64"
+        # - PYTHON_DIR: "C:\\Python27-x64"
 
 branches:
     only:
