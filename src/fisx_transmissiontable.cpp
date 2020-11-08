@@ -190,15 +190,13 @@ double TransmissionTable::getTransmission(const double & energy) const
         // return last value of the table
         // return (--i)->second;
         // or return 1 because we are dealing with a transmission?
-        return 1.0;
+        return (i2--)->second;
     }
     i1 = this->transmissionTable.begin();
-    if (energy < (i1->second))
+    if (energy <= (i1->first))
     {
         // return first value of the table
-        // return i->second;
-        // or return 0 because we are dealing with a transmission?
-        return 0.0;
+        return i1->second;
     }
     i1 = i2;
     i1--;
