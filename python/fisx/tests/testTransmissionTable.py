@@ -69,8 +69,8 @@ class testTransmissionTable(unittest.TestCase):
         self.assertTrue( transmissionTable == {0.0:1.0},
                         "Incorrect default transmission table")
         t = instance.getTransmission(-1.0)
-        self.assertTrue( t == 0.0,
-                        "Incorrect transmission %f. Expected 0.0" % t)
+        self.assertTrue( t == 1.0,
+                        "Incorrect transmission %f. Expected 1.0" % t)
         t = instance.getTransmission(1.0)
         self.assertTrue( t == 1.0,
                         "Incorrect transmission %f. Expected 1.0" % t)
@@ -101,8 +101,8 @@ class testTransmissionTable(unittest.TestCase):
         self.assertTrue( comment == "My comment",
                         "Incorrect comment <%s>" % comment)
         v = instance.getTransmission(0.09)
-        self.assertTrue(v == 0.0,
-                        "Incorrect transmission %f. Expected 0.0" % v)
+        self.assertTrue(v == 0.1,
+                        "Incorrect transmission %f. Expected 0.1" % v)
         v = instance.getTransmission(1.0)
         self.assertTrue(v == 1.0,
                         "Incorrect transmission %f. Expected 1.0" % v)
@@ -123,11 +123,11 @@ class testTransmissionTable(unittest.TestCase):
         self.assertTrue( comment == "My comment",
                         "Incorrect comment <%s>" % comment)
         v = instance.getTransmission(0.09)
-        self.assertTrue(v == 0.0,
-                        "Incorrect transmission %f. Expected 0.0" % v)
+        self.assertTrue(v == 0.1,
+                        "Incorrect transmission %f. Expected 0.1" % v)
         v = instance.getTransmission(1.0)
-        self.assertTrue(v == 1.0,
-                        "Incorrect transmission %f. Expected 1.0" % v)
+        self.assertTrue(v == 0.2,
+                        "Incorrect transmission %f. Expected 0.2" % v)
         v = instance.getTransmission(0.18)
         self.assertTrue(abs(v - 0.18) < 1.0e-8,
                         "Incorrect transmission %f. Expected 0.18" % v)
