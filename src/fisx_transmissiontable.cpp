@@ -65,14 +65,25 @@ void TransmissionTable::setTransmissionTable(const std::map<double, double> & ta
 {
     std::string msg;
     std::map<double, double>::const_iterator c_it;
+    double max_enery;
 
     // verify that no value is negative
+    max_energy = -1;
     for (c_it = table.begin(); c_it != table.end(); ++c_it)
     {
         if (c_it->first < 0.0)
         {
             msg = "TransmissionTable::setTransmissionTable. Invalid energy";
             throw std::invalid_argument(msg);
+        }
+        if (c_it->first < max_energy)
+        {
+            msg = "TransmissionTable::setTransmissionTable. Energies must be sorted from low to high.";
+            throw std::invalid_argument(msg);
+        }
+        else
+        {
+            max_energy = c_it->first;
         }
         if (c_it->second < 0.0)
         {
@@ -111,6 +122,7 @@ void TransmissionTable::setTransmissionTable(const std::vector<double> & energy,
                                              const std::string & comment)
 {
     std::vector<double>::size_type i;
+    double max_energy;
     std::string msg;
 
     // check input
@@ -132,12 +144,23 @@ void TransmissionTable::setTransmissionTable(const std::vector<double> & energy,
         msg = "TransmissionTable::setTransmissionTable. Number of energies and attenuations not matching";
         throw std::invalid_argument(msg);
     }
+
+    max_energy = -1;
     for (i = 0; i < energy.size(); ++i)
     {
         if (energy[i] < 0.0)
         {
             msg = "TransmissionTable::setTransmissionTable. Negative energy";
             throw std::invalid_argument(msg);
+        }
+        if (energy[i] < max_energy)
+        {
+            msg = "TransmissionTable::setTransmissionTable. Energies must be sorted from low to high.";
+            throw std::invalid_argument(msg);
+        }
+        else
+        {
+            max_energy = energy[i];
         }
         if (transmission[i] < 0.0)
         {
@@ -150,7 +173,17 @@ void TransmissionTable::setTransmissionTable(const std::vector<double> & energy,
     this->transmissionTable.clear();
     for (i = 0; i < energy.size(); ++i)
     {
-        this->transmissionTable[energy[i]] = transmission[i];
+        // avoid problems with duplicated energies
+        if (this->transmissionTable.find(energy[i]) != this->transmissionTable.end())
+        {
+            // create the entry at at energy 0.001 eV higher
+            this->transmissionTable[energy[i] + 0.000001] = transmission[i];
+        }
+        else
+        {
+            this->transmissionTable[energy[i]] = transmission[i];
+        }
+
     }
     if (name.size() > 0)
     {
