@@ -1,6 +1,6 @@
 VERSION 1.2.0
 
-Provide support for user filters and attenuators defined as transmission tables.
+Provide support for user beam filters and attenuators defined as transmission tables.
 
 VERSION 1.1.9
 
