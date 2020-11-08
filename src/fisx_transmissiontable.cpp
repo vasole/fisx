@@ -65,7 +65,7 @@ void TransmissionTable::setTransmissionTable(const std::map<double, double> & ta
 {
     std::string msg;
     std::map<double, double>::const_iterator c_it;
-    double max_enery;
+    double max_energy;
 
     // verify that no value is negative
     max_energy = -1;
@@ -223,7 +223,9 @@ double TransmissionTable::getTransmission(const double & energy) const
         // return last value of the table
         // return (--i)->second;
         // or return 1 because we are dealing with a transmission?
-        return (i2--)->second;
+        i1 = i2;
+        i1--;
+        return i1->second;
     }
     i1 = this->transmissionTable.begin();
     if (energy <= (i1->first))

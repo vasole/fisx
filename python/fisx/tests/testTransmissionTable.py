@@ -100,12 +100,18 @@ class testTransmissionTable(unittest.TestCase):
         comment = instance.getComment()
         self.assertTrue( comment == "My comment",
                         "Incorrect comment <%s>" % comment)
+
+        # we must get the first element
         v = instance.getTransmission(0.09)
         self.assertTrue(v == 0.1,
                         "Incorrect transmission %f. Expected 0.1" % v)
+
+        # we must get the last element
         v = instance.getTransmission(1.0)
-        self.assertTrue(v == 1.0,
-                        "Incorrect transmission %f. Expected 1.0" % v)
+        self.assertTrue(v == 0.5,
+                        "Incorrect transmission %f. Expected 0.5" % v)
+
+        # we must get interpolated values
         e = [0.15, 0.22, 0.41]
         v = instance.getTransmission(e)
         for i in range(len(e)):
