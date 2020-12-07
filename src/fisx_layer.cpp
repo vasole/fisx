@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2016 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2020 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -48,7 +48,7 @@ void Layer::setDensity(const double & value)
 {
     if (value <= 0.0)
     {
-        throw std::invalid_argument("Density must be possitive value.");
+        throw std::invalid_argument("Density must be positive value.");
     }
     this->density = value;
 }
@@ -57,7 +57,7 @@ void Layer::setThickness(const double & value)
 {
     if (value <= 0.0)
     {
-        throw std::invalid_argument("Thickness must be possitive value.");
+        throw std::invalid_argument("Thickness must be positive value.");
     }
     this->thickness = value;
 }
