@@ -2,10 +2,6 @@ language: python
 
 matrix:
     include:
-        - python: 2.7
-          os: linux
-          env: BUILD_COMMAND=sdist
-
         - python: 3.6
           os: linux
           env: BUILD_COMMAND=sdist
@@ -19,6 +15,12 @@ matrix:
           env: 
               - BUILD_COMMAND=bdist_wheel
               - PYTHON_VERSION=3
+
+        - python: 3.8
+          arch: ppc64le
+          os: linux
+          env: BUILD_COMMAND=sdist
+
 branches:
     only:
         - master
