@@ -6,10 +6,6 @@ matrix:
           os: linux
           env: BUILD_COMMAND=sdist
 
-        - python: 3.8
-          os: linux
-          env: BUILD_COMMAND=sdist
-
         - language: generic
           os: osx
           env: 
