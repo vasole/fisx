@@ -31,7 +31,7 @@ jobs:
             python-version: 3.8
             BUILD_COMMAND: sdist
           - name-suffix: "ppc64le_sdist"
-            os: ubuntu20.04
+            os: ubuntu-latest
             arch: ppc64le
             architecture: ppc64le
             python-version: 3.8
