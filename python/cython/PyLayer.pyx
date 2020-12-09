@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2017 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2020 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -66,7 +66,7 @@ cdef class PyLayer:
         the layer transmission according to the incident angle (default 90.)
         """
         if not hasattr(energies, "__len__"):
-            energies = numpy.array([energies], numpy.float)
+            energies = numpy.array([energies], numpy.float64)
         return self.thisptr.getTransmission(energies, deref(elementsLib.thisptr), angle)
 
     def setMaterial(self, PyMaterial material):
