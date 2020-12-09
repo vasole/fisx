@@ -51,12 +51,12 @@ jobs:
 
       # Runs a set of commands using the runners shell
       - name: Generate source package or wheel
-        run:
+        run: |
           python setup.py sdist
           ls dist
 
       - name: Install from source package
-        run: 
+        run:
           pip install --pre --find-links dist/ --no-cache-dir --no-index fisx
 
       - name: Run the tests
