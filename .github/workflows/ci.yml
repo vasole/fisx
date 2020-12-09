@@ -25,10 +25,15 @@ jobs:
           - name-suffix: "(Minimum Versions)"
             os: ubuntu-latest
             python-version: 3.6
-          - os: ubuntu-latest
+            BUILD_COMMAND: sdist
+          - name-suffix: "sdist"
+            os: ubuntu-latest
             python-version: 3.8
-          - os: macos-latest
+            BUILD_COMMAND: sdist
+          - name-suffix: "bdist_wheel"
+            os: macos-latest
             python-version: 3.8
+            BUILD_COMMAND: bdist_wheel
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -66,7 +71,7 @@ jobs:
 
       - name: Generate source package or wheel
         run: |
-          python setup.py sdist
+          python setup.py ${{ matrix.BUILD_COMMAND }}
           ls dist
 
       - name: Install from source package
