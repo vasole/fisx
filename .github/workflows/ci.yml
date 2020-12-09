@@ -30,6 +30,11 @@ jobs:
             os: ubuntu-latest
             python-version: 3.8
             BUILD_COMMAND: sdist
+          - name-suffix: "ppc64le_sdist"
+            os: ubuntu-latest
+            arch: ppc64le
+            python-version: 3.8
+            BUILD_COMMAND: bdist_wheel
           - name-suffix: "bdist_wheel"
             os: macos-latest
             python-version: 3.8
