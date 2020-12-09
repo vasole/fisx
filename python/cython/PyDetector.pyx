@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2018 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2020 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -49,7 +49,7 @@ cdef class PyDetector:
 
     def getTransmission(self, energies, PyElements elementsLib, double angle=90.):
         if not hasattr(energies, "__len__"):
-            energies = numpy.array([energies], numpy.float)
+            energies = numpy.array([energies], numpy.float64)
         return self.thisptr.getTransmission(energies, deref(elementsLib.thisptr), angle)
 
     def setActiveArea(self, double area):

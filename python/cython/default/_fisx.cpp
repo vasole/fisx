@@ -1664,7 +1664,6 @@ static const char __pyx_k_test[] = "__test__";
 static const char __pyx_k_PyXRF[] = "PyXRF";
 static const char __pyx_k_angle[] = "angle";
 static const char __pyx_k_array[] = "array";
-static const char __pyx_k_float[] = "float";
 static const char __pyx_k_funny[] = "funny";
 static const char __pyx_k_label[] = "label";
 static const char __pyx_k_numpy[] = "numpy";
@@ -1694,6 +1693,7 @@ static const char __pyx_k_comment[] = "comment";
 static const char __pyx_k_compton[] = "compton";
 static const char __pyx_k_density[] = "density";
 static const char __pyx_k_element[] = "element";
+static const char __pyx_k_float64[] = "float64";
 static const char __pyx_k_getName[] = "getName";
 static const char __pyx_k_setBeam[] = "_setBeam";
 static const char __pyx_k_toBytes[] = "toBytes";
@@ -1879,7 +1879,7 @@ static PyObject *__pyx_n_s_fisx;
 static PyObject *__pyx_n_s_fisxVersion;
 static PyObject *__pyx_n_s_fisx__fisx;
 static PyObject *__pyx_n_s_flag;
-static PyObject *__pyx_n_s_float;
+static PyObject *__pyx_n_s_float64;
 static PyObject *__pyx_n_s_function;
 static PyObject *__pyx_n_s_funny;
 static PyObject *__pyx_n_s_getComment;
@@ -2455,7 +2455,7 @@ static void __pyx_pf_4fisx_5_fisx_10PyDetector_2__dealloc__(struct __pyx_obj_4fi
  * 
  *     def getTransmission(self, energies, PyElements elementsLib, double angle=90.):             # <<<<<<<<<<<<<<
  *         if not hasattr(energies, "__len__"):
- *             energies = numpy.array([energies], numpy.float)
+ *             energies = numpy.array([energies], numpy.float64)
  */
 
 /* Python wrapper */
@@ -2569,7 +2569,7 @@ static PyObject *__pyx_pf_4fisx_5_fisx_10PyDetector_4getTransmission(struct __py
  * 
  *     def getTransmission(self, energies, PyElements elementsLib, double angle=90.):
  *         if not hasattr(energies, "__len__"):             # <<<<<<<<<<<<<<
- *             energies = numpy.array([energies], numpy.float)
+ *             energies = numpy.array([energies], numpy.float64)
  *         return self.thisptr.getTransmission(energies, deref(elementsLib.thisptr), angle)
  */
   __pyx_t_1 = __Pyx_HasAttr(__pyx_v_energies, __pyx_n_s_len); if (unlikely(__pyx_t_1 == ((int)-1))) __PYX_ERR(1, 51, __pyx_L1_error)
@@ -2579,7 +2579,7 @@ static PyObject *__pyx_pf_4fisx_5_fisx_10PyDetector_4getTransmission(struct __py
     /* "python/cython/_fisx.pyx":52
  *     def getTransmission(self, energies, PyElements elementsLib, double angle=90.):
  *         if not hasattr(energies, "__len__"):
- *             energies = numpy.array([energies], numpy.float)             # <<<<<<<<<<<<<<
+ *             energies = numpy.array([energies], numpy.float64)             # <<<<<<<<<<<<<<
  *         return self.thisptr.getTransmission(energies, deref(elementsLib.thisptr), angle)
  * 
  */
@@ -2595,7 +2595,7 @@ static PyObject *__pyx_pf_4fisx_5_fisx_10PyDetector_4getTransmission(struct __py
     PyList_SET_ITEM(__pyx_t_4, 0, __pyx_v_energies);
     __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_numpy); if (unlikely(!__pyx_t_6)) __PYX_ERR(1, 52, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_float); if (unlikely(!__pyx_t_7)) __PYX_ERR(1, 52, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_float64); if (unlikely(!__pyx_t_7)) __PYX_ERR(1, 52, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __pyx_t_6 = NULL;
@@ -2654,14 +2654,14 @@ static PyObject *__pyx_pf_4fisx_5_fisx_10PyDetector_4getTransmission(struct __py
  * 
  *     def getTransmission(self, energies, PyElements elementsLib, double angle=90.):
  *         if not hasattr(energies, "__len__"):             # <<<<<<<<<<<<<<
- *             energies = numpy.array([energies], numpy.float)
+ *             energies = numpy.array([energies], numpy.float64)
  *         return self.thisptr.getTransmission(energies, deref(elementsLib.thisptr), angle)
  */
   }
 
   /* "python/cython/_fisx.pyx":53
  *         if not hasattr(energies, "__len__"):
- *             energies = numpy.array([energies], numpy.float)
+ *             energies = numpy.array([energies], numpy.float64)
  *         return self.thisptr.getTransmission(energies, deref(elementsLib.thisptr), angle)             # <<<<<<<<<<<<<<
  * 
  *     def setActiveArea(self, double area):
@@ -2685,7 +2685,7 @@ static PyObject *__pyx_pf_4fisx_5_fisx_10PyDetector_4getTransmission(struct __py
  * 
  *     def getTransmission(self, energies, PyElements elementsLib, double angle=90.):             # <<<<<<<<<<<<<<
  *         if not hasattr(energies, "__len__"):
- *             energies = numpy.array([energies], numpy.float)
+ *             energies = numpy.array([energies], numpy.float64)
  */
 
   /* function exit code */
@@ -19328,7 +19328,7 @@ static PyObject *__pyx_pf_4fisx_5_fisx_7PyLayer_6getTransmission(struct __pyx_ob
  *         the layer transmission according to the incident angle (default 90.)
  *         """
  *         if not hasattr(energies, "__len__"):             # <<<<<<<<<<<<<<
- *             energies = numpy.array([energies], numpy.float)
+ *             energies = numpy.array([energies], numpy.float64)
  *         return self.thisptr.getTransmission(energies, deref(elementsLib.thisptr), angle)
  */
   __pyx_t_1 = __Pyx_HasAttr(__pyx_v_energies, __pyx_n_s_len); if (unlikely(__pyx_t_1 == ((int)-1))) __PYX_ERR(1, 836, __pyx_L1_error)
@@ -19338,7 +19338,7 @@ static PyObject *__pyx_pf_4fisx_5_fisx_7PyLayer_6getTransmission(struct __pyx_ob
     /* "python/cython/_fisx.pyx":837
  *         """
  *         if not hasattr(energies, "__len__"):
- *             energies = numpy.array([energies], numpy.float)             # <<<<<<<<<<<<<<
+ *             energies = numpy.array([energies], numpy.float64)             # <<<<<<<<<<<<<<
  *         return self.thisptr.getTransmission(energies, deref(elementsLib.thisptr), angle)
  * 
  */
@@ -19354,7 +19354,7 @@ static PyObject *__pyx_pf_4fisx_5_fisx_7PyLayer_6getTransmission(struct __pyx_ob
     PyList_SET_ITEM(__pyx_t_4, 0, __pyx_v_energies);
     __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_numpy); if (unlikely(!__pyx_t_6)) __PYX_ERR(1, 837, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_float); if (unlikely(!__pyx_t_7)) __PYX_ERR(1, 837, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_float64); if (unlikely(!__pyx_t_7)) __PYX_ERR(1, 837, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __pyx_t_6 = NULL;
@@ -19413,14 +19413,14 @@ static PyObject *__pyx_pf_4fisx_5_fisx_7PyLayer_6getTransmission(struct __pyx_ob
  *         the layer transmission according to the incident angle (default 90.)
  *         """
  *         if not hasattr(energies, "__len__"):             # <<<<<<<<<<<<<<
- *             energies = numpy.array([energies], numpy.float)
+ *             energies = numpy.array([energies], numpy.float64)
  *         return self.thisptr.getTransmission(energies, deref(elementsLib.thisptr), angle)
  */
   }
 
   /* "python/cython/_fisx.pyx":838
  *         if not hasattr(energies, "__len__"):
- *             energies = numpy.array([energies], numpy.float)
+ *             energies = numpy.array([energies], numpy.float64)
  *         return self.thisptr.getTransmission(energies, deref(elementsLib.thisptr), angle)             # <<<<<<<<<<<<<<
  * 
  *     def setMaterial(self, PyMaterial material):
@@ -34092,7 +34092,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_fisxVersion, __pyx_k_fisxVersion, sizeof(__pyx_k_fisxVersion), 0, 0, 1, 1},
   {&__pyx_n_s_fisx__fisx, __pyx_k_fisx__fisx, sizeof(__pyx_k_fisx__fisx), 0, 0, 1, 1},
   {&__pyx_n_s_flag, __pyx_k_flag, sizeof(__pyx_k_flag), 0, 0, 1, 1},
-  {&__pyx_n_s_float, __pyx_k_float, sizeof(__pyx_k_float), 0, 0, 1, 1},
+  {&__pyx_n_s_float64, __pyx_k_float64, sizeof(__pyx_k_float64), 0, 0, 1, 1},
   {&__pyx_n_s_function, __pyx_k_function, sizeof(__pyx_k_function), 0, 0, 1, 1},
   {&__pyx_n_s_funny, __pyx_k_funny, sizeof(__pyx_k_funny), 0, 0, 1, 1},
   {&__pyx_n_s_getComment, __pyx_k_getComment, sizeof(__pyx_k_getComment), 0, 0, 1, 1},
