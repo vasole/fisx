@@ -4,13 +4,13 @@ matrix:
     include:
         - python: 3.6
           os: linux
-          env: BUILD_COMMAND=sdist
+          env: BUILD_COMMAND=bdist_wheel
 
-        - language: generic
-          os: osx
-          env: 
-              - BUILD_COMMAND=bdist_wheel
-              - PYTHON_VERSION=3
+        #- language: generic
+        #  os: osx
+        #  env: 
+        #      - BUILD_COMMAND=bdist_wheel
+        #      - PYTHON_VERSION=3
 
         - python: 3.8
           arch: ppc64le
