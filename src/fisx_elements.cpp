@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2020 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2022 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -1549,6 +1549,17 @@ std::map<std::string, double> Elements::getCascadeModifiedVacancyDistribution(co
 {
     const Element & elementObject = this->getElement(elementName);
     return elementObject.getCascadeModifiedVacancyDistribution(distribution);
+
+}
+
+std::map<std::string, std::map<std::string, double> >\
+Elements::getXRayLinesFromVacancyDistribution(const std::string & elementName,
+                                              const std::map<std::string, double> & distribution, \
+                                              const int & cascade, \
+                                              const int & useFluorescenceYield) const
+{
+    const Element & elementObject = this->getElement(elementName);
+    return elementObject.getXRayLinesFromVacancyDistribution(distribution, cascade, useFluorescenceYield);
 
 }
 
