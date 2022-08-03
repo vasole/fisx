@@ -142,6 +142,54 @@ public:
     const std::map<std::string, double> & getRadiativeTransitions(const std::string & elementName, \
                                                                   const std::string & subshell) const;
 
+    /*!
+    Convenience method to simplify access to element calculations from binding (ex. python)
+
+    Given a set of energies, give the initial distribution of vacancies (before cascade) due to
+    photoelectric effect.
+    The output map keys correspond to the different partial photoelectric shells and the values
+    are just vectors of mu_photoelectric(shell, E)/mu_photoelectric(total, E)
+    */
+    std::map<std::string, std::vector <double> >getInitialPhotoelectricVacancyDistribution(\
+                                                const std::string & elementName,
+                                                const std::vector<double> & energies) const;
+
+    /*!
+    Convenience method to simplify access to element calculations from binding (ex. python)
+
+    Given one energy, give the initial distribution of vacancies (before cascade) due to
+    photoelectric effect.
+    The output map keys correspond to the different subshells and the values are just
+    mu_photoelectric(shell, E)/mu_photoelectric(total, E).
+    */
+    std::map<std::string, double> getInitialPhotoelectricVacancyDistribution(\
+                                                                             const std::string & elementName,
+                                                                             const double & energy) const;
+
+    std::map<std::string, double> getCascadeModifiedVacancyDistribution(const std::string & elementName,
+                                                                        const std::map<std::string, \
+                                                                        double> & distribution) const;
+
+    /*!
+    Convenience method to simplify access to element calculations from binding (ex. python)
+
+    Given an initial vacancy distribution, returns the emitted X-rays.
+
+    Input:
+    distribution - Map[key, double] of the form [(sub)shell][amount of vacancies]
+    cascade - Consider de-excitation cascade (default is 1 = true)
+    useFluorescenceYield - Correct by fluorescence yield (default is 1 = true)
+
+    Output:
+    map[key]["rate"] - emission rate where key is the transition line (ex. KL3)
+    map[key]["energy"] - emission energy where key is the transition line (ex. KL3)
+    */
+    std::map<std::string, std::map<std::string, double> >\
+        getXRayLinesFromVacancyDistribution(const std::string & elementName,
+                                            const std::map<std::string, double> & distribution, \
+                                            const int & cascade = 1,
+                                            const int & useFluorescenceYield = 1) const;
+
     // shell related functions
     /*!
     Convenience method to simplify access to element properties from binding (ex. python)

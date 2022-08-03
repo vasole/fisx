@@ -1526,6 +1526,32 @@ std::map<std::string, std::map<std::string, double> > Elements::getExcitationFac
     return this->getExcitationFactors(element, energies, weights)[0];
 }
 
+std::map<std::string, std::vector <double> > Elements::getInitialPhotoelectricVacancyDistribution(\
+                                                const std::string & elementName,
+                                                const std::vector<double> & energies) const
+{
+    const Element & elementObject = this->getElement(elementName);
+    return elementObject.getInitialPhotoelectricVacancyDistribution(energies);
+}
+
+
+std::map<std::string, double> Elements::getInitialPhotoelectricVacancyDistribution(\
+                                                                         const std::string & elementName,
+                                                                         const double & energy) const
+{
+    const Element & elementObject = this->getElement(elementName);
+    return elementObject.getInitialPhotoelectricVacancyDistribution(energy);
+}
+
+std::map<std::string, double> Elements::getCascadeModifiedVacancyDistribution(const std::string & elementName,
+                                                                    const std::map<std::string, \
+                                                                    double> & distribution) const
+{
+    const Element & elementObject = this->getElement(elementName);
+    return elementObject.getCascadeModifiedVacancyDistribution(distribution);
+
+}
+
 std::map<std::string, double> Elements::parseFormula(const std::string & formula) const
 {
     std::map<std::string, double> composition;
