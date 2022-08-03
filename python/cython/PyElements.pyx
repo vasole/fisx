@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2020 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2022 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -205,7 +205,7 @@ cdef class PyElements:
                                                     pair)
     def setMassAttenuationCoefficientsFile(self, crossSectionsFile):
         self.thisptr.setMassAttenuationCoefficientsFile(toBytes(crossSectionsFile))
-    
+
     def _getSingleMassAttenuationCoefficients(self, std_string element,
                                                      double energy):
         if sys.version < "3.0":
@@ -246,7 +246,7 @@ cdef class PyElements:
                  fractions is 1.
 
         It gives back the mass attenuation coefficients at the given energies as a map where
-        the keys are the different physical processes and the values are lists of the 
+        the keys are the different physical processes and the values are lists of the
         calculated values via log-log interpolation in the internal table.
         """
         if hasattr(name, "keys"):
@@ -261,7 +261,7 @@ cdef class PyElements:
 
     def getExcitationFactors(self, name, energy, weight=None):
         """
-        getExcitationFactors(name, energy, weight=None)	
+        getExcitationFactors(name, energy, weight=None)
         Given energy(s) and (optional) weight(s), for the specfified element, this method returns
         the emitted X-ray already corrected for cascade and fluorescence yield.
         It is the equivalent of the excitation factor in D.K.G. de Boer's paper.
@@ -449,4 +449,51 @@ cdef class PyElements:
 
     def removeMaterials(self):
         self.thisptr.removeMaterials()
+
+    def getInitialPhotoelectricVacancyDistribution(self, elementName, energy):
+        """
+        Given one energy, give the initial distribution of vacancies (before cascade) due to
+        photoelectric effect.
+        The output map keys correspond to the different subshells and the values are just
+        mu_photoelectric(shell, E)/mu_photoelectric(total, E).
+        """
+        return toStringKeys(self.thisptr.getInitialPhotoelectricVacancyDistribution( \
+                                    toBytes(elementName), energy))
+    
+    def getCascadeModifiedVacancyDistribution(self, elementName, distribution):
+        return self._getCascadeModifiedVacancyDistribution(toBytes(elementName),
+                                                    toBytesKeys(distribution))
+
+    def _getCascadeModifiedVacancyDistribution(self, std_string elementName,
+                                                    std_map[std_string, double] distribution):
+        return toStringKeysAndValues(self.thisptr.getCascadeModifiedVacancyDistribution( \
+                                    elementName, distribution))
+
+    def getXRayLinesFromVacancyDistribution(self, elementName, distribution,
+                                            cascade=1, useFluorescenceYield=1):
+        """ 
+        Given an initial vacancy distribution, returns the emitted X-rays.
+
+        Input:
+        distribution - Map[key, double] of the form [(sub)shell][amount of vacancies]
+        cascade - Consider de-excitation cascade (default is 1 = true)
+        useFluorescenceYield - Correct by fluorescence yield (default is 1 = true)
+
+        Output:
+        map[key]["rate"] - emission rate where key is the transition line (ex. KL3)
+        map[key]["energy"] - emission energy where key is the transition line (ex. KL3)
+        """
+        return self._getXRayLinesFromVacancyDistribution(toBytes(elementName),
+                                                         toBytesKeysAndValues(distribution),
+                                                         cascade,
+                                                         useFluorescenceYield)
+
+    def _getXRayLinesFromVacancyDistribution(self, std_string elementName,
+                                             std_map[std_string, double] distribution,
+                                             int cascade=1, int useFluorescenceYield=1):
+        return toStringKeysAndValues(self.thisptr.getXRayLinesFromVacancyDistribution( \
+                                            elementName,
+                                            distribution,
+                                            cascade,
+                                            useFluorescenceYield))
 
