@@ -1,3 +1,9 @@
+VERSION 1.2.1
+
+Provide additonal methods to simplify debugging from python.
+
+Add doxygen generated documentation.
+
 VERSION 1.2.0
 
 Provide support for user beam filters and attenuators defined as transmission tables.

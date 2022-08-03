@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2016 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2022 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -72,8 +72,8 @@ else:
     def toBytesKeysAndValues(inputDict, encoding="utf-8"):
         if not isinstance(inputDict, dict):
             return inputDict
-        return dict((key.encode(encoding), toByteKeysAndValues(value)) if hasattr(key, "encode") \
-                    else (key, toByteKeysAndValues(value)) for key, value in inputDict.items())
+        return dict((key.encode(encoding), toBytesKeysAndValues(value)) if hasattr(key, "encode") \
+                    else (key, toBytesKeysAndValues(value)) for key, value in inputDict.items())
 
     def toStringKeysAndValues(inputDict, encoding="utf-8"):
         if not isinstance(inputDict, dict):

@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2020 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2022 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -116,6 +116,18 @@ cdef extern from "fisx_elements.h" namespace "fisx":
         std_map[std_string, double] getNonradiativeTransitions(std_string, std_string) except +
 
         std_map[std_string, double] getShellConstants(std_string, std_string) except +
+
+        std_map[std_string, double] getInitialPhotoelectricVacancyDistribution(\
+                                                                std_string,
+                                                                double) except +
+
+        std_map[std_string, double] getCascadeModifiedVacancyDistribution( \
+                                                        std_string,
+                                                        std_map[std_string, double]) except +
+
+        std_map[std_string, std_map[std_string, double] ]\
+                getXRayLinesFromVacancyDistribution(std_string, std_map[std_string, double],
+                                                    int, int) except +
 
         void setElementCascadeCacheEnabled(std_string, int) except +
 
