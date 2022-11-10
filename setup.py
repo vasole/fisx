@@ -4,7 +4,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2018 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2022 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -150,9 +150,9 @@ class smart_install_data(install_data):
         print("fisx to be installed in %s" %  self.install_dir)
         return install_data.run(self)
 
-topLevel = os.path.dirname(__file__)
-if not len(topLevel):
-    topLevel = "."
+#topLevel = os.path.dirname(__file__)
+#if not len(topLevel):
+topLevel = "."
 fileList = glob.glob(os.path.join(topLevel, "fisx_data", "*.dat"))
 fileList.append(os.path.join(topLevel, "changelog.txt"))
 fileList.append(os.path.join(topLevel, "LICENSE"))
