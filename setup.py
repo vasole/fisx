@@ -150,9 +150,9 @@ class smart_install_data(install_data):
         print("fisx to be installed in %s" %  self.install_dir)
         return install_data.run(self)
 
-#topLevel = os.path.dirname(__file__)
-#if not len(topLevel):
-topLevel = "."
+topLevel = os.path.dirname(os.path.relpath(__file__))
+if not len(topLevel):
+    topLevel = "."
 fileList = glob.glob(os.path.join(topLevel, "fisx_data", "*.dat"))
 fileList.append(os.path.join(topLevel, "changelog.txt"))
 fileList.append(os.path.join(topLevel, "LICENSE"))
