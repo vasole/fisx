@@ -76,7 +76,10 @@ jobs:
 
       - name: Install from source package
         run:
-          pip install --pre --find-links dist/ --no-cache-dir --no-index fisx
+          for filename in dist/fisx*.*; do
+            echo "\nInstall $filename"
+            pip install --pre $filename
+          done
 
       - name: Run the tests
         run:

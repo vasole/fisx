@@ -94,7 +94,10 @@ if FISX_DOC_DIR is None:
 
 def get_version():
     """Returns current version number from version.py file"""
+    dirname = os.path.dirname(os.path.abspath(__file__))
+    sys.path.insert(0, dirname)
     import version
+    sys.path = sys.path[1:]
     return version.strictversion
 
 __version__ = get_version()

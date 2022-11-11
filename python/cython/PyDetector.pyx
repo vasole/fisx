@@ -36,7 +36,7 @@ from libcpp.map cimport map as std_map
 
 from Elements cimport *
 from Detector cimport *
-from FisxCythonTools import toBytes, toBytesKeys, toBytesKeysAndValues, toString,  toStringKeys, toStringKeysAndValues, toStringList
+from fisx.FisxCythonTools import toBytes, toBytesKeys, toBytesKeysAndValues, toString,  toStringKeys, toStringKeysAndValues, toStringList
 
 cdef class PyDetector:
     cdef Detector *thisptr

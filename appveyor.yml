@@ -67,17 +67,21 @@ test_script:
     # Install the generated wheel package to test it
     #- "pip install --pre --find-links dist/ --trusted-host www.edna-site.org --find-links http://www.edna-site.org/pub/wheelhouse/ fisx"
     - "pip install numpy"
-    - "pip install --pre --no-index --find-links dist/ fisx"
+    - "FOR %%F IN (dist\\fisx*.*) DO (
+        pip install --pre %%F
+      )"
 
     # Print Python info
     - "python ci\\info_platform.py"
     - "pip freeze"
 
+    # Run the tests
+    - "cd .."
     - "python -m fisx.tests.testAll"
 
     # Leave test virtualenv
-    - "%VENV_TEST_DIR%\\Scripts\\deactivate.bat"
-    - "rmdir %VENV_TEST_DIR% /s /q"
+    - "fisx\\%VENV_TEST_DIR%\\Scripts\\deactivate.bat"
+    - "rmdir fisx\\%VENV_TEST_DIR% /s /q"
 
 artifacts:
     # Archive the generated wheel package in the ci.appveyor.com build report.
