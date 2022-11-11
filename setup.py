@@ -73,7 +73,7 @@ if use_cython():
             build_ext = None
         elif version < "0.17":
             build_ext = None
-    except:
+    except ImportError:
         build_ext = None
 else:
     build_ext = None
@@ -176,7 +176,7 @@ if build_ext:
     if os.path.exists(multiple_pyx):
         try:
             os.remove(multiple_pyx)
-        except:
+        except Exception:
             print("WARNING: Could not delete file. Assuming up-to-date.")
     if not os.path.exists(multiple_pyx):
         pyx = glob.glob(os.path.join(cython_dir, "*pyx"))
