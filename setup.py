@@ -43,7 +43,6 @@ else:
         from setuptools.command.sdist import sdist
     except ImportError:
         from distutils.core import setup, Extension
-        from distutils.sysconfig import get_python_lib
         from distutils.command.build_py import build_py
         from distutils.command.install_data import install_data
         from distutils.command.sdist import sdist
