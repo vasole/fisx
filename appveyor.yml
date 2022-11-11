@@ -1,5 +1,5 @@
 os:
-    - Visual Studio 2015
+    - Visual Studio 2019
 
 cache:
     - '%LOCALAPPDATA%\pip\Cache'
@@ -15,10 +15,10 @@ environment:
 
     matrix:
         # Python 3.6
-        - PYTHON_DIR: "C:\\Python36-x64"
+        # - PYTHON_DIR: "C:\\Python36-x64"
 
-        # Python 2.7
-        # - PYTHON_DIR: "C:\\Python27-x64"
+        # Python 3.10
+        - PYTHON_DIR: "C:\\Python310-x64"
 
 branches:
     only:
@@ -52,7 +52,7 @@ build_script:
     - "pip freeze"
 
     # Build
-    - "python setup.py bdist_wheel bdist_msi"
+    - "python setup.py bdist_wheel"
     - ps: "ls dist"
 
     # Leave build virtualenv
