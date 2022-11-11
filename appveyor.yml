@@ -52,7 +52,7 @@ build_script:
     - "pip freeze"
 
     # Build
-    - "python setup.py bdist_wheel bdist_msi"
+    - "python setup.py bdist_wheel"
     - ps: "ls dist"
 
     # Leave build virtualenv
