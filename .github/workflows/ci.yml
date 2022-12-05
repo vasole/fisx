@@ -24,7 +24,7 @@ jobs:
         include:
           - name-suffix: "(Minimum Versions)"
             os: ubuntu-latest
-            python-version: 3.6
+            python-version: 3.7
             BUILD_COMMAND: sdist
           - name-suffix: "sdist"
             os: ubuntu-latest
