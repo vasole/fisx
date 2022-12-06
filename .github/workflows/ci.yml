@@ -75,7 +75,7 @@ jobs:
           ls dist
 
       - name: Install from source package
-        run:
+        run: |
           for filename in dist/fisx*.*; do
             echo "\nInstall $filename"
             pip install --pre $filename
