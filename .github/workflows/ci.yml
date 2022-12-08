@@ -24,7 +24,7 @@ jobs:
         include:
           - name-suffix: "(Minimum Versions)"
             os: ubuntu-latest
-            python-version: 3.6
+            python-version: 3.7
             BUILD_COMMAND: sdist
           - name-suffix: "sdist"
             os: ubuntu-latest
@@ -75,8 +75,11 @@ jobs:
           ls dist
 
       - name: Install from source package
-        run:
-          pip install --pre --find-links dist/ --no-cache-dir --no-index fisx
+        run: |
+          for filename in dist/fisx*.*; do
+            echo "\nInstall $filename"
+            pip install --pre $filename
+          done
 
       - name: Run the tests
         run:

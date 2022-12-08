@@ -53,7 +53,11 @@ script:
     - pip install --upgrade pip
 
     # Install from source package
-    - pip install --pre --find-links dist/ --no-cache-dir --no-index fisx $PIP_INSTALL_EXTRA_ARGS
+    - |
+      for filename in dist/fisx*.*; do
+        echo "\nInstall $filename"
+        pip install --pre $filename $PIP_INSTALL_EXTRA_ARGS
+      done
 
     # Print Python info
     - python ci/info_platform.py

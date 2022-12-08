@@ -969,7 +969,7 @@ struct __pyx_obj_4fisx_5_fisx_PyTransmissionTable;
 struct __pyx_obj_4fisx_5_fisx_PyXRF;
 
 /* "python/cython/_fisx.pyx":41
- * from FisxCythonTools import toBytes, toBytesKeys, toBytesKeysAndValues, toString,  toStringKeys, toStringKeysAndValues, toStringList
+ * from fisx.FisxCythonTools import toBytes, toBytesKeys, toBytesKeysAndValues, toString,  toStringKeys, toStringKeysAndValues, toStringList
  * 
  * cdef class PyDetector:             # <<<<<<<<<<<<<<
  *     cdef Detector *thisptr

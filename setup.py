@@ -43,7 +43,6 @@ else:
         from setuptools.command.sdist import sdist
     except ImportError:
         from distutils.core import setup, Extension
-        from distutils.sysconfig import get_python_lib
         from distutils.command.build_py import build_py
         from distutils.command.install_data import install_data
         from distutils.command.sdist import sdist
@@ -74,7 +73,7 @@ if use_cython():
             build_ext = None
         elif version < "0.17":
             build_ext = None
-    except:
+    except ImportError:
         build_ext = None
 else:
     build_ext = None
@@ -95,7 +94,10 @@ if FISX_DOC_DIR is None:
 
 def get_version():
     """Returns current version number from version.py file"""
+    dirname = os.path.dirname(os.path.abspath(__file__))
+    sys.path.insert(0, dirname)
     import version
+    sys.path = sys.path[1:]
     return version.strictversion
 
 __version__ = get_version()
@@ -177,7 +179,7 @@ if build_ext:
     if os.path.exists(multiple_pyx):
         try:
             os.remove(multiple_pyx)
-        except:
+        except Exception:
             print("WARNING: Could not delete file. Assuming up-to-date.")
     if not os.path.exists(multiple_pyx):
         pyx = glob.glob(os.path.join(cython_dir, "*pyx"))
