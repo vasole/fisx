@@ -30,23 +30,10 @@
 import glob
 import os
 import sys
-if "bdist_wheel" in sys.argv:
-    from setuptools import setup, Extension
-    from setuptools.command.build_py import build_py
-    from distutils.command.install_data import install_data
-    from setuptools.command.sdist import sdist
-else:
-    try:
-        from setuptools import setup, Extension
-        from setuptools.command.build_py import build_py
-        from distutils.command.install_data import install_data
-        from setuptools.command.sdist import sdist
-    except ImportError:
-        from distutils.core import setup, Extension
-        from distutils.command.build_py import build_py
-        from distutils.command.install_data import install_data
-        from distutils.command.sdist import sdist
-
+from setuptools import setup, Extension
+from setuptools.command.build_py import build_py
+from distutils.command.install_data import install_data
+from setuptools.command.sdist import sdist
 
 # check if cython is not to be used despite being present
 def use_cython():
@@ -90,7 +77,6 @@ if FISX_DATA_DIR is None:
     FISX_DATA_DIR = os.path.join('fisx', 'fisx_data')
 if FISX_DOC_DIR is None:
     FISX_DOC_DIR = os.path.join('fisx', 'fisx_data')
-
 
 def get_version():
     """Returns current version number from version.py file"""
