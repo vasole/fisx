@@ -4,7 +4,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2022 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2023 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -32,7 +32,6 @@ import os
 import sys
 from setuptools import setup, Extension
 from setuptools.command.build_py import build_py
-from distutils.command.install_data import install_data
 from setuptools.command.sdist import sdist
 
 # check if cython is not to be used despite being present
@@ -73,10 +72,19 @@ import numpy
 FISX_DATA_DIR = os.getenv("FISX_DATA_DIR")
 FISX_DOC_DIR = os.getenv("FISX_DOC_DIR")
 
+DISTUTILS = False
 if FISX_DATA_DIR is None:
     FISX_DATA_DIR = os.path.join('fisx', 'fisx_data')
+else:
+    DISTUTILS = True
+
 if FISX_DOC_DIR is None:
     FISX_DOC_DIR = os.path.join('fisx', 'fisx_data')
+else:
+    DISTUTILS = True
+
+if DISTUTILS:
+    from distutils.command.install_data import install_data
 
 def get_version():
     """Returns current version number from version.py file"""
@@ -124,29 +132,55 @@ class smart_build_py(build_py):
                 lineToBeWritten = "FISX_DOC_DIR = r'%s'\n" % FISX_DOC_DIR
             fid.write(lineToBeWritten)
         fid.close()
+
+        if not DISTUTILS:
+            # package_data cannot deal with data files outside the package
+            fileList = glob.glob(os.path.join(topLevel, "fisx_data", "*.dat"))
+            fileList.append(os.path.join(topLevel, "changelog.txt"))
+            fileList.append(os.path.join(topLevel, "LICENSE"))
+            fileList.append(os.path.join(topLevel, "README.rst"))
+            fileList.append(os.path.join(topLevel, "TODO"))
+
+            target = os.path.join(self.build_lib, "fisx", "fisx_data")
+            if not os.path.exists(target):
+                os.mkdir(target)
+
+            dirname = os.path.dirname(os.path.relpath(__file__))
+            if not len(dirname):
+                dirname = "."
+            for src in fileList:
+                dest = os.path.join(target, os.path.basename(src))
+                print("copying %s to %s" % (src, dest))
+                self.copy_file(src, dest)
+            
         return toReturn
 
-class smart_install_data(install_data):
-    def run(self):
-        global INSTALL_DIR
-        global FISX_DATA_DIR
-        global FISX_DOC_DIR
-        #need to change self.install_dir to the library dir
-        install_cmd = self.get_finalized_command('install')
-        self.install_dir = getattr(install_cmd, 'install_lib')
-        INSTALL_DIR = self.install_dir
-        print("fisx to be installed in %s" %  self.install_dir)
-        return install_data.run(self)
+if DISTUTILS:
+    class smart_install_data(install_data):
+        def run(self):
+            global INSTALL_DIR
+            global FISX_DATA_DIR
+            global FISX_DOC_DIR
+            #need to change self.install_dir to the library dir
+            install_cmd = self.get_finalized_command('install')
+            self.install_dir = getattr(install_cmd, 'install_lib')
+            INSTALL_DIR = self.install_dir
+            print("fisx to be installed in %s" %  self.install_dir)
+            return install_data.run(self)
 
 topLevel = os.path.dirname(os.path.relpath(__file__))
 if not len(topLevel):
     topLevel = "."
-fileList = glob.glob(os.path.join(topLevel, "fisx_data", "*.dat"))
-fileList.append(os.path.join(topLevel, "changelog.txt"))
-fileList.append(os.path.join(topLevel, "LICENSE"))
-fileList.append(os.path.join(topLevel, "README.rst"))
-fileList.append(os.path.join(topLevel, "TODO"))
-data_files = [(FISX_DATA_DIR, fileList)]
+
+if DISTUTILS:
+    fileList = glob.glob(os.path.join(topLevel, "fisx_data", "*.dat"))
+    fileList.append(os.path.join(topLevel, "changelog.txt"))
+    fileList.append(os.path.join(topLevel, "LICENSE"))
+    fileList.append(os.path.join(topLevel, "README.rst"))
+    fileList.append(os.path.join(topLevel, "TODO"))
+    data_files = [(FISX_DATA_DIR, fileList)]
+else:
+    data_files = None
 
 # actual build stuff
 FORCE = False
@@ -270,9 +304,10 @@ class sdist_debian(sdist):
         self.archive_files = [debian_arch]
         print("Building debian .orig.tar.gz in %s" % self.archive_files[0])
 
-cmdclass = {'install_data': smart_install_data,
-            'build_py': smart_build_py,
+cmdclass = {'build_py': smart_build_py,
             'debian_src': sdist_debian}
+if DISTUTILS:
+    cmdclass['install_data'] = smart_install_data
 if build_ext:
     cmdclass['build_ext'] = build_ext
 

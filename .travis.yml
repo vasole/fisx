@@ -1,8 +1,10 @@
+dist: focal
+
 language: python
 
 matrix:
     include:
-        - python: 3.6
+        - python: 3.7
           os: linux
           env: BUILD_COMMAND=bdist_wheel
 
