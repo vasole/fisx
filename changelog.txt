@@ -1,8 +1,10 @@
 VERSION 1.2.1
 
-Provide additonal methods to simplify debugging from python.
+Provide additional methods to simplify debugging from python.
 
 Add doxygen generated documentation.
+
+Update build mechanisms
 
 VERSION 1.2.0
 
