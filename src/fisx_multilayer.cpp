@@ -218,17 +218,26 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                 std::map<std::string, double> sampleLayerComposition;
                 std::map<std::string, double>::const_iterator mapIt;
                 std::map<std::string, double>::const_iterator mapIt2;
-                // Next line does not work if material defined as a mixture of elements
-                // like Ag1 0.5, Au1 0.4, Cu1 0.10
-                // while working in case of 
-                // like Ag 0.5, Au 0.4, Cu 0.10
-                // sampleLayerComposition = (*layerPtr).getComposition(elementsLibrary);
-                // whole library has to be reworked to get compositions from elements library
-                // because layers and materials do not have the complete information
-                // replaced by next line
-                sampleLayerComposition = elementsLibrary.getComposition((*layerPtr).getMaterial().getName(), this->getMaterials());
+
+                if ((*layerPtr).hasMaterialComposition())
+                {
+                   // a material was provided
+                    sampleLayerComposition = elementsLibrary.getComposition((*layerPtr).getMaterial().getName(), \
+                                                                            this->getMaterials());
+                }
+                else
+                {
+                    // This part does not work in C++ if material defined as a mixture of elements
+                    // like Ag1 0.5, Au1 0.4, Cu1 0.10
+                    // while it works in case of 
+                    // like Ag 0.5, Au 0.4, Cu 0.10
+                    // whole library has to be reworked to get compositions from elements library
+                    // because layers and materials do not have the complete information
+                    sampleLayerComposition = (*layerPtr).getComposition(elementsLibrary);;
+                }
                 if (sampleLayerComposition.size() < 1)
                 {
+                    std::cout << (*layerPtr).getMaterial().getName() << std::endl;
                     std::cout << "sample composition empty!" << std::endl;
                 }
                 for (iPeakFamily = 0 ; iPeakFamily < sampleLayerPeakFamilies[iLayer].size(); iPeakFamily++)
