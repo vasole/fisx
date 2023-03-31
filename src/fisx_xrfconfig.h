@@ -140,6 +140,7 @@ public:
    const std::vector<TransmissionTable> & getUserBeamFilters() const {return this->userBeamFilters;};
    const std::vector<Layer> & getSample() const {return this->sample;};
    const std::vector<Layer> & getAttenuators() const {return this->attenuators;};
+   const std::vector<Material> & getMaterials() const {return this->materials;};
    const std::vector<TransmissionTable> & getUserAttenuators() const {return this->userAttenuators;};
    const Detector & getDetector() const {return this->detector;};
    const double & getAlphaIn() const {return this->alphaIn;};
