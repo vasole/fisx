@@ -160,4 +160,22 @@ std::string Material::getComment() const
     return this->comment;
 }
 
+std::ostream& operator<< (std::ostream& o, Material const & material)
+
+{
+
+    std::map<std::string, double>::const_iterator c_it;
+    std::map<std::string, double> composition;
+
+    composition = material.getComposition();
+    o << "Material: " << material.getName();
+    for(c_it = composition.begin(); c_it != composition.end(); ++c_it)
+    {
+        o << " name " << (c_it->first);
+        o << " amount " << (c_it->second);
+    }
+
+    return o;
+}
+
 } // namespace fisx

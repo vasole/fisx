@@ -56,6 +56,8 @@ public:
     Material(const std::string & materialName, const double & density = 1.0, \
              const double & thickness = 1.0, const std::string & comment = "");
 
+    friend std::ostream& operator<< (std::ostream& o, Material const & material);
+
     void setName(const std::string & name);
     void initialize(const std::string & materialName, const double & density = 1.0,\
                     const double & thickness = 1.0, const std::string & comment="");
