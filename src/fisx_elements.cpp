@@ -83,17 +83,14 @@ Elements::Elements(std::string epdl97Directory)
 Elements::Elements(std::string directoryName, short pymca)
 {
     std::string BINDING_ENERGIES="EADL97_BindingEnergies.dat";
-    std::string joinSymbol;
     std::string bindingEnergies;
     std::string crossSections;
-
-#ifdef _WIN32
-    joinSymbol = "\\";
-#elif _WIN64
-    joinSymbol = "\\";
+#if defined(_WIN32) || defined(_WIN64) || defined(__MINGW32__) || defined(__CYGWIN32__)
+    std::string joinSymbol = "\\";
 #else
-    joinSymbol = "//";
-#endif
+    std::string joinSymbol = "//";
+#endif // __WIN32
+
     // check if directoryName already ends with the joinSymbol
     if (directoryName.substr(directoryName.size() - 1, 1) == joinSymbol)
     {
