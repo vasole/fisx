@@ -313,4 +313,9 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                            useMassFractions, secondaryCalculationLimit);
 }
 
+void XRF::printConfiguration() const
+{
+    std::cout << this->getConfiguration() << std::endl;
+}
+
 } // namespace fisx

@@ -164,6 +164,11 @@ public:
     void addCollimator();
 
     /*!
+    For debugging purposes
+    */
+    void printConfiguration() const;
+
+    /*!
     Get the current configuration
     */
     const XRFConfig & getConfiguration() const;
@@ -298,6 +303,7 @@ public:
     const double & getAlphaOut() const {return this->configuration.getAlphaOut();};
     const double & getScatteringAngle() const {return this->configuration.getScatteringAngle();};
     const int & getReferenceLayer() const {return this->configuration.getReferenceLayer();};
+    const std::vector<Material> & getMaterials() const {return this->configuration.getMaterials();};
 
 private:
     /*!
