@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2018 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2023 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -218,7 +218,19 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                 std::map<std::string, double> sampleLayerComposition;
                 std::map<std::string, double>::const_iterator mapIt;
                 std::map<std::string, double>::const_iterator mapIt2;
-                sampleLayerComposition = (*layerPtr).getComposition(elementsLibrary);
+                // Next line does not work if material defined as a mixture of elements
+                // like Ag1 0.5, Au1 0.4, Cu1 0.10
+                // while working in case of 
+                // like Ag 0.5, Au 0.4, Cu 0.10
+                // sampleLayerComposition = (*layerPtr).getComposition(elementsLibrary);
+                // whole library has to be reworked to get compositions from elements library
+                // because layers and materials do not have the complete information
+                // replaced by next line
+                sampleLayerComposition = elementsLibrary.getComposition((*layerPtr).getMaterial().getName(), this->getMaterials());
+                if (sampleLayerComposition.size() < 1)
+                {
+                    std::cout << "sample composition empty!" << std::endl;
+                }
                 for (iPeakFamily = 0 ; iPeakFamily < sampleLayerPeakFamilies[iLayer].size(); iPeakFamily++)
                 {
                     iString = sampleLayerPeakFamilies[iLayer][iPeakFamily].first.find(' ');
