@@ -126,8 +126,6 @@ public:
     const double & getThickness()const {return this->thickness;};
     const double & getFunnyFactor()const {return this->funnyFactor;};
 
-    std::map<std::string, double> getComposition(const Elements & elements);
-
 private:
     std::string materialName;
     bool hasMaterial;
