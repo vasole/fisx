@@ -10,5 +10,6 @@ var classfisx_1_1_material =
     [ "initialize", "classfisx_1_1_material.html#a26d452e3efa03d0436a5a43422f49dc0", null ],
     [ "setComposition", "classfisx_1_1_material.html#a4d281545c3cf817e2cacefb7fec46d11", null ],
     [ "setComposition", "classfisx_1_1_material.html#a73465f46d09b1d30404995d8527ed567", null ],
-    [ "setName", "classfisx_1_1_material.html#a30d5bbc25e6dcd0511a8b23fd0897aab", null ]
+    [ "setName", "classfisx_1_1_material.html#a30d5bbc25e6dcd0511a8b23fd0897aab", null ],
+    [ "operator<<", "classfisx_1_1_material.html#adf6797f1f8db644a065be5ac8d4b31dd", null ]
 ];

@@ -402,6 +402,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                     {
                         elementMassFraction = sampleLayerComposition[elementName];
                     }
+                    std::cout << "Element " << elementName << " massFraction " << elementMassFraction << std::endl;
                 }
                 if (useMassFractions)
                 {
@@ -1101,7 +1102,8 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
             }
         }
     }
-    this->lastMultilayerFluorescence = actualResult;
+    this->printConfiguration();
+    // this->lastMultilayerFluorescence = actualResult;
     return actualResult;
 }
 

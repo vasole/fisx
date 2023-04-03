@@ -129,6 +129,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>setRefenceLayer</b> (
 <tr class="memitem:ac3b05df02151a3517ece19df1dbf0341"><td class="memItemLeft" align="right" valign="top"><a id="ac3b05df02151a3517ece19df1dbf0341"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>addCollimator</b> ()</td></tr>
 <tr class="separator:ac3b05df02151a3517ece19df1dbf0341"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a13d2c68d5c05ebed73ce004df64edade"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfisx_1_1_x_r_f.html#a13d2c68d5c05ebed73ce004df64edade">printConfiguration</a> () const</td></tr>
+<tr class="separator:a13d2c68d5c05ebed73ce004df64edade"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a86232b58dfa24fd5647324bd97ffceab"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classfisx_1_1_x_r_f_config.html">XRFConfig</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfisx_1_1_x_r_f.html#a86232b58dfa24fd5647324bd97ffceab">getConfiguration</a> () const</td></tr>
 <tr class="separator:a86232b58dfa24fd5647324bd97ffceab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afca224a6e53888926a0e509a74e86091"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfisx_1_1_x_r_f.html#afca224a6e53888926a0e509a74e86091">setConfiguration</a> (const <a class="el" href="classfisx_1_1_x_r_f_config.html">XRFConfig</a> &amp;configuration)</td></tr>
@@ -173,6 +175,21 @@ const double &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>getScat
 <tr class="memitem:ad44f6a938aa5fb4a0515a9178a076bd8"><td class="memItemLeft" align="right" valign="top"><a id="ad44f6a938aa5fb4a0515a9178a076bd8"></a>
 const int &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>getReferenceLayer</b> () const</td></tr>
 <tr class="separator:ad44f6a938aa5fb4a0515a9178a076bd8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a36c2eb26ad24992823c85c61fd952777"><td class="memItemLeft" align="right" valign="top"><a id="a36c2eb26ad24992823c85c61fd952777"></a>
+const std::vector&lt; <a class="el" href="classfisx_1_1_material.html">Material</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>getMaterials</b> () const</td></tr>
+<tr class="separator:a36c2eb26ad24992823c85c61fd952777"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a37a834e0d31cde555cb72e2ec0867344"><td class="memItemLeft" align="right" valign="top">std::map&lt; std::string, double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfisx_1_1_x_r_f.html#a37a834e0d31cde555cb72e2ec0867344">getLayerComposition</a> (const <a class="el" href="classfisx_1_1_layer.html">Layer</a> &amp;layer, const <a class="el" href="classfisx_1_1_elements.html">Elements</a> &amp;elements) const</td></tr>
+<tr class="separator:a37a834e0d31cde555cb72e2ec0867344"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a17b4709fe0e1fafb438d49aa5da0fe5f"><td class="memItemLeft" align="right" valign="top">std::map&lt; std::string, double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfisx_1_1_x_r_f.html#a17b4709fe0e1fafb438d49aa5da0fe5f">getLayerMassAttenuationCoefficients</a> (const <a class="el" href="classfisx_1_1_layer.html">Layer</a> &amp;layer, const double &amp;energy, const <a class="el" href="classfisx_1_1_elements.html">Elements</a> &amp;elements) const</td></tr>
+<tr class="separator:a17b4709fe0e1fafb438d49aa5da0fe5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad53f865884b51b77246b976bd43350f5"><td class="memItemLeft" align="right" valign="top">std::map&lt; std::string, std::vector&lt; double &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfisx_1_1_x_r_f.html#ad53f865884b51b77246b976bd43350f5">getLayerMassAttenuationCoefficients</a> (const <a class="el" href="classfisx_1_1_layer.html">Layer</a> &amp;layer, const std::vector&lt; double &gt; &amp;energies, const <a class="el" href="classfisx_1_1_elements.html">Elements</a> &amp;elements) const</td></tr>
+<tr class="separator:ad53f865884b51b77246b976bd43350f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8f3566b48f6202d632ff825d5a40a203"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfisx_1_1_x_r_f.html#a8f3566b48f6202d632ff825d5a40a203">getLayerTransmission</a> (const <a class="el" href="classfisx_1_1_layer.html">Layer</a> &amp;layer, const double &amp;energy, const <a class="el" href="classfisx_1_1_elements.html">Elements</a> &amp;elements, const double &amp;angle=90.0) const</td></tr>
+<tr class="separator:a8f3566b48f6202d632ff825d5a40a203"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac7f8b91d4f8c6d041c593596f115916a"><td class="memItemLeft" align="right" valign="top">std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfisx_1_1_x_r_f.html#ac7f8b91d4f8c6d041c593596f115916a">getLayerTransmission</a> (const <a class="el" href="classfisx_1_1_layer.html">Layer</a> &amp;layer, const std::vector&lt; double &gt; &amp;energy, const <a class="el" href="classfisx_1_1_elements.html">Elements</a> &amp;elements, const double &amp;angle=90.0) const</td></tr>
+<tr class="separator:ac7f8b91d4f8c6d041c593596f115916a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ade5b1d6bf32298b446ae321bc010e5a1"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::pair&lt; std::string, double &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfisx_1_1_x_r_f.html#ade5b1d6bf32298b446ae321bc010e5a1">getLayerPeakFamilies</a> (const <a class="el" href="classfisx_1_1_layer.html">Layer</a> &amp;layer, const double &amp;energy, const <a class="el" href="classfisx_1_1_elements.html">Elements</a> &amp;elements) const</td></tr>
+<tr class="separator:ade5b1d6bf32298b446ae321bc010e5a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a7fe67d54e1e7f3c1d28c1c8552a72c2c"></a>
@@ -382,6 +399,222 @@ const int &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>getReferen
       </table>
 </div><div class="memdoc">
 <p>Get geometric efficiency term. Solid angle subtended by the detector at the sample divided by 4 * pi </p>
+
+</div>
+</div>
+<a id="a37a834e0d31cde555cb72e2ec0867344"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a37a834e0d31cde555cb72e2ec0867344">&sect;&nbsp;</a></span>getLayerComposition()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::map&lt; std::string, double &gt; fisx::XRF::getLayerComposition </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classfisx_1_1_layer.html">Layer</a> &amp;&#160;</td>
+          <td class="paramname"><em>layer</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classfisx_1_1_elements.html">Elements</a> &amp;&#160;</td>
+          <td class="paramname"><em>elements</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Get the layer composition either from internal material or from name. In the later case the elements instance is not used. </p>
+
+</div>
+</div>
+<a id="a17b4709fe0e1fafb438d49aa5da0fe5f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a17b4709fe0e1fafb438d49aa5da0fe5f">&sect;&nbsp;</a></span>getLayerMassAttenuationCoefficients() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::map&lt; std::string, double &gt; fisx::XRF::getLayerMassAttenuationCoefficients </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classfisx_1_1_layer.html">Layer</a> &amp;&#160;</td>
+          <td class="paramname"><em>layer</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const double &amp;&#160;</td>
+          <td class="paramname"><em>energy</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classfisx_1_1_elements.html">Elements</a> &amp;&#160;</td>
+          <td class="paramname"><em>elements</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Get the layer mass attenuation coefficients transmission at the given energy using the elements library supplied but accounting for the materials defined in the configuration. If the layer material is not defined or cannot be handled, it will throw the relevant error. </p>
+
+</div>
+</div>
+<a id="ad53f865884b51b77246b976bd43350f5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad53f865884b51b77246b976bd43350f5">&sect;&nbsp;</a></span>getLayerMassAttenuationCoefficients() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::map&lt; std::string, std::vector&lt; double &gt; &gt; fisx::XRF::getLayerMassAttenuationCoefficients </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classfisx_1_1_layer.html">Layer</a> &amp;&#160;</td>
+          <td class="paramname"><em>layer</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; double &gt; &amp;&#160;</td>
+          <td class="paramname"><em>energies</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classfisx_1_1_elements.html">Elements</a> &amp;&#160;</td>
+          <td class="paramname"><em>elements</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Get the layer mass attenuation coefficients transmission at the given energies using the elements library supplied but accounting for the materials defined in the configuration. If a material is not defined or cannot be handled, it will throw the relevant error. </p>
+
+</div>
+</div>
+<a id="ade5b1d6bf32298b446ae321bc010e5a1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ade5b1d6bf32298b446ae321bc010e5a1">&sect;&nbsp;</a></span>getLayerPeakFamilies()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt; std::pair&lt; std::string, double &gt; &gt; fisx::XRF::getLayerPeakFamilies </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classfisx_1_1_layer.html">Layer</a> &amp;&#160;</td>
+          <td class="paramname"><em>layer</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const double &amp;&#160;</td>
+          <td class="paramname"><em>energy</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classfisx_1_1_elements.html">Elements</a> &amp;&#160;</td>
+          <td class="paramname"><em>elements</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Get the emitted peak families from a layer given an energy and a reference to an elements library. It uses the supplied <a class="el" href="classfisx_1_1_elements.html" title="Class handling the physical properties. ">Elements</a> library accounting for the materials defined in the configuration. It returns an ordered vector of pairs. The first element is the peak family ("Si K", "Pb L1", ...) and the second the binding energy. </p>
+
+</div>
+</div>
+<a id="a8f3566b48f6202d632ff825d5a40a203"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8f3566b48f6202d632ff825d5a40a203">&sect;&nbsp;</a></span>getLayerTransmission() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double fisx::XRF::getLayerTransmission </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classfisx_1_1_layer.html">Layer</a> &amp;&#160;</td>
+          <td class="paramname"><em>layer</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const double &amp;&#160;</td>
+          <td class="paramname"><em>energy</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classfisx_1_1_elements.html">Elements</a> &amp;&#160;</td>
+          <td class="paramname"><em>elements</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const double &amp;&#160;</td>
+          <td class="paramname"><em>angle</em> = <code>90.0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Get the layer transmissions at the given energy using the elements library supplied but accounting for the materials defined in the configuration. If a material is not defined or cannot be handled, it will throw the relevant error. </p>
+
+</div>
+</div>
+<a id="ac7f8b91d4f8c6d041c593596f115916a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac7f8b91d4f8c6d041c593596f115916a">&sect;&nbsp;</a></span>getLayerTransmission() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt; double &gt; fisx::XRF::getLayerTransmission </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classfisx_1_1_layer.html">Layer</a> &amp;&#160;</td>
+          <td class="paramname"><em>layer</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; double &gt; &amp;&#160;</td>
+          <td class="paramname"><em>energy</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classfisx_1_1_elements.html">Elements</a> &amp;&#160;</td>
+          <td class="paramname"><em>elements</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const double &amp;&#160;</td>
+          <td class="paramname"><em>angle</em> = <code>90.0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Get the layer transmissions at the given energies using the elements library supplied but accounting for the materials defined in the configuration. If a material is not defined or cannot be handled, it will throw the relevant error. </p>
 
 </div>
 </div>
@@ -602,6 +835,24 @@ const int &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>getReferen
 </table>
 </div><div class="memdoc">
 <p>Get the user beam filters to be applied </p>
+
+</div>
+</div>
+<a id="a13d2c68d5c05ebed73ce004df64edade"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a13d2c68d5c05ebed73ce004df64edade">&sect;&nbsp;</a></span>printConfiguration()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void fisx::XRF::printConfiguration </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>For debugging purposes </p>
 
 </div>
 </div>
@@ -1007,7 +1258,7 @@ const int &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>getReferen
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>fisx</b></li><li class="navelem"><a class="el" href="classfisx_1_1_x_r_f.html">XRF</a></li>
-    <li class="footer">Generated on Wed Aug 3 2022 18:43:22 for fisx by
+    <li class="footer">Generated on Mon Apr 3 2023 17:43:44 for fisx by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.12 </li>
   </ul>
