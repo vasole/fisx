@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2022 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2023 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -381,6 +381,15 @@ public:
     */
     std::map<std::string, double> getComposition(const std::string & name, \
                                                  const std::vector<Material> & materials) const;
+
+    /*!
+    Try to interpret a composition (in terms of map of strings representing elements, chemical formulas or material names)
+    and mass fractions using the supplied supplied list of materials.
+    It returns the composition in terms of elements and mass fractions.
+    In case of failure, it returns an empty map.
+    */
+    std::map<std::string, double> getComposition(const std::map<std::string, double> & composition, \
+                                                 const std::vector<Material> & materials = std::vector<Material>()) const;
 
     /*!
     Try to parse a given string as a formula, returning the associated number of "atoms"

@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2022 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2023 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -1376,6 +1376,44 @@ std::map<std::string, double> Elements::getComposition(const std::string & name)
             }
             result[c_it2->first] += composition[c_it2->first] * tmpResult[c_it->first];
         }
+    }
+    return result;
+}
+
+std::map<std::string, double> Elements::getComposition(const std::map<std::string, double> & inputComposition, \
+                                                       const std::vector<Material> & additionalMaterials) const
+{
+    std::map<std::string, double>::const_iterator c_it, c_it2;
+    std::map<std::string, double> tmpComposition;
+    std::map<std::string, double> result;
+    double total;
+
+    for (c_it = inputComposition.begin(); c_it != inputComposition.end(); ++c_it)
+    {
+        tmpComposition = this->getComposition(c_it->first, additionalMaterials);
+        if (tmpComposition.size() < 1)
+        {
+            return tmpComposition;
+        }
+        for (c_it2 = tmpComposition.begin(); c_it2 != tmpComposition.end(); ++c_it2)
+        {
+            if (result.find(c_it2->first) == result.end())
+            {
+                result[c_it2->first] = 0.0;
+            }
+            result[c_it2->first] += c_it2->second * c_it->second;
+        }
+    }
+
+    // make sure that everything is normalized (not warranted from input composition)
+    total = 0;
+    for (c_it = result.begin(); c_it != result.end(); ++c_it)
+    {
+        total += c_it->second;
+    }
+    for (c_it = result.begin(); c_it != result.end(); ++c_it)
+    {
+        result[c_it->first] /= total;
     }
     return result;
 }
