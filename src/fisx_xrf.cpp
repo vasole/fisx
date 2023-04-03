@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2020 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2023 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -33,6 +33,7 @@
 #include <iostream>
 #include <sstream>
 #include <iomanip>
+#include <algorithm>
 
 namespace fisx
 {
@@ -259,6 +260,116 @@ const XRFConfig & XRF::getConfiguration() const
     return this->configuration;
 
 }
+
+std::map<std::string, double> XRF::getLayerComposition(const Layer & layer, const Elements & elements) const
+{
+    std::map <std::string, double> composition;
+    Material layerMaterial;
+
+    if (layer.hasMaterialComposition())
+    {
+        // It has an actual material with the composition. However, the name of the material can be unset
+        // and one cannot simply use its name via the line commented below.
+        // return elements.getComposition(layer.getMaterialName(), this->getMaterials());
+        return elements.getComposition(layer.getMaterial().getComposition(), this->getMaterials());
+    }
+    else
+    {
+        // It has a material name, element or formula as composition
+        return elements.getComposition(layer.getMaterialName(), this->getMaterials());
+    }
+}
+
+std::map<std::string, double> XRF::getLayerMassAttenuationCoefficients(const Layer & layer,
+                                                                       const double & energy,
+                                                                       const Elements & elements) const
+{
+    // the call to getLayerComposition already took care of the list of defined elements
+    return elements.getMassAttenuationCoefficients(this->getLayerComposition(layer, elements), energy);
+}
+
+std::map<std::string, std::vector<double> > XRF::getLayerMassAttenuationCoefficients(const Layer & layer,
+                                                                       const std::vector<double> & energy,
+                                                                       const Elements & elements) const
+{
+    // the call to getLayerComposition already took care of the list of defined elements
+    return elements.getMassAttenuationCoefficients(this->getLayerComposition(layer, elements), energy);
+}
+
+double XRF::getLayerTransmission(const Layer & layer,
+                                 const double & energy,
+                                 const Elements & elements,
+                                 const double & angle) const
+{
+    std::vector<double> energies;
+
+    energies.resize(0);
+    energies.push_back(energy);
+    return this->getLayerTransmission(layer, energies, elements, angle)[0];
+}
+
+std::vector<double> XRF::getLayerTransmission(const Layer & layer,
+                                             const std::vector<double> & energy,
+                                             const Elements & elements,
+                                             const double & angle) const
+{
+    const double PI = std::acos(-1.0);
+    std::vector<double>::size_type i;
+    std::vector<double> tmpDoubleVector;
+    double tmpDouble;
+
+    if (angle == 90.0)
+    {
+        tmpDouble = layer.getDensity() * layer.getThickness();
+    }
+    else
+    {
+        if (angle < 0)
+            tmpDouble = std::sin(-angle * PI / 180.);
+        else
+            tmpDouble = std::sin(angle * PI / 180.);
+        tmpDouble = layer.getDensity() * layer.getThickness() / tmpDouble;
+    }
+
+    if(tmpDouble <= 0.0)
+    {
+        std::string msg;
+        msg = "Layer " + layer.getName() + " thickness is " + elements.toString(tmpDouble) + " g/cm2";
+        throw std::runtime_error( msg );
+    }
+
+    tmpDoubleVector = this->getLayerMassAttenuationCoefficients(layer, energy, elements)["total"];
+
+    for (i = 0; i < tmpDoubleVector.size(); i++)
+    {
+        tmpDoubleVector[i] = (1.0 - layer.getFunnyFactor()) + \
+                              (layer.getFunnyFactor() * exp(-(tmpDouble * tmpDoubleVector[i])));
+    }
+    return tmpDoubleVector;
+}
+
+std::vector<std::pair<std::string, double> > XRF::getLayerPeakFamilies(const Layer & layer,
+                                                                      const double & energy,
+                                                                      const Elements & elements) const
+{
+    std::map<std::string, double> composition;
+    std::vector<std::string> elementsList;
+    std::map<std::string, double>::const_iterator c_it;
+
+    composition = this->getLayerComposition(layer, elements);
+
+    for(c_it = composition.begin(); c_it != composition.end(); ++c_it)
+    {
+        if (std::find(elementsList.begin(), elementsList.end(), c_it->first) == elementsList.end())
+        {
+            elementsList.push_back(c_it->first);
+        }
+    }
+
+    return elements.getPeakFamilies(elementsList, energy);
+
+}
+
 
 std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, double> > > > \
                 XRF::getMultilayerFluorescence(const std::vector<std::string> & elementFamilyLayer, \

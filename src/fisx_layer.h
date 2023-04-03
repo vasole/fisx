@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2016 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2023 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -54,7 +54,7 @@ public:
 
     void setMaterial(const Material & material);
 
-    std::string name;
+    const std::string & getName()const {return this->name;};
 
     /*!
     Get the layer composition either from internal material or from name.
@@ -127,6 +127,7 @@ public:
     const double & getFunnyFactor()const {return this->funnyFactor;};
 
 private:
+    std::string name;
     std::string materialName;
     bool hasMaterial;
     Material material;

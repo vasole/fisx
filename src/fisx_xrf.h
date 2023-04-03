@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2020 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2023 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -317,14 +317,6 @@ public:
     std::map<std::string, double> getLayerComposition(const Layer & layer, const Elements & elements) const;
 
     /*!
-    Get the layer transmission at the given energy using the elements library
-    supplied.
-    If the material is not defined or cannot be handled, it will throw the
-    relevant error.
-    */
-    double getLayerTransmission(const Layer & layer, const double & energy, const Elements & elements, const double & angle = 90.0) const;
-
-    /*!
     Get the layer mass attenuation coefficients transmission at the given energy using the elements library
     supplied but accounting for the materials defined in the configuration.
     If the layer material is not defined or cannot be handled, it will throw the
@@ -345,7 +337,13 @@ public:
                                                                 const Layer & layer,
                                                                 const std::vector<double> & energies,
                                                                 const Elements & elements) const;
-
+    /*!
+    Get the layer transmissions at the given energy using the elements library
+    supplied but accounting for the materials defined in the configuration.
+    If a material is not defined or cannot be handled, it will throw the
+    relevant error.
+    */
+    double getLayerTransmission(const Layer & layer, const double & energy, const Elements & elements, const double & angle = 90.0) const;
 
     /*!
     Get the layer transmissions at the given energies using the elements library
