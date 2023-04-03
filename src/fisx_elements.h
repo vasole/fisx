@@ -399,7 +399,7 @@ public:
                             const std::vector<double> & weights = std::vector<double>()) const;
 
     /*!
-    Given an energy and its (optional) weight, for the specfified element, this method returns
+    Given an energy and its (optional) weight, for the specified element, this method returns
     the emitted X-ray already corrected for cascade and fluorescence yield.
     It is the equivalent of the excitation factor in D.K.G. de Boer's paper.
     */
