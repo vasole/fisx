@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2020 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2023 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -135,12 +135,12 @@ void XRFConfig::readConfigurationFromFile(const std::string & fileName)
     if (intVector.size() == 0)
     {
         intVector.resize(mapDoubles["energy"].size());
-        std::fill(intVector.begin(), intVector.end(), 1.0);
+        std::fill(intVector.begin(), intVector.end(), 1);
     }
     if (flagVector.size() == 0)
     {
         flagVector.resize(mapDoubles["energy"].size());
-        std::fill(flagVector.begin(), flagVector.end(), 1.0);
+        std::fill(flagVector.begin(), flagVector.end(), 1);
     }
 
     counter = 0;
