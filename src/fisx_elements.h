@@ -612,7 +612,7 @@ private:
                                         const double & thickness) const;
 
     struct sortVectorOfExcited {
-        bool operator()(const std::pair<std::string, double> &left, const std::pair<std::string,int> &right) {
+        bool operator()(const std::pair<std::string, double> &left, const std::pair<std::string, double> &right) {
         return left.second < right.second;
     }
 };

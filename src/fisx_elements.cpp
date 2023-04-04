@@ -310,7 +310,7 @@ void Elements::addElement(const Element & element)
     }
     else
     {
-        this->elementDict[name] = this->elementList.size();
+        this->elementDict[name] = (int) this->elementList.size();
         this->elementList.push_back(element);
     }
 }
@@ -1605,9 +1605,9 @@ std::map<std::string, double> Elements::parseFormula(const std::string & formula
     std::map<std::string, double>::iterator it;
     std::string::size_type i, p1, p2, length;
     std::string::const_iterator c_it;
-    std::vector<int> openParenthesis;
-    std::vector<int> closeParenthesis;
-    std::vector<int>::size_type nParenthesis;
+    std::vector<std::string::size_type> openParenthesis;
+    std::vector<std::string::size_type> closeParenthesis;
+    std::vector<std::string::size_type>::size_type nParenthesis;
     std::string newFormula;
     bool parsingKey;
     std::string lastKey;
@@ -2100,7 +2100,6 @@ const std::vector<Material>::size_type Elements::getMaterialIndexFromName(const 
 {
     std::vector<Material>::size_type i;
 
-    this->materialList.begin();
     for (i = 0; i < this->materialList.size(); i++)
     {
         if(this->materialList[i].getName() == name)
