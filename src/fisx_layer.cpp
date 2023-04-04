@@ -90,21 +90,14 @@ bool Layer::hasMaterialComposition() const
 std::map<std::string, double> Layer::getMassAttenuationCoefficients(const double & energy, \
                                                 const Elements & elements) const
 {
-    if (this->hasMaterial)
-    {
-        return elements.getMassAttenuationCoefficients(this->material.getComposition(), energy);
-    }
-    else
-    {
-        return elements.getMassAttenuationCoefficients(this->materialName, energy);
-    }
+    return elements.getMassAttenuationCoefficients(this->getComposition(elements), energy);
 }
 
-std::map<std::string, double> Layer::getComposition(const Elements & elements)
+std::map<std::string, double> Layer::getComposition(const Elements & elements) const
 {
     if (this->hasMaterial)
     {
-        return this->material.getComposition();
+        return elements.getComposition(this->material.getComposition());
     }
     else
     {
@@ -116,26 +109,7 @@ std::map<std::string, std::vector<double> > Layer::getMassAttenuationCoefficient
                                                    const std::vector<double> & energy, \
                                                    const Elements & elements) const
 {
-    if (this->hasMaterial)
-    {
-        return elements.getMassAttenuationCoefficients(this->material.getComposition(), energy);
-    }
-    else
-    {
-        return elements.getMassAttenuationCoefficients(this->materialName, energy);
-    }
-}
-
-std::map<std::string, double> Layer::getComposition(const Elements & elements) const
-{
-    if (this->hasMaterial)
-    {
-        return this->material.getComposition();
-    }
-    else
-    {
-        return elements.getComposition(this->materialName);
-    }
+    return elements.getMassAttenuationCoefficients(this->getComposition(elements), energy);
 }
 
 double Layer::getTransmission(const double & energy, const Elements & elements, const double & angle) const

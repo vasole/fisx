@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2020 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2023 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -56,7 +56,7 @@ cdef class PyLayer:
         Given a reference to an elements library, it gives back a dictionary where the keys are the
         elements and the values the mass fractions.
         """
-        return self.thisptr.getComposition(deref(elementsLib.thisptr))
+        return toStringKeys(self.thisptr.getComposition(deref(elementsLib.thisptr)))
 
     def getTransmission(self, energies, PyElements elementsLib, double angle=90.):
         """
@@ -81,9 +81,9 @@ cdef class PyLayer:
         """
         getPeakFamilies(energy, ElementsLibraryInstance)
 
-        Given an energy and a reference to an elements library return dictionarys.
-        The key is the peak family ("Si K", "Pb L1", ...) and the value the binding energy.
+        Given an energy and a reference to an elements library return a list of pairs.
+        First is the peak family ("Si K", "Pb L1", ...) and second the value the binding energy.
         """
         tmpResult = self.thisptr.getPeakFamilies(energy, deref(elementsLib.thisptr))
-        return sorted(tmpResult, key=itemgetter(1))
+        return [(toString(x[0]), x[1]) for x in sorted(tmpResult, key=itemgetter(1))]
 

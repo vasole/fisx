@@ -20,6 +20,7 @@ var classfisx_1_1_elements =
     [ "getColumn", "classfisx_1_1_elements.html#a748f5a6f194ba1f07fbc2609774783a4", null ],
     [ "getComposition", "classfisx_1_1_elements.html#a954a8dba31072874bc3ac603a90c6e5a", null ],
     [ "getComposition", "classfisx_1_1_elements.html#a9b5072dc3ce75afd7399f31e01f9c6ef", null ],
+    [ "getComposition", "classfisx_1_1_elements.html#a10fbecc97408d83c15ab13a24a1090d4", null ],
     [ "getCompositionFromFormula", "classfisx_1_1_elements.html#ae918579951f5de45dfe03ee4e004b923", null ],
     [ "getDensity", "classfisx_1_1_elements.html#afae43989086a9e06e3a323059841f2f8", null ],
     [ "getElement", "classfisx_1_1_elements.html#a4dc477417827a0b687000e2c80ef9225", null ],

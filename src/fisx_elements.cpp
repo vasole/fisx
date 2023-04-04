@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2022 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2023 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -83,17 +83,14 @@ Elements::Elements(std::string epdl97Directory)
 Elements::Elements(std::string directoryName, short pymca)
 {
     std::string BINDING_ENERGIES="EADL97_BindingEnergies.dat";
-    std::string joinSymbol;
     std::string bindingEnergies;
     std::string crossSections;
-
-#ifdef _WIN32
-    joinSymbol = "\\";
-#elif _WIN64
-    joinSymbol = "\\";
+#if defined(_WIN32) || defined(_WIN64) || defined(__MINGW32__) || defined(__CYGWIN32__)
+    std::string joinSymbol = "\\";
 #else
-    joinSymbol = "//";
-#endif
+    std::string joinSymbol = "//";
+#endif // __WIN32
+
     // check if directoryName already ends with the joinSymbol
     if (directoryName.substr(directoryName.size() - 1, 1) == joinSymbol)
     {
@@ -313,7 +310,7 @@ void Elements::addElement(const Element & element)
     }
     else
     {
-        this->elementDict[name] = this->elementList.size();
+        this->elementDict[name] = (int) this->elementList.size();
         this->elementList.push_back(element);
     }
 }
@@ -1383,6 +1380,44 @@ std::map<std::string, double> Elements::getComposition(const std::string & name)
     return result;
 }
 
+std::map<std::string, double> Elements::getComposition(const std::map<std::string, double> & inputComposition, \
+                                                       const std::vector<Material> & additionalMaterials) const
+{
+    std::map<std::string, double>::const_iterator c_it, c_it2;
+    std::map<std::string, double> tmpComposition;
+    std::map<std::string, double> result;
+    double total;
+
+    for (c_it = inputComposition.begin(); c_it != inputComposition.end(); ++c_it)
+    {
+        tmpComposition = this->getComposition(c_it->first, additionalMaterials);
+        if (tmpComposition.size() < 1)
+        {
+            return tmpComposition;
+        }
+        for (c_it2 = tmpComposition.begin(); c_it2 != tmpComposition.end(); ++c_it2)
+        {
+            if (result.find(c_it2->first) == result.end())
+            {
+                result[c_it2->first] = 0.0;
+            }
+            result[c_it2->first] += c_it2->second * c_it->second;
+        }
+    }
+
+    // make sure that everything is normalized (not warranted from input composition)
+    total = 0;
+    for (c_it = result.begin(); c_it != result.end(); ++c_it)
+    {
+        total += c_it->second;
+    }
+    for (c_it = result.begin(); c_it != result.end(); ++c_it)
+    {
+        result[c_it->first] /= total;
+    }
+    return result;
+}
+
 std::map<std::string, double> Elements::getComposition(const std::string & name, \
                                                  const std::vector<Material> & additionalMaterials) const
 {
@@ -1570,9 +1605,9 @@ std::map<std::string, double> Elements::parseFormula(const std::string & formula
     std::map<std::string, double>::iterator it;
     std::string::size_type i, p1, p2, length;
     std::string::const_iterator c_it;
-    std::vector<int> openParenthesis;
-    std::vector<int> closeParenthesis;
-    std::vector<int>::size_type nParenthesis;
+    std::vector<std::string::size_type> openParenthesis;
+    std::vector<std::string::size_type> closeParenthesis;
+    std::vector<std::string::size_type>::size_type nParenthesis;
     std::string newFormula;
     bool parsingKey;
     std::string lastKey;
@@ -2065,7 +2100,6 @@ const std::vector<Material>::size_type Elements::getMaterialIndexFromName(const 
 {
     std::vector<Material>::size_type i;
 
-    this->materialList.begin();
     for (i = 0; i < this->materialList.size(); i++)
     {
         if(this->materialList[i].getName() == name)

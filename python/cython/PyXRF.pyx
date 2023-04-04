@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2020 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2023 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -50,8 +50,11 @@ cdef class PyXRF:
     def __dealloc__(self):
         del self.thisptr
 
-    def readConfigurationFromFile(self, std_string fileName):
-        self.thisptr.readConfigurationFromFile(fileName)
+    def readConfigurationFromFile(self, fileName):
+        """
+        Read the configuration from a PyMca .cfg ot .fit file
+        """
+        self.thisptr.readConfigurationFromFile(toBytes(fileName))
 
     def setBeam(self, energies, weights=None, characteristic=None, divergency=None):
         if not hasattr(energies, "__len__"):
@@ -89,7 +92,10 @@ cdef class PyXRF:
         """
         cdef std_vector[Layer] container
         if len(layerList):
-            if len(layerList[0]) == 4:
+            if isinstance(layerList[0], PyLayer):
+                for layer in layerList:
+                    self._addLayerToLayerVector(layer, container)
+            elif len(layerList[0]) == 4:
                 for name, density, thickness, funny in layerList:
                     container.push_back(Layer(toBytes(name), density, thickness, funny))
             else:
@@ -104,7 +110,7 @@ cdef class PyXRF:
         """
         self._fillTransmissionTable(pyTransmissionTableList, "filter")
 
-    def _fillTransmissionTable(self, pyTransmissionTableList, function):        
+    def _fillTransmissionTable(self, pyTransmissionTableList, function):
         if function not in ["filter", "attenuator"]:
             raise ValueError("Please specify usage as filter or as attenuator")
         if len(pyTransmissionTableList):
@@ -155,12 +161,16 @@ cdef class PyXRF:
         Unless you know what you are doing, the funny factors must be 1.0
         """
         cdef std_vector[Layer] container
-        if len(layerList[0]) == 4:
-            for name, density, thickness, funny in layerList:
-                container.push_back(Layer(toBytes(name), density, thickness, funny))
-        else:
-            for name, density, thickness in layerList:
-                container.push_back(Layer(toBytes(name), density, thickness, 1.0))
+        if len(layerList):
+            if isinstance(layerList[0], PyLayer):
+                for layer in layerList:
+                    self._addLayerToLayerVector(layer, container)
+            elif len(layerList[0]) == 4:
+                for name, density, thickness, funny in layerList:
+                    container.push_back(Layer(toBytes(name), density, thickness, funny))
+            else:
+                for name, density, thickness in layerList:
+                    container.push_back(Layer(toBytes(name), density, thickness, 1.0))
         self.thisptr.setSample(container, referenceLayer)
 
 
@@ -175,13 +185,20 @@ cdef class PyXRF:
         Unless you know what you are doing, the funny factors must be 1.0
         """
         cdef std_vector[Layer] container
-        if len(layerList[0]) == 4:
-            for name, density, thickness, funny in layerList:
-                container.push_back(Layer(toBytes(name), density, thickness, funny))
-        else:
-            for name, density, thickness in layerList:
-                container.push_back(Layer(toBytes(name), density, thickness, 1.0))
-        self.thisptr.setAttenuators(container)
+        if len(layerList):
+            if isinstance(layerList[0], PyLayer):
+                for layer in layerList:
+                    self._addLayerToLayerVector(layer, container)
+            elif len(layerList[0]) == 4:
+                for name, density, thickness, funny in layerList:
+                    container.push_back(Layer(toBytes(name), density, thickness, funny))
+            else:
+                for name, density, thickness in layerList:
+                    container.push_back(Layer(toBytes(name), density, thickness, 1.0))
+        return self.thisptr.setAttenuators(container)
+
+    cdef void _addLayerToLayerVector(self, PyLayer layer, std_vector[Layer]& container):
+        container.push_back(deref(layer.thisptr))
 
     def setUserAttenuators(self, pyTransmissionTableList):
         """
@@ -201,6 +218,75 @@ cdef class PyXRF:
             self.thisptr.setGeometry(alphaIn, alphaOut, alphaIn + alphaOut)
         else:
             self.thisptr.setGeometry(alphaIn, alphaOut, scatteringAngle)
+
+    def getLayerComposition(self, PyLayer layerInstance, PyElements elementsLibrary):
+        return toStringKeys(self.thisptr.getLayerComposition(deref(layerInstance.thisptr),
+                                                deref(elementsLibrary.thisptr)))
+
+    def getLayerMassAttenuationCoefficients(self, PyLayer layerInstance, energies, \
+                                            PyElements elementsLibrary):
+        if not hasattr(energies, "__len__"):
+            return toStringKeys(self._getLayerMassAttenuationCoefficientsSingle( \
+                                    layerInstance, \
+                                    energies, elementsLibrary))
+        else:
+            return toStringKeys(self._getLayerMassAttenuationCoefficientsMultiple( \
+                                    layerInstance,
+                                    energies,
+                                    elementsLibrary))
+
+    def _getLayerMassAttenuationCoefficientsSingle(self, PyLayer layerInstance, \
+                                            double energy, \
+                                            PyElements elementsLibrary):
+        return self.thisptr.getLayerMassAttenuationCoefficients( \
+                                    deref(layerInstance.thisptr), \
+                                    energy, deref(elementsLibrary.thisptr))
+
+    def _getLayerMassAttenuationCoefficientsMultiple(self, PyLayer layerInstance, \
+                                            std_vector[double] energies, \
+                                            PyElements elementsLibrary):
+
+        return self.thisptr.getLayerMassAttenuationCoefficients( \
+                                    deref(layerInstance.thisptr), \
+                                    energies, deref(elementsLibrary.thisptr))
+
+    def getLayerTransmission(self, PyLayer layerInstance, energies, \
+                             PyElements elementsLibrary, angle=90.):
+        if not hasattr(energies, "__len__"):
+            return self._getLayerTransmissionSingle( \
+                                    layerInstance, \
+                                    energies, \
+                                    elementsLibrary, \
+                                    angle)
+        else:
+            return self._getLayerTransmissionMultiple( \
+                                    layerInstance, \
+                                    energies, \
+                                    elementsLibrary, \
+                                    angle)
+
+    def _getLayerTransmissionSingle(self, PyLayer layerInstance, double energy, \
+                             PyElements elementsLibrary, double angle):
+        return self.thisptr.getLayerTransmission( \
+                                    deref(layerInstance.thisptr), \
+                                    energy, \
+                                    deref(elementsLibrary.thisptr), \
+                                    angle)
+
+    def _getLayerTransmissionMultiple(self, PyLayer layerInstance, \
+                             std_vector[double] energies, \
+                             PyElements elementsLibrary, double angle):
+        return self.thisptr.getLayerTransmission( \
+                                    deref(layerInstance.thisptr), \
+                                    energies, \
+                                    deref(elementsLibrary.thisptr), \
+                                    angle)
+
+    def getLayerPeakFamilies(self, PyLayer layerInstance, double energy, \
+                             PyElements elementsLibrary):
+        return toStringKeys(self.thisptr.getLayerPeakFamilies( \
+                                    deref(layerInstance.thisptr), \
+                                    energy, deref(elementsLibrary.thisptr)))
 
     def getMultilayerFluorescence(self, elementFamilyLayer, PyElements elementsLibrary, \
                             int secondary = 0, int useGeometricEfficiency = 1, int useMassFractions = 0, \

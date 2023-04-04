@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2020 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2023 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -1673,7 +1673,7 @@ void Element::emptyCascadeCache()
 
 int Element::isCascadeCacheFilled() const
 {
-    return this->cascadeCache.size();
+    return (int) this->cascadeCache.size();
 }
 
 void Element::setCacheEnabled(const int & flag)
@@ -1782,7 +1782,7 @@ void Element::updateCache(const std::vector< double> & energy)
 
 int Element::getCacheSize() const
 {
-    return this->muCache.size();
+    return (int) this->muCache.size();
 }
 
 } // namespace fisx

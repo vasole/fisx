@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2018 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2023 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -87,7 +87,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
     std::fill(muTotal.begin(), muTotal.end(), 0.0);
     for (iLayer = 0; iLayer < filters.size(); iLayer++)
     {
-        doubleVector = filters[iLayer].getTransmission(energies, elementsLibrary);
+        doubleVector = this->getLayerTransmission(filters[iLayer], energies, elementsLibrary);
         for (iRay = 0; iRay < energies.size(); iRay++)
         {
             actualRays[1][iRay] *= doubleVector[iRay];
@@ -186,7 +186,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                 sampleLayerWeight[iLayer] = 1.0;
             else
                 sampleLayerWeight[iLayer] = exp(-tmpDouble);
-            muTotal[iLayer] = (*layerPtr).getMassAttenuationCoefficients( \
+            muTotal[iLayer] = this->getLayerMassAttenuationCoefficients( *layerPtr, \
                                                             energies[iRay], \
                                                             elementsLibrary)["total"];
             // layer thickness and density
@@ -207,7 +207,9 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                 sampleLayerFamilies[iLayer].clear();
                 sampleLayerMuTotal[iLayer].clear();
                 layerPtr = &sample[iLayer];
-                sampleLayerPeakFamilies[iLayer] = (*layerPtr).getPeakFamilies(energies[iRay], elementsLibrary);
+                // sampleLayerPeakFamilies[iLayer] = (*layerPtr).getPeakFamilies(energies[iRay], elementsLibrary);
+                sampleLayerPeakFamilies[iLayer] = this->getLayerPeakFamilies(*layerPtr, energies[iRay], elementsLibrary);
+
                 // They are ordered by increasing increasing binding energy
                 std::string::size_type iString;
                 std::string ele;
@@ -218,7 +220,14 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                 std::map<std::string, double> sampleLayerComposition;
                 std::map<std::string, double>::const_iterator mapIt;
                 std::map<std::string, double>::const_iterator mapIt2;
-                sampleLayerComposition = (*layerPtr).getComposition(elementsLibrary);
+
+                sampleLayerComposition = this->getLayerComposition(*layerPtr, elementsLibrary);
+
+                if (sampleLayerComposition.size() < 1)
+                {
+                    std::cout << (*layerPtr).getMaterial().getName() << std::endl;
+                    std::cout << "sample composition empty!" << std::endl;
+                }
                 for (iPeakFamily = 0 ; iPeakFamily < sampleLayerPeakFamilies[iLayer].size(); iPeakFamily++)
                 {
                     iString = sampleLayerPeakFamilies[iLayer][iPeakFamily].first.find(' ');
@@ -278,7 +287,8 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                 sampleLayerEnergies[iLayer].push_back(energies[iRay]);
                 // calculate sample mu total at all those energies
                 std::map<std::string, std::vector<double> > tmpStringDoubleVecMap;
-                tmpStringDoubleVecMap = (*layerPtr).getMassAttenuationCoefficients( \
+                // tmpStringDoubleVecMap = (*layerPtr).getMassAttenuationCoefficients(
+                tmpStringDoubleVecMap = this->getLayerMassAttenuationCoefficients( *layerPtr, \
                                                                 sampleLayerEnergies[iLayer], \
                                                                 elementsLibrary);
                 sampleLayerMuTotal[iLayer] = tmpStringDoubleVecMap["total"];
@@ -382,7 +392,8 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                 {
                     std::map<std::string, double> sampleLayerComposition;
                     layerPtr = &sample[iLayer];
-                    sampleLayerComposition = (*layerPtr).getComposition(elementsLibrary);
+                    // sampleLayerComposition = (*layerPtr).getComposition(elementsLibrary);
+                    sampleLayerComposition = this->getLayerComposition( *layerPtr, elementsLibrary);
                     if (sampleLayerComposition.find(elementName) == sampleLayerComposition.end())
                     {
                         elementMassFraction = 0.0;
@@ -430,7 +441,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                             // std::cout << "CALCULATING mu_1_i for " << c_it->first << " ";
                             // std::cout << "energy " << energy;
                             result[c_it->first]["mu_1_i"] = \
-                                    sample[iLayer].getMassAttenuationCoefficients(energy, \
+                                    this->getLayerMassAttenuationCoefficients(sample[iLayer], energy, \
                                                                                 elementsLibrary) ["total"];
                             // calculate detection efficiency of fluorescent energy
                             detectionEfficiency = 1.0;
@@ -440,7 +451,8 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                             {
                                 jLayer--;
                                 layerPtr = &sample[jLayer];
-                                detectionEfficiency *= (*layerPtr).getTransmission(energy, \
+                                detectionEfficiency *= this->getLayerTransmission( *layerPtr, \
+                                                                                   energy, \
                                                                                    elementsLibrary, \
                                                                                    alphaOut);
                             }
@@ -448,7 +460,8 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                             for (jLayer = 0; jLayer < attenuators.size(); jLayer++)
                             {
                                 layerPtr = &attenuators[jLayer];
-                                detectionEfficiency *= (*layerPtr).getTransmission(energy, \
+                                detectionEfficiency *= this->getLayerTransmission( *layerPtr, \
+                                                                                   energy, \
                                                                                    elementsLibrary, \
                                                                                    90.0);
                             }
@@ -460,6 +473,8 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
 
 
                             // detection efficiency decomposed in geometric and intrinsic
+                            // TODO: If the detector is defined as a material, one can have the same troubles
+                            // as when using methods from the layers.
                             detectionEfficiency *= geometricEfficiency[iLayer];
 
                             if (detector.hasMaterialComposition() || (detector.getMaterialName().size() > 0 ))
@@ -510,7 +525,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                     continue;
                 }
                 // primary
-                mu_1_lambda = sample[iLayer].getMassAttenuationCoefficients( \
+                mu_1_lambda = this->getLayerMassAttenuationCoefficients( sample[iLayer], \
                                                                 energies[iRay], \
                                                                 elementsLibrary)["total"];
                 density_1 = sample[iLayer].getDensity();
@@ -730,7 +745,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                             throw std::runtime_error(" mu_1_i key. Mass attenuation not present???");
                                         mu_1_i = mapIt->second;
                                         mu_1_j = \
-                                            sample[iLayer].getMassAttenuationCoefficients(energy, \
+                                            this->getLayerMassAttenuationCoefficients(sample[iLayer], energy, \
                                                                                 elementsLibrary)["total"];
                                         mu_2_j = sampleLayerMuTotal[jLayer][iLambda];
                                         bLayer = iLayer + 1;
@@ -739,7 +754,8 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                         {
                                             mu_b_j_d_t += sampleLayerDensity[bLayer] * \
                                                           sampleLayerThickness[bLayer] * \
-                                                          sample[bLayer].getMassAttenuationCoefficients(energy, \
+                                                          this->getLayerMassAttenuationCoefficients(sample[bLayer], \
+                                                                                                    energy, \
                                                                                     elementsLibrary)["total"];
                                             bLayer++;
                                         }
@@ -857,7 +873,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                             throw std::runtime_error(" mu_1_i key. Mass attenuation not present???");
                                         mu_1_i = mapIt->second;
                                         mu_1_j = \
-                                            sample[iLayer].getMassAttenuationCoefficients(energy, \
+                                            this->getLayerMassAttenuationCoefficients(sample[iLayer], energy, \
                                                                                 elementsLibrary)["total"];
                                         mu_2_j = sampleLayerMuTotal[jLayer][iLambda];
                                         bLayer = jLayer + 1;
@@ -866,7 +882,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                         {
                                             mu_b_j_d_t += sampleLayerDensity[bLayer] * \
                                                           sampleLayerThickness[bLayer] * \
-                                                          sample[bLayer].getMassAttenuationCoefficients(energy, \
+                                                          this->getLayerMassAttenuationCoefficients(sample[bLayer], energy, \
                                                                                     elementsLibrary)["total"];
                                             bLayer++;
                                         }
@@ -1085,7 +1101,8 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
             }
         }
     }
-    this->lastMultilayerFluorescence = actualResult;
+    this->printConfiguration();
+    // this->lastMultilayerFluorescence = actualResult;
     return actualResult;
 }
 

@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2020 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2023 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -164,6 +164,11 @@ public:
     void addCollimator();
 
     /*!
+    For debugging purposes
+    */
+    void printConfiguration() const;
+
+    /*!
     Get the current configuration
     */
     const XRFConfig & getConfiguration() const;
@@ -298,6 +303,68 @@ public:
     const double & getAlphaOut() const {return this->configuration.getAlphaOut();};
     const double & getScatteringAngle() const {return this->configuration.getScatteringAngle();};
     const int & getReferenceLayer() const {return this->configuration.getReferenceLayer();};
+    const std::vector<Material> & getMaterials() const {return this->configuration.getMaterials();};
+
+    /*
+    Replacement of layer methods accounting for materials defined in the configuration.
+    Only the XRF instance knows about all the materials defined. That is not the case for the elements library.
+    */
+
+    /*!
+    Get the layer composition either from internal material or from name.
+    In the later case the elements instance is not used.
+    */
+    std::map<std::string, double> getLayerComposition(const Layer & layer, const Elements & elements) const;
+
+    /*!
+    Get the layer mass attenuation coefficients transmission at the given energy using the elements library
+    supplied but accounting for the materials defined in the configuration.
+    If the layer material is not defined or cannot be handled, it will throw the
+    relevant error.
+    */
+    std::map<std::string, double> getLayerMassAttenuationCoefficients(const Layer & layer,
+                                                                      const double & energy,
+                                                                      const Elements & elements) const;
+
+
+    /*!
+    Get the layer mass attenuation coefficients transmission at the given energies using the elements
+    library supplied but accounting for the materials defined in the configuration.
+    If a material is not defined or cannot be handled, it will throw the
+    relevant error.
+    */
+    std::map<std::string, std::vector<double> > getLayerMassAttenuationCoefficients( \
+                                                                const Layer & layer,
+                                                                const std::vector<double> & energies,
+                                                                const Elements & elements) const;
+    /*!
+    Get the layer transmissions at the given energy using the elements library
+    supplied but accounting for the materials defined in the configuration.
+    If a material is not defined or cannot be handled, it will throw the
+    relevant error.
+    */
+    double getLayerTransmission(const Layer & layer, const double & energy, const Elements & elements, const double & angle = 90.0) const;
+
+    /*!
+    Get the layer transmissions at the given energies using the elements library
+    supplied but accounting for the materials defined in the configuration.
+    If a material is not defined or cannot be handled, it will throw the
+    relevant error.
+    */
+    std::vector<double> getLayerTransmission(const Layer & layer,
+                                             const std::vector<double> & energy,
+                                             const Elements & elements,
+                                             const double & angle = 90.0) const;
+
+    /*!
+    Get the emitted peak families from a layer given an energy and a reference to an elements library.
+    It uses the supplied Elements library accounting for the materials defined in the configuration.
+    It returns an ordered vector of pairs.
+    The first element is the peak family ("Si K", "Pb L1", ...) and the second the binding energy.
+    */
+    std::vector<std::pair<std::string, double> > getLayerPeakFamilies(const Layer & layer,
+                                                                      const double & energy,
+                                                                      const Elements & elements) const;
 
 private:
     /*!

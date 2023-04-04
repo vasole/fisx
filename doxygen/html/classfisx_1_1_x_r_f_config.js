@@ -8,6 +8,7 @@ var classfisx_1_1_x_r_f_config =
     [ "getBeam", "classfisx_1_1_x_r_f_config.html#a12adcbb21f6df1d540943c7344dd0c00", null ],
     [ "getBeamFilters", "classfisx_1_1_x_r_f_config.html#a543838a9a6af7405e7fd5ad8ad214045", null ],
     [ "getDetector", "classfisx_1_1_x_r_f_config.html#a15bdceb1ec3f05a0c27f677123458212", null ],
+    [ "getMaterials", "classfisx_1_1_x_r_f_config.html#afb43663a5ccd2df2483f7fbbcc4c5865", null ],
     [ "getReferenceLayer", "classfisx_1_1_x_r_f_config.html#afc12e69e4b0f14c52c3c58c24b801969", null ],
     [ "getSample", "classfisx_1_1_x_r_f_config.html#a650dd058f6e4bfa83e3a9c3216969904", null ],
     [ "getScatteringAngle", "classfisx_1_1_x_r_f_config.html#a245ca8cde57338268f43d4b994662c8b", null ],
