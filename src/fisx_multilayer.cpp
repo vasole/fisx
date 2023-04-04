@@ -402,7 +402,6 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                     {
                         elementMassFraction = sampleLayerComposition[elementName];
                     }
-                    std::cout << "Element " << elementName << " massFraction " << elementMassFraction << std::endl;
                 }
                 if (useMassFractions)
                 {
