@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2020 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2023 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -201,6 +201,75 @@ cdef class PyXRF:
             self.thisptr.setGeometry(alphaIn, alphaOut, alphaIn + alphaOut)
         else:
             self.thisptr.setGeometry(alphaIn, alphaOut, scatteringAngle)
+
+    def getLayerComposition(self, PyLayer layerInstance, PyElements elementsLibrary):
+        return self.thisptr.getLayerComposition(deref(layerInstance.thisptr),
+                                                deref(elementsLibrary.thisptr))
+
+    def getLayerMassAttenuationCoefficients(self, PyLayer layerInstance, energies, \
+                                            PyElements elementsLibrary):
+        if not hasattr(energies, "__len__"):
+            return self._getLayerMassAttenuationCoefficientsSingle( \
+                                    layerInstance, \
+                                    energies, elementsLibrary)
+        else:
+            return self._getLayerMassAttenuationCoefficientsMultiple( \
+                                    layerInstance,
+                                    energies,
+                                    elementsLibrary)
+
+    def _getLayerMassAttenuationCoefficientsSingle(self, PyLayer layerInstance, \
+                                            double energy, \
+                                            PyElements elementsLibrary):
+        return self.thisptr.getLayerMassAttenuationCoefficients( \
+                                    deref(layerInstance.thisptr), \
+                                    energy, deref(elementsLibrary.thisptr))
+
+    def _getLayerMassAttenuationCoefficientsMultiple(self, PyLayer layerInstance, \
+                                            std_vector[double] energies, \
+                                            PyElements elementsLibrary):
+
+        return self.thisptr.getLayerMassAttenuationCoefficients( \
+                                    deref(layerInstance.thisptr), \
+                                    energies, deref(elementsLibrary.thisptr))
+            
+    def getLayerTransmission(self, PyLayer layerInstance, energies, \
+                             PyElements elementsLibrary, angle=90.):
+        if not hasattr(energies, "__len__"):
+            return self._getLayerTransmissionSingle( \
+                                    layerInstance, \
+                                    energies, \
+                                    elementsLibrary, \
+                                    angle)
+        else:
+            return self._getLayerTransmissionMultiple( \
+                                    layerInstance, \
+                                    energies, \
+                                    elementsLibrary, \
+                                    angle)
+
+    def _getLayerTransmissionSingle(self, PyLayer layerInstance, double energy, \
+                             PyElements elementsLibrary, double angle):
+        return self.thisptr.getLayerTransmission( \
+                                    deref(layerInstance.thisptr), \
+                                    energy, \
+                                    deref(elementsLibrary.thisptr), \
+                                    angle)
+
+    def _getLayerTransmissionMultiple(self, PyLayer layerInstance, \
+                             std_vector[double] energies, \
+                             PyElements elementsLibrary, double angle):
+        return self.thisptr.getLayerTransmission( \
+                                    deref(layerInstance.thisptr), \
+                                    energies, \
+                                    deref(elementsLibrary.thisptr), \
+                                    angle)
+
+    def getLayerPeakFamilies(self, PyLayer layerInstance, double energy, \
+                             PyElements elementsLibrary):
+        return self.thisptr.getLayerPeakFamilies( \
+                                    deref(layerInstance.thisptr), \
+                                    energy, deref(elementsLibrary.thisptr))
 
     def getMultilayerFluorescence(self, elementFamilyLayer, PyElements elementsLibrary, \
                             int secondary = 0, int useGeometricEfficiency = 1, int useMassFractions = 0, \
