@@ -1072,8 +1072,8 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
             }
         }
     }
-    this->printConfiguration();
-    // this->lastMultilayerFluorescence = actualResult;
+    // this->printConfiguration();
+    this->lastMultilayerFluorescence = actualResult;
     return actualResult;
 }
 
