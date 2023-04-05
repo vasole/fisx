@@ -74,7 +74,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
     std::vector<double> doubleVector;
     std::map<std::string, std::map<std::string, double> > result;
     std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, double> > > > actualResult;
-    std::vector<std::map<std::string, double>> sampleLayerCompositionList;
+    std::vector<std::map<std::string, double> > sampleLayerCompositionList;
     std::vector<double> energyThresholdList;
 
     energyThresholdList.clear();
