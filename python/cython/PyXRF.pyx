@@ -238,18 +238,23 @@ cdef class PyXRF:
     def _getLayerMassAttenuationCoefficientsSingle(self, PyLayer layerInstance, \
                                             double energy, \
                                             PyElements elementsLibrary):
+        cdef std_map[std_string, double] composition
+        composition.clear()
         return self.thisptr.getLayerMassAttenuationCoefficients( \
                                     deref(layerInstance.thisptr), \
-                                    energy, deref(elementsLibrary.thisptr))
+                                    energy, deref(elementsLibrary.thisptr), \
+                                    composition)
 
     def _getLayerMassAttenuationCoefficientsMultiple(self, PyLayer layerInstance, \
                                             std_vector[double] energies, \
                                             PyElements elementsLibrary):
-
+        cdef std_map[std_string, double] composition
+        composition.clear()
         return self.thisptr.getLayerMassAttenuationCoefficients( \
                                     deref(layerInstance.thisptr), \
-                                    energies, deref(elementsLibrary.thisptr))
-
+                                    energies, deref(elementsLibrary.thisptr), \
+                                    composition)
+            
     def getLayerTransmission(self, PyLayer layerInstance, energies, \
                              PyElements elementsLibrary, angle=90.):
         if not hasattr(energies, "__len__"):
@@ -267,26 +272,35 @@ cdef class PyXRF:
 
     def _getLayerTransmissionSingle(self, PyLayer layerInstance, double energy, \
                              PyElements elementsLibrary, double angle):
+        cdef std_map[std_string, double] composition
+        composition.clear()
         return self.thisptr.getLayerTransmission( \
                                     deref(layerInstance.thisptr), \
                                     energy, \
                                     deref(elementsLibrary.thisptr), \
-                                    angle)
+                                    angle, \
+                                    composition)
 
     def _getLayerTransmissionMultiple(self, PyLayer layerInstance, \
                              std_vector[double] energies, \
                              PyElements elementsLibrary, double angle):
+        cdef std_map[std_string, double] composition
+        composition.clear()
         return self.thisptr.getLayerTransmission( \
                                     deref(layerInstance.thisptr), \
                                     energies, \
                                     deref(elementsLibrary.thisptr), \
-                                    angle)
+                                    angle, \
+                                    composition)
 
     def getLayerPeakFamilies(self, PyLayer layerInstance, double energy, \
                              PyElements elementsLibrary):
+        cdef std_map[std_string, double] composition
+        composition.clear()
         return toStringKeys(self.thisptr.getLayerPeakFamilies( \
                                     deref(layerInstance.thisptr), \
-                                    energy, deref(elementsLibrary.thisptr)))
+                                    energy, deref(elementsLibrary.thisptr), \
+                                    composition))
 
     def getMultilayerFluorescence(self, elementFamilyLayer, PyElements elementsLibrary, \
                             int secondary = 0, int useGeometricEfficiency = 1, int useMassFractions = 0, \
