@@ -324,7 +324,8 @@ public:
     */
     std::map<std::string, double> getLayerMassAttenuationCoefficients(const Layer & layer,
                                                                       const double & energy,
-                                                                      const Elements & elements) const;
+                                                                      const Elements & elements,
+                                                const std::map<std::string, double> & layerComposition = std::map<std::string, double>()) const;
 
 
     /*!
@@ -334,16 +335,18 @@ public:
     relevant error.
     */
     std::map<std::string, std::vector<double> > getLayerMassAttenuationCoefficients( \
-                                                                const Layer & layer,
-                                                                const std::vector<double> & energies,
-                                                                const Elements & elements) const;
+                                                const Layer & layer,
+                                                const std::vector<double> & energies,
+                                                const Elements & elements,
+                                                const std::map<std::string, double> & layerComposition = std::map<std::string, double>()) const;
     /*!
     Get the layer transmissions at the given energy using the elements library
     supplied but accounting for the materials defined in the configuration.
     If a material is not defined or cannot be handled, it will throw the
     relevant error.
     */
-    double getLayerTransmission(const Layer & layer, const double & energy, const Elements & elements, const double & angle = 90.0) const;
+    double getLayerTransmission(const Layer & layer, const double & energy, const Elements & elements, const double & angle = 90.0, \
+                                                const std::map<std::string, double> & layerComposition = std::map<std::string, double>()) const;
 
     /*!
     Get the layer transmissions at the given energies using the elements library
@@ -354,7 +357,8 @@ public:
     std::vector<double> getLayerTransmission(const Layer & layer,
                                              const std::vector<double> & energy,
                                              const Elements & elements,
-                                             const double & angle = 90.0) const;
+                                             const double & angle = 90.0,
+                                             const std::map<std::string, double> & layerComposition = std::map<std::string, double>()) const;
 
     /*!
     Get the emitted peak families from a layer given an energy and a reference to an elements library.
@@ -363,9 +367,9 @@ public:
     The first element is the peak family ("Si K", "Pb L1", ...) and the second the binding energy.
     */
     std::vector<std::pair<std::string, double> > getLayerPeakFamilies(const Layer & layer,
-                                                                      const double & energy,
-                                                                      const Elements & elements) const;
-
+                                             const double & energy,
+                                             const Elements & elements,
+                                             const std::map<std::string, double> & layerComposition = std::map<std::string, double>()) const;
 private:
     /*!
     Reference to elements library to be used for calculations
