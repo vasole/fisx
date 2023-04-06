@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2022 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2023 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -86,11 +86,11 @@ cdef extern from "fisx_elements.h" namespace "fisx":
                             getMassAttenuationCoefficients(std_string, std_vector[double]) except +
         
         std_map[std_string, std_vector[double]] getMassAttenuationCoefficients(std_map[std_string, double],\
-                                                                               double) except +
+                                                                               double, int) except +
 
         std_map[std_string, std_vector[double]]\
                             getMassAttenuationCoefficients(std_map[std_string, double],\
-                                                           std_vector[double]) except +
+                                                           std_vector[double], int) except +
 
         std_vector[std_map[std_string, std_map[std_string, double]]] getExcitationFactors( \
                             std_string element,
