@@ -287,7 +287,7 @@ std::map<std::string, double> XRF::getLayerMassAttenuationCoefficients( \
                                                 const std::map<std::string, double> & layerComposition) const
 {
     if (layerComposition.size() > 0)
-        return elements.getMassAttenuationCoefficients(layerComposition, energy);
+        return elements.getMassAttenuationCoefficients(layerComposition, energy, 1);
     else
         return elements.getMassAttenuationCoefficients(this->getLayerComposition(layer, elements), energy);
 }
@@ -298,9 +298,15 @@ std::map<std::string, std::vector<double> > XRF::getLayerMassAttenuationCoeffici
                                                 const std::map<std::string, double> & layerComposition) const
 {
     if (layerComposition.size() > 0)
-        return elements.getMassAttenuationCoefficients(layerComposition, energy);
+    {
+        // this is an optimization path where the layer composition is already in terms of elements
+        // and not in terms of materials or formulas to be parsed
+        return elements.getMassAttenuationCoefficients(layerComposition, energy, 1);
+    }
     else
+    {
         return elements.getMassAttenuationCoefficients(this->getLayerComposition(layer, elements), energy);
+    }
 }
 
 double XRF::getLayerTransmission(const Layer & layer,
