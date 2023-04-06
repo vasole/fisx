@@ -1047,8 +1047,9 @@ std::map<std::string, std::vector<double> > Elements::getMassAttenuationCoeffici
 }
 
 std::map<std::string, double> Elements::getMassAttenuationCoefficients(\
-                                                std::map<std::string, double> inputFormulaDict,\
-                                                double inputEnergy) const
+                                                const std::map<std::string, double> & inputFormulaDict,\
+                                                const double & inputEnergy, \
+                                                const int & isComposition) const
 {
     std::vector<double> energy;
     std::map<std::string, std::vector<double> >tmpResult;
@@ -1056,7 +1057,7 @@ std::map<std::string, double> Elements::getMassAttenuationCoefficients(\
 
     energy.resize(1);
     energy[0] = inputEnergy;
-    tmpResult = this->getMassAttenuationCoefficients(inputFormulaDict, energy);
+    tmpResult = this->getMassAttenuationCoefficients(inputFormulaDict, energy, isComposition);
 
     result["energy"] = tmpResult["energy"][0];
     result["coherent"] = tmpResult["coherent"][0];
@@ -1069,8 +1070,9 @@ std::map<std::string, double> Elements::getMassAttenuationCoefficients(\
 }
 
 std::map<std::string, std::vector<double> > Elements::getMassAttenuationCoefficients(\
-                                                std::map<std::string, double> inputFormulaDict,\
-                                                                std::vector<double> energy) const
+                                                const std::map<std::string, double> & inputFormulaDict,\
+                                                const std::vector<double> & energy, \
+                                                const int & isComposition) const
 {
     std::string element, msg, name;
     double total, massFraction;
@@ -1083,42 +1085,51 @@ std::map<std::string, std::vector<double> > Elements::getMassAttenuationCoeffici
     std::map<std::string, double>::iterator it;
     std::map<std::string , int>::const_iterator mapIterator;
 
-    total = 0.0;
-    for (c_it = inputFormulaDict.begin(); c_it != inputFormulaDict.end(); ++c_it)
+    if (isComposition)
     {
-        massFraction = c_it->second;
-        if (massFraction < 0.0)
+        // no need to parse anything
+        elementsDict = inputFormulaDict;
+        total = 1.0;
+    }
+    else
+    {
+        total = 0.0;
+        for (c_it = inputFormulaDict.begin(); c_it != inputFormulaDict.end(); ++c_it)
         {
-            msg = "Name " + c_it->first + " has a negative mass fraction!!!";
-            throw std::invalid_argument(msg);
-        }
-        // we may have received formulas ...
-        name = c_it->first;
-        //composition = this->getCompositionFromFormula(name);
-        composition = this->getComposition(name);
-        if (composition.size() < 1)
-        {
-            msg = "Name " + c_it->first + " not understood";
-            std::cout << msg << std::endl;
-            throw std::invalid_argument(msg);
-        }
-        for(it = composition.begin(); it != composition.end(); ++it)
-        {
-            composition[it->first] *= massFraction;
-            if (elementsDict.find(it->first) == elementsDict.end())
+            massFraction = c_it->second;
+            if (massFraction < 0.0)
             {
-                elementsDict[it->first] = 0.0;
+                msg = "Name " + c_it->first + " has a negative mass fraction!!!";
+                throw std::invalid_argument(msg);
             }
-            elementsDict[it->first] += composition[it->first];
+            // we may have received formulas ...
+            name = c_it->first;
+            //composition = this->getCompositionFromFormula(name);
+            composition = this->getComposition(name);
+            if (composition.size() < 1)
+            {
+                msg = "Name " + c_it->first + " not understood";
+                std::cout << msg << std::endl;
+                throw std::invalid_argument(msg);
+            }
+            for(it = composition.begin(); it != composition.end(); ++it)
+            {
+                composition[it->first] *= massFraction;
+                if (elementsDict.find(it->first) == elementsDict.end())
+                {
+                    elementsDict[it->first] = 0.0;
+                }
+                elementsDict[it->first] += composition[it->first];
+            }
+            total += massFraction;
         }
-        total += massFraction;
+        if (total <= 0.0)
+        {
+            msg = "Sum of mass fractions is less or equal to 0";
+            throw std::invalid_argument(msg);
+        }
     }
 
-    if (total <= 0.0)
-    {
-        msg = "Sum of mass fractions is less or equal to 0";
-        throw std::invalid_argument(msg);
-    }
 
     result["energy"].resize(energy.size());
     result["coherent"].resize(energy.size());
