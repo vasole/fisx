@@ -46,8 +46,6 @@ Example
 
 There is a `web application <http://fisxserver.esrf.fr>`_ using this library for calculating expected x-ray count rates.
 
-Basic `Doxygen documentation <https://vasole.github.io/fisx/doxygen/html/classfisx_1_1_elements.html>`_ of the underlying C++ library is available.
-
 This piece of Python code shows how the library can be used via its python binding.
 
 .. code-block:: python
