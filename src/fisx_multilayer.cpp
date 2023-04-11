@@ -333,20 +333,17 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
 
             for(iLayer = 0; iLayer < sample.size(); iLayer++)
             {
-
-                for (int i = 0; i < sampleLayerEnergies[iLayer].size(); ++i)
-                {
-                    muTotalCacheEnergies.push_back(sampleLayerEnergies[iLayer][i]);
-                }
+                muTotalCacheEnergies.insert(muTotalCacheEnergies.end(), \
+                                            sampleLayerEnergies[iLayer].begin(), \
+                                            sampleLayerEnergies[iLayer].end());
             }
             // make the energies unique
             std::sort(muTotalCacheEnergies.begin(), muTotalCacheEnergies.end());
-            /*
             muTotalCacheEnergies.erase(std::unique(muTotalCacheEnergies.begin(), \
                                                    muTotalCacheEnergies.end()), \
                                                    muTotalCacheEnergies.end());
-            */
             muTotalCacheLayer.resize(sample.size());
+
             for(iLayer = 0; iLayer < sample.size(); iLayer++)
             {
                 muTotalCacheLayer[iLayer] = this->getLayerMassAttenuationCoefficients(sample[iLayer], \
@@ -355,6 +352,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                                                                       sampleLayerCompositionList[iLayer])["total"];
             }
         }
+        // cross check that ALL energies are present
         /*
         for(iLayer = 0; iLayer < sample.size(); iLayer++)
         {
@@ -374,7 +372,6 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
             }
         }
         */
-        // cross check that ALL energies are present?
 
         // we start calculation
         // mu_1_lambda = Mass attenuation coefficient of iLayer at incident energy
@@ -1187,7 +1184,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
         }
     }
     // this->printConfiguration();
-    this->lastMultilayerFluorescence = actualResult;
+    // this->lastMultilayerFluorescence = actualResult;
     return actualResult;
 }
 
