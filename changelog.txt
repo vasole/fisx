@@ -1,3 +1,9 @@
+VERSION 1.3.0
+
+Speed up multilayer fluorescence calculation.
+
+Remove doxygen generated documentation from version control.
+
 VERSION 1.2.1
 
 Provide additional methods to simplify debugging from python.
