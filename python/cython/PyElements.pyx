@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2022 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2023 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -296,7 +296,7 @@ cdef class PyElements:
 
     def _getMassAttenuationCoefficients(self, std_map[std_string, double] elementDict,
                                               std_vector[double] energy):
-        return self.thisptr.getMassAttenuationCoefficients(elementDict, energy)
+        return self.thisptr.getMassAttenuationCoefficients(elementDict, energy, 0)
 
     def _getExcitationFactors(self, std_string element,
                                    std_vector[double] energies,

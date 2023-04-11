@@ -55,15 +55,19 @@ cdef extern from "fisx_xrf.h" namespace "fisx":
         double getGeometricEfficiency(int) except +
 
         std_map[std_string, double] getLayerComposition(Layer , Elements) except +
-        std_map[std_string, double] getLayerMassAttenuationCoefficients(Layer, double, Elements) except +
+        std_map[std_string, double] getLayerMassAttenuationCoefficients(Layer, double, Elements, \
+                                                                        std_map[std_string, double]) except +
         std_map[std_string, std_vector[double]] getLayerMassAttenuationCoefficients( \
                                                                  Layer, \
                                                                  std_vector[double], \
-                                                                 Elements) except +
-        double getLayerTransmission( Layer, double, Elements, double) except +
-        std_vector[double] getLayerTransmission( Layer, std_vector[double], Elements, double) except +
+                                                                 Elements, \
+                                                                 std_map[std_string, double]) except +
+        double getLayerTransmission( Layer, double, Elements, double, std_map[std_string, double]) except +
+        std_vector[double] getLayerTransmission( Layer, std_vector[double], Elements, double, \
+                                                 std_map[std_string, double]) except +
 
-        std_vector[std_pair[std_string, double]] getLayerPeakFamilies( Layer, double, Elements) except +
+        std_vector[std_pair[std_string, double]] getLayerPeakFamilies( Layer, double, Elements, \
+                                                                std_map[std_string, double]) except +
 
         std_map[std_string, std_map[std_string, double]] getFluorescence(std_string, \
                 Elements, int, std_string, int, int, double) except +

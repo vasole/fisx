@@ -280,38 +280,53 @@ std::map<std::string, double> XRF::getLayerComposition(const Layer & layer, cons
     }
 }
 
-std::map<std::string, double> XRF::getLayerMassAttenuationCoefficients(const Layer & layer,
-                                                                       const double & energy,
-                                                                       const Elements & elements) const
+std::map<std::string, double> XRF::getLayerMassAttenuationCoefficients( \
+                                                const Layer & layer,
+                                                const double & energy,
+                                                const Elements & elements,
+                                                const std::map<std::string, double> & layerComposition) const
 {
-    // the call to getLayerComposition already took care of the list of defined elements
-    return elements.getMassAttenuationCoefficients(this->getLayerComposition(layer, elements), energy);
+    if (layerComposition.size() > 0)
+        return elements.getMassAttenuationCoefficients(layerComposition, energy, 1);
+    else
+        return elements.getMassAttenuationCoefficients(this->getLayerComposition(layer, elements), energy);
 }
 
 std::map<std::string, std::vector<double> > XRF::getLayerMassAttenuationCoefficients(const Layer & layer,
-                                                                       const std::vector<double> & energy,
-                                                                       const Elements & elements) const
+                                                const std::vector<double> & energy,
+                                                const Elements & elements,
+                                                const std::map<std::string, double> & layerComposition) const
 {
-    // the call to getLayerComposition already took care of the list of defined elements
-    return elements.getMassAttenuationCoefficients(this->getLayerComposition(layer, elements), energy);
+    if (layerComposition.size() > 0)
+    {
+        // this is an optimization path where the layer composition is already in terms of elements
+        // and not in terms of materials or formulas to be parsed
+        return elements.getMassAttenuationCoefficients(layerComposition, energy, 1);
+    }
+    else
+    {
+        return elements.getMassAttenuationCoefficients(this->getLayerComposition(layer, elements), energy);
+    }
 }
 
 double XRF::getLayerTransmission(const Layer & layer,
                                  const double & energy,
                                  const Elements & elements,
-                                 const double & angle) const
+                                 const double & angle,
+                                 const std::map<std::string, double> & layerComposition) const
 {
     std::vector<double> energies;
 
     energies.resize(0);
     energies.push_back(energy);
-    return this->getLayerTransmission(layer, energies, elements, angle)[0];
+    return this->getLayerTransmission(layer, energies, elements, angle, layerComposition)[0];
 }
 
 std::vector<double> XRF::getLayerTransmission(const Layer & layer,
                                              const std::vector<double> & energy,
                                              const Elements & elements,
-                                             const double & angle) const
+                                             const double & angle,
+                                             const std::map<std::string, double> & layerComposition) const
 {
     const double PI = std::acos(-1.0);
     std::vector<double>::size_type i;
@@ -338,7 +353,7 @@ std::vector<double> XRF::getLayerTransmission(const Layer & layer,
         throw std::runtime_error( msg );
     }
 
-    tmpDoubleVector = this->getLayerMassAttenuationCoefficients(layer, energy, elements)["total"];
+    tmpDoubleVector = this->getLayerMassAttenuationCoefficients(layer, energy, elements, layerComposition)["total"];
 
     for (i = 0; i < tmpDoubleVector.size(); i++)
     {
@@ -348,15 +363,20 @@ std::vector<double> XRF::getLayerTransmission(const Layer & layer,
     return tmpDoubleVector;
 }
 
-std::vector<std::pair<std::string, double> > XRF::getLayerPeakFamilies(const Layer & layer,
-                                                                      const double & energy,
-                                                                      const Elements & elements) const
+std::vector<std::pair<std::string, double> > XRF::getLayerPeakFamilies( \
+                                                        const Layer & layer,
+                                                        const double & energy,
+                                                        const Elements & elements,
+                                                        const std::map<std::string, double> & layerComposition) const
 {
     std::map<std::string, double> composition;
     std::vector<std::string> elementsList;
     std::map<std::string, double>::const_iterator c_it;
 
-    composition = this->getLayerComposition(layer, elements);
+    if (layerComposition.size() > 0)
+        composition = layerComposition;
+    else
+        composition = this->getLayerComposition(layer, elements);
 
     for(c_it = composition.begin(); c_it != composition.end(); ++c_it)
     {

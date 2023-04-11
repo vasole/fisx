@@ -275,8 +275,9 @@ public:
     values are the vectors of the calculated values via log-log interpolation in the internal table.
     */
     std::map<std::string, std::vector<double> > getMassAttenuationCoefficients(\
-                                                std::map<std::string, double> elementMassFractions,\
-                                                std::vector<double> energies) const;
+                                                const std::map<std::string, double> & elementMassFractions,\
+                                                const std::vector<double> & energies,
+                                                const int & isComposition = 0) const;
 
 
     /*!
@@ -293,8 +294,9 @@ public:
     coefficients at the given energy as a map where the keys are the different physical processes and the
     values are the calculated values via log-log interpolation in the internal table.    */
     std::map<std::string, double> getMassAttenuationCoefficients(\
-                                                std::map<std::string, double> elementMassFractions,\
-                                                double energies) const;
+                                                const std::map<std::string, double> & elementMassFractions,\
+                                                const double & energies,
+                                                const int & isComposition = 0) const;
 
     // Material handling
     /*!

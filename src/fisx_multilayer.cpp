@@ -32,6 +32,7 @@
 //#include <iostream>
 #include <sstream>
 #include <iomanip>
+#include <algorithm>
 
 namespace fisx
 {
@@ -74,11 +75,19 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
     std::vector<double> doubleVector;
     std::map<std::string, std::map<std::string, double> > result;
     std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, double> > > > actualResult;
+    std::vector<std::map<std::string, double> > sampleLayerCompositionList;
     std::vector<double> energyThresholdList;
 
     energyThresholdList.clear();
     // beam is ordered
     // maxEnergy = energies[energies.size() - 1];
+
+    // use a cache for the sample layers composition
+    for (iLayer = 0; iLayer < sample.size(); iLayer++)
+    {
+        sampleLayerCompositionList.push_back(this->getLayerComposition(sample[iLayer], elementsLibrary));
+    }
+
 
     // get the beam after the beam filters
     std::vector<double> muTotal;
@@ -126,6 +135,8 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
     std::vector<std::vector<double> >sampleLayerRates;
     std::vector<std::vector<double> >sampleLayerMuTotal;
     std::map<std::string, double> sampleLayerComposition;
+    std::vector<double> muTotalCacheEnergies;
+    std::vector<std::vector<double> > muTotalCacheLayer;
     std::vector<double>::size_type iLambda;
     std::vector<std::string> sampleLayerFamilies;
     std::vector<std::vector<std::pair<std::string, double> > >sampleLayerPeakFamilies;
@@ -134,6 +145,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
     std::vector<double> sampleLayerThickness;
     std::vector<double> sampleLayerWeight;
     std::map< std::string, std::map<std::string, double> > escapeRates;
+
 
     // * implement a cache
     std::map< std::string, std::map< double, std::map<std::string, std::map<std::string, double> > > > \
@@ -151,6 +163,8 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
     sampleLayerDensity.resize(sample.size());
     sampleLayerThickness.resize(sample.size());
     sampleLayerWeight.resize(sample.size());
+    muTotalCacheEnergies.resize(0);
+    muTotalCacheLayer.resize(0);
     escapeRates.clear();
 
     iRay = energies.size();
@@ -159,6 +173,8 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
     double minimumExcitationEnergy = -1.0;
     while (iRay > 0)
     {
+        muTotalCacheLayer.resize(0);
+        muTotalCacheEnergies.resize(0);
         if (minimumExcitationEnergy < 0.0)
         {
             for (std::vector<std::string>::size_type iElement = 0; iElement < energyThresholdList.size(); iElement++)
@@ -188,7 +204,8 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                 sampleLayerWeight[iLayer] = exp(-tmpDouble);
             muTotal[iLayer] = this->getLayerMassAttenuationCoefficients( *layerPtr, \
                                                             energies[iRay], \
-                                                            elementsLibrary)["total"];
+                                                            elementsLibrary, \
+                                                            sampleLayerCompositionList[iLayer])["total"];
             // layer thickness and density
             sampleLayerDensity[iLayer] = (*layerPtr).getDensity();
             sampleLayerThickness[iLayer] = (*layerPtr).getThickness();
@@ -208,9 +225,12 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                 sampleLayerMuTotal[iLayer].clear();
                 layerPtr = &sample[iLayer];
                 // sampleLayerPeakFamilies[iLayer] = (*layerPtr).getPeakFamilies(energies[iRay], elementsLibrary);
-                sampleLayerPeakFamilies[iLayer] = this->getLayerPeakFamilies(*layerPtr, energies[iRay], elementsLibrary);
+                sampleLayerPeakFamilies[iLayer] = this->getLayerPeakFamilies(*layerPtr,
+                                                                             energies[iRay],
+                                                                             elementsLibrary,
+                                                                             sampleLayerCompositionList[iLayer]);
 
-                // They are ordered by increasing increasing binding energy
+                // They are ordered by increasing binding energy
                 std::string::size_type iString;
                 std::string ele;
                 std::string lastEle="dummytext";
@@ -221,7 +241,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                 std::map<std::string, double>::const_iterator mapIt;
                 std::map<std::string, double>::const_iterator mapIt2;
 
-                sampleLayerComposition = this->getLayerComposition(*layerPtr, elementsLibrary);
+                sampleLayerComposition = sampleLayerCompositionList[iLayer];
 
                 if (sampleLayerComposition.size() < 1)
                 {
@@ -267,8 +287,16 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                             {
                                 continue;
                             }
-                            sampleLayerEnergies[iLayer].push_back(mapIt2->second);
+                            tmpDouble = mapIt2->second;
                             mapIt2 = c_it->second.find("rate");
+                            /* Another possible optimization
+                            if (mapIt2->second < 0.0001)
+                            {
+                                // low intensity line, skip it
+                                continue;
+                            }
+                            */
+                            sampleLayerEnergies[iLayer].push_back(tmpDouble);
                             // Store rates already corrected for the beam intensity reaching the layer
                             // Store rates already corrected for the element mass fraction
                             sampleLayerRates[iLayer].push_back(mapIt2->second * sampleLayerComposition[ele] * \
@@ -290,13 +318,61 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                 // tmpStringDoubleVecMap = (*layerPtr).getMassAttenuationCoefficients(
                 tmpStringDoubleVecMap = this->getLayerMassAttenuationCoefficients( *layerPtr, \
                                                                 sampleLayerEnergies[iLayer], \
-                                                                elementsLibrary);
+                                                                elementsLibrary, \
+                                                                sampleLayerCompositionList[iLayer]);
                 sampleLayerMuTotal[iLayer] = tmpStringDoubleVecMap["total"];
-
                 sampleLayerRates[iLayer].push_back((weights[iRay] * sampleLayerWeight[iLayer])*\
                 tmpStringDoubleVecMap["coherent"].back());
             }
         }
+
+        if (muTotalCacheLayer.size() == 0)
+        {
+            // we can create a cache with all the energies we are going to dealing with and
+            // all the mass attenuation coefficients at each layer
+
+            for(iLayer = 0; iLayer < sample.size(); iLayer++)
+            {
+                muTotalCacheEnergies.insert(muTotalCacheEnergies.end(), \
+                                            sampleLayerEnergies[iLayer].begin(), \
+                                            sampleLayerEnergies[iLayer].end());
+            }
+            // make the energies unique
+            std::sort(muTotalCacheEnergies.begin(), muTotalCacheEnergies.end());
+            muTotalCacheEnergies.erase(std::unique(muTotalCacheEnergies.begin(), \
+                                                   muTotalCacheEnergies.end()), \
+                                                   muTotalCacheEnergies.end());
+            muTotalCacheLayer.resize(sample.size());
+
+            for(iLayer = 0; iLayer < sample.size(); iLayer++)
+            {
+                muTotalCacheLayer[iLayer] = this->getLayerMassAttenuationCoefficients(sample[iLayer], \
+                                                                                      muTotalCacheEnergies, \
+                                                                                      elementsLibrary, \
+                                                                                      sampleLayerCompositionList[iLayer])["total"];
+            }
+        }
+        // cross check that ALL energies are present
+        /*
+        for(iLayer = 0; iLayer < sample.size(); iLayer++)
+        {
+
+            for (int i = 0; i < sampleLayerEnergies[iLayer].size(); ++i)
+            {
+                if(!std::binary_search(muTotalCacheEnergies.begin(),
+                                      muTotalCacheEnergies.end(),
+                                      sampleLayerEnergies[iLayer][i]))
+                {
+                    throw std::runtime_error(" NOT PRESENT 1");
+                }
+                else
+                {
+                    std::cout << " present iRay" << iRay << std::endl;
+                }
+            }
+        }
+        */
+
         // we start calculation
         // mu_1_lambda = Mass attenuation coefficient of iLayer at incident energy
         double mu_1_lambda;
@@ -393,7 +469,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                     std::map<std::string, double> sampleLayerComposition;
                     layerPtr = &sample[iLayer];
                     // sampleLayerComposition = (*layerPtr).getComposition(elementsLibrary);
-                    sampleLayerComposition = this->getLayerComposition( *layerPtr, elementsLibrary);
+                    sampleLayerComposition = sampleLayerCompositionList[iLayer];
                     if (sampleLayerComposition.find(elementName) == sampleLayerComposition.end())
                     {
                         elementMassFraction = 0.0;
@@ -442,7 +518,8 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                             // std::cout << "energy " << energy;
                             result[c_it->first]["mu_1_i"] = \
                                     this->getLayerMassAttenuationCoefficients(sample[iLayer], energy, \
-                                                                                elementsLibrary) ["total"];
+                                                                                elementsLibrary,
+                                                                                sampleLayerCompositionList[iLayer])["total"];
                             // calculate detection efficiency of fluorescent energy
                             detectionEfficiency = 1.0;
                             // transmission through upper layers
@@ -454,7 +531,8 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                 detectionEfficiency *= this->getLayerTransmission( *layerPtr, \
                                                                                    energy, \
                                                                                    elementsLibrary, \
-                                                                                   alphaOut);
+                                                                                   alphaOut,
+                                                                                   sampleLayerCompositionList[jLayer]);
                             }
                             // transmission through attenuators
                             for (jLayer = 0; jLayer < attenuators.size(); jLayer++)
@@ -527,7 +605,8 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                 // primary
                 mu_1_lambda = this->getLayerMassAttenuationCoefficients( sample[iLayer], \
                                                                 energies[iRay], \
-                                                                elementsLibrary)["total"];
+                                                                elementsLibrary,
+                                                                sampleLayerCompositionList[iLayer])["total"];
                 density_1 = sample[iLayer].getDensity();
                 thickness_1 = sample[iLayer].getThickness();
                 for (c_it = result.begin(); c_it != result.end(); ++c_it)
@@ -541,7 +620,6 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                     tmpDouble = (mu_1_lambda / sinAlphaIn) + (mu_1_i / sinAlphaOut);
                     // keep factor for deciding if secondary excitation is to be considered or not
                     tmpDouble = (1.0 - exp( - tmpDouble * density_1 * thickness_1)) / tmpDouble;
-                    //result[c_it->first]["criterium"] = tmpDouble;
                     tmpDouble *= (elementMassFractionFactor / sinAlphaIn);
                     result[c_it->first]["primary"] = tmpDouble * \
                                                      primaryExcitationFactors[c_it->first]["rate"] * \
@@ -577,7 +655,6 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                     {
                         if (iLayer == jLayer)
                         {
-                            double criteriumMax=secondaryCalculationLimit;
                             // intralayer secondary
                             for(iLambda = 0; iLambda < sampleLayerEnergies[jLayer].size(); iLambda++)
                             {
@@ -604,26 +681,16 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                 }
                                 tmpExcitationFactors = excitationFactorsCache[elementName] \
                                                         [sampleLayerEnergies[jLayer][iLambda]];
-                                double criterium;
                                 for (c_it = result.begin(); c_it != result.end(); ++c_it)
                                 {
                                     if (tmpExcitationFactors.find(c_it->first) == tmpExcitationFactors.end())
                                     {
+                                        // TODO: This needs a comment
                                         continue;
                                     }
                                     mapIt = result[c_it->first].find("mu_1_i");
                                     if (mapIt == result[c_it->first].end())
                                         throw std::runtime_error(" mu_1_i key. Mass attenuation not present???");
-                                    criterium = tmpExcitationFactors[c_it->first]["rate"] * \
-                                                    sampleLayerRates[jLayer][iLambda];
-                                    criterium /= (primaryExcitationFactors[c_it->first]["rate"] * \
-                                                     sampleLayerWeight[iLayer]);
-                                    if (criterium <= criteriumMax)
-                                    {
-                                        // std::cout << " criterium = " << criterium;
-                                        // std::cout << " criterium Max = " << criteriumMax << std::endl;
-                                        continue;
-                                    }
                                     mu_1_i = mapIt->second;
                                     tmpDouble = Math::deBoerL0(mu_1_lambda / sinAlphaIn,
                                                                mu_1_i / sinAlphaOut,
@@ -655,16 +722,6 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                     result[c_it->first]["secondary"] += tmpDouble;
                                     result[c_it->first]["rate"] += tmpDouble * \
                                                                    result[c_it->first]["efficiency"];
-                                    if (criteriumMax > 0.0)
-                                    {
-                                        if ((tmpDouble/result[c_it->first]["primary"]) < 0.00001)
-                                        {
-                                            if (criterium > criteriumMax)
-                                            {
-                                                criteriumMax = criterium;
-                                            }
-                                        }
-                                    }
                                 }
                             }
                         }
@@ -682,14 +739,12 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                 continue;
                             }
 
-                            double criterium;
                             // continue;
                             mu_2_lambda = muTotal[jLayer];
                             density_2 = sampleLayerDensity[jLayer];
                             thickness_2 = sampleLayerThickness[jLayer];
                             if (iLayer < jLayer)
                             {
-                                double criteriumMax = secondaryCalculationLimit;
                                 // interlayer case a)
                                 for(iLambda = 0;
                                     iLambda < sampleLayerEnergies[jLayer].size(); \
@@ -731,32 +786,60 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                         }
                                         if (tmpExcitationFactors[c_it->first]["rate"] < 1.0e-30)
                                         {
+                                            // TODO: Is this test necessary or should it be part of optional optimizations?
                                             continue;
                                         }
-                                        criterium = tmpExcitationFactors[c_it->first]["rate"] * \
-                                                    sampleLayerRates[jLayer][iLambda];
-                                        criterium /= (primaryExcitationFactors[c_it->first]["rate"] * \
-                                                     sampleLayerWeight[iLayer]);
-                                        if (criterium <= criteriumMax)
-                                            continue;
 
                                         mapIt = result[c_it->first].find("mu_1_i");
                                         if (mapIt == result[c_it->first].end())
                                             throw std::runtime_error(" mu_1_i key. Mass attenuation not present???");
+                                        /*
+                                        if(std::lower_bound(muTotalCacheEnergies.begin(), muTotalCacheEnergies.end(), energy) == \
+                                           muTotalCacheEnergies.end())
+                                           {
+                                               std::cout << "c_it->first = " << c_it->first << "elementName " << elementName << std::endl;
+                                               std::cout << "Energy not found ;" << energy << std::endl;
+                                               throw std::runtime_error("STOP");
+                                           }
+                                        */
                                         mu_1_i = mapIt->second;
-                                        mu_1_j = \
-                                            this->getLayerMassAttenuationCoefficients(sample[iLayer], energy, \
-                                                                                elementsLibrary)["total"];
+                                        int cacheIndex;
+                                        cacheIndex = -1;
+                                        if (std::binary_search(muTotalCacheEnergies.begin(), muTotalCacheEnergies.end(), energy))
+                                        {
+                                            cacheIndex = std::lower_bound(muTotalCacheEnergies.begin(), \
+                                                                              muTotalCacheEnergies.end(), \
+                                                                              energy) - muTotalCacheEnergies.begin();
+                                            mu_1_j = muTotalCacheLayer[iLayer][cacheIndex];
+                                        }
+                                        else
+                                        {
+                                            mu_1_j = \
+                                                this->getLayerMassAttenuationCoefficients(sample[iLayer], energy, \
+                                                                            elementsLibrary,
+                                                                            sampleLayerCompositionList[iLayer])["total"];
+                                        }
+
                                         mu_2_j = sampleLayerMuTotal[jLayer][iLambda];
                                         bLayer = iLayer + 1;
                                         mu_b_j_d_t = 0.0;
                                         while (bLayer < jLayer)
                                         {
-                                            mu_b_j_d_t += sampleLayerDensity[bLayer] * \
-                                                          sampleLayerThickness[bLayer] * \
-                                                          this->getLayerMassAttenuationCoefficients(sample[bLayer], \
-                                                                                                    energy, \
-                                                                                    elementsLibrary)["total"];
+                                            if (cacheIndex >= 0)
+                                            {
+                                                mu_b_j_d_t += sampleLayerDensity[bLayer] * \
+                                                              sampleLayerThickness[bLayer] * \
+                                                              muTotalCacheLayer[bLayer][cacheIndex];
+                                            }
+                                            else
+                                            {
+                                                mu_b_j_d_t += sampleLayerDensity[bLayer] * \
+                                                              sampleLayerThickness[bLayer] * \
+                                                              this->getLayerMassAttenuationCoefficients(sample[bLayer], \
+                                                                                                        energy, \
+                                                                                        elementsLibrary,
+                                                                                        sampleLayerCompositionList[bLayer])["total"];
+                                            }
                                             bLayer++;
                                         }
                                         tmpDouble = std::exp(-mu_1_i * density_1 * thickness_1/sinAlphaOut);
@@ -790,22 +873,11 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                         result[c_it->first]["secondary"] += tmpDouble;
                                         result[c_it->first]["rate"] += tmpDouble * \
                                                                        result[c_it->first]["efficiency"];
-                                        if (criteriumMax > 0.0)
-                                        {
-                                            if ((tmpDouble/result[c_it->first]["primary"]) < 0.00001)
-                                            {
-                                                if (criterium > criteriumMax)
-                                                {
-                                                    criteriumMax = criterium;
-                                                }
-                                            }
-                                        }
                                     }
                                 }
                             }
                             if (iLayer > jLayer)
                             {
-                                double criteriumMax = secondaryCalculationLimit;
                                 // interlayer case b)
                                 double layerFactor;
                                 layerFactor = std::exp(-mu_2_lambda * density_2 * thickness_2/sinAlphaIn);
@@ -862,28 +934,48 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                         {
                                             continue;
                                         }
-                                        criterium = tmpExcitationFactors[c_it->first]["rate"] * \
-                                                    sampleLayerRates[jLayer][iLambda];
-                                        criterium /= (primaryExcitationFactors[c_it->first]["rate"] * \
-                                                     sampleLayerWeight[iLayer]);
-                                        if (criterium <= criteriumMax)
-                                            continue;
                                         mapIt = result[c_it->first].find("mu_1_i");
                                         if (mapIt == result[c_it->first].end())
                                             throw std::runtime_error(" mu_1_i key. Mass attenuation not present???");
                                         mu_1_i = mapIt->second;
-                                        mu_1_j = \
-                                            this->getLayerMassAttenuationCoefficients(sample[iLayer], energy, \
-                                                                                elementsLibrary)["total"];
+                                        int cacheIndex;
+                                        cacheIndex = -1;
+                                        if (std::binary_search(muTotalCacheEnergies.begin(), muTotalCacheEnergies.end(), energy))
+                                        {
+                                            cacheIndex = std::lower_bound(muTotalCacheEnergies.begin(), \
+                                                                              muTotalCacheEnergies.end(), \
+                                                                              energy) - muTotalCacheEnergies.begin();
+                                            mu_1_j = muTotalCacheLayer[iLayer][cacheIndex];
+                                        }
+                                        else
+                                        {
+                                            mu_1_j = \
+                                                this->getLayerMassAttenuationCoefficients(sample[iLayer], energy, \
+                                                                                    elementsLibrary,
+                                                                                    sampleLayerCompositionList[iLayer])["total"];
+                                        }
+
                                         mu_2_j = sampleLayerMuTotal[jLayer][iLambda];
                                         bLayer = jLayer + 1;
                                         mu_b_j_d_t = 0.0;
                                         while (bLayer < iLayer)
                                         {
-                                            mu_b_j_d_t += sampleLayerDensity[bLayer] * \
-                                                          sampleLayerThickness[bLayer] * \
-                                                          this->getLayerMassAttenuationCoefficients(sample[bLayer], energy, \
-                                                                                    elementsLibrary)["total"];
+                                            if (cacheIndex >= 0)
+                                            {
+                                                mu_1_j = muTotalCacheLayer[iLayer][cacheIndex];
+                                                mu_b_j_d_t += sampleLayerDensity[bLayer] * \
+                                                              sampleLayerThickness[bLayer] * \
+                                                              muTotalCacheLayer[bLayer][cacheIndex];
+                                            }
+                                            else
+                                            {
+                                                mu_b_j_d_t += sampleLayerDensity[bLayer] * \
+                                                              sampleLayerThickness[bLayer] * \
+                                                              this->getLayerMassAttenuationCoefficients(sample[bLayer], energy, \
+                                                                                    elementsLibrary,
+                                                                                    sampleLayerCompositionList[bLayer])["total"];
+                                            }
+
                                             bLayer++;
                                         }
                                         tmpDouble = layerFactor * sampleLayerRates[jLayer][iLambda];
@@ -914,16 +1006,6 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                         result[c_it->first]["secondary"] += tmpDouble;
                                         result[c_it->first]["rate"] += tmpDouble * \
                                                                        result[c_it->first]["efficiency"];
-                                        if (criteriumMax > 0.0)
-                                        {
-                                            if ((tmpDouble/result[c_it->first]["primary"]) < 0.00001)
-                                            {
-                                                if (criterium > criteriumMax)
-                                                {
-                                                    criteriumMax = criterium;
-                                                }
-                                            }
-                                        }
                                     }
                                 }
                             }
@@ -1101,7 +1183,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
             }
         }
     }
-    this->printConfiguration();
+    // this->printConfiguration();
     // this->lastMultilayerFluorescence = actualResult;
     return actualResult;
 }
