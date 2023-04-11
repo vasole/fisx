@@ -277,7 +277,11 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                             }
                             if (secondaryCalculationLimit > 0.0)
                             {
-                                if ((mapIt2->second * sampleLayerComposition[ele]) < secondaryCalculationLimit)
+                                //if ((mapIt2->second * sampleLayerComposition[ele]) < secondaryCalculationLimit)
+                                // unfortunately the mass fraction of the element is not a good criterium
+                                // for instance, we can have 20 elements with a mass fraction of 1 % but all
+                                // together make 20 % of the sample.
+                                if (mapIt2->second < secondaryCalculationLimit)
                                 {
                                     continue;
                                 };
