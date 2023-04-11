@@ -30,6 +30,7 @@
 #include <iostream>
 #include <math.h>
 #include <stdexcept>
+#include <algorithm>
 
 namespace fisx
 {
