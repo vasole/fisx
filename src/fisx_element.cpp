@@ -1561,68 +1561,36 @@ std::map<std::string, std::map<std::string, double> > Element::getPhotoelectricE
     return result;
 }
 
-
 std::pair<long, long> Element::getInterpolationIndices(const std::vector<double> & vec, const double & x) const
 {
-    static long lastI0 = 0L;
-    std::vector<double>::size_type length, iMin, iMax, distance;
-    int counter;
+    long iMin, iMax;
     std::pair<long, long> result;
+    std::vector<double>::const_iterator c_it;
 
-    // try if last point is of any use
-    length = vec.size();
-    if (lastI0 >= (int) length)
+    c_it = std::lower_bound(vec.begin(), vec.end(), x);
+
+    if (c_it == vec.end())
     {
-        lastI0 = (long) (length - 1);
-    }
-    if (x < vec[lastI0])
-    {
-        iMax = lastI0;
-        iMin = 0;
+        iMax = vec.size() - 1;
+        iMin = iMax - 1;
     }
     else
     {
-        iMin = lastI0;
-        iMax = length - 1;
-        // try a point that is close?
-        if ((length - iMin) > 21)
+        iMax = c_it - vec.begin();
+        if (iMax > 0)
         {
-            lastI0 = (long) (iMin + 20);
-            if (x < vec[lastI0])
-            {
-                iMax = lastI0;
-            }
+            iMin = iMax - 1;
+        }
+        else
+        {
+            iMax = 1;
+            iMin = 0;
         }
     }
 
-    counter = 0;
-    distance = iMax - iMin;
-    while (distance > 1)
-    {
-        // divide the distance by two
-        if (distance > 2)
-        {
-            distance = distance >> 1;
-        }
-        else
-        {
-            distance -= 1;
-        }
-        lastI0 = (long) (iMin + distance);
-        if (x > vec[lastI0])
-        {
-            iMin = lastI0;
-        }
-        else
-        {
-            iMax = lastI0;
-        }
-        distance = iMax - iMin;
-        counter++;
-    }
-    // std::cout << "Needed " << counter << " iterations " << std::endl;
     result.first = (long) iMin;
     result.second = (long) iMax;
+
     return result;
 }
 
