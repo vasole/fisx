@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2020 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2023 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -29,7 +29,7 @@
 #define FISX_VERSION_H
 #include <string>
 
-#define FISX_VERSION_STR "1.2.1"
+#define FISX_VERSION_STR "1.3.0"
 
 namespace fisx
 {
