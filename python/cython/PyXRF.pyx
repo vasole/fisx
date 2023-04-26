@@ -304,7 +304,7 @@ cdef class PyXRF:
 
     def getMultilayerFluorescence(self, elementFamilyLayer, PyElements elementsLibrary, \
                             int secondary = 0, int useGeometricEfficiency = 1, int useMassFractions = 0, \
-                            secondaryCalculationLimit = 0.0):
+                            double secondaryCalculationLimit = 0.0):
         """
         Input
         elementFamilyLayer - Vector of strings. Each string represents the information we are interested on.
@@ -332,12 +332,18 @@ cdef class PyXRF:
         [Element Family][Layer][line][element line layer] - Secondary rate (prior to correct for detection efficiency)
         due to the fluorescence from the given element, line and layer index composing the map key.
         """
+        cdef std_vector[std_string] elementFamilyLayerVector
+        cdef std_map[std_string, std_map[int, std_map[std_string, std_map[std_string, double]]]] result
         if sys.version > "3.0":
-            elementFamilyLayer = [toBytes(x) for x in elementFamilyLayer]
-            return toStringKeysAndValues(self.thisptr.getMultilayerFluorescence(elementFamilyLayer, \
+            for x in elementFamilyLayer:
+                elementFamilyLayerVector.push_back(toBytes(x))
+            with nogil:
+                result = self.thisptr.getMultilayerFluorescence( \
+                            elementFamilyLayerVector, \
                             deref(elementsLibrary.thisptr), \
                             secondary, useGeometricEfficiency, \
-                            useMassFractions, secondaryCalculationLimit))
+                            useMassFractions, secondaryCalculationLimit)
+            return toStringKeysAndValues(result)
         else:
             return self.thisptr.getMultilayerFluorescence(elementFamilyLayer, \
                             deref(elementsLibrary.thisptr), \
