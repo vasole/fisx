@@ -244,7 +244,8 @@ public:
     */
     std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, double> > > > \
                 getMultilayerFluorescence(const std::vector<std::string> & elementFamilyLayer, \
-                const Elements & elementsLibrary, const int & secondary = 0, \
+                const Elements & elementsLibrary, \
+                const int & secondary = 0, \
                 const int & useGeometricEfficiency = 1, \
                 const int & useMassFractions = 0, \
                 const double & secondaryCalculationLimit = 0.0);
