@@ -425,8 +425,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                 calculationLayer = layerList[iElement];
             else
                 calculationLayer = layerList[0];
-            if (calculationLayer < 0)
-                throw std::runtime_error("Requested to calculate a negative layer index!");
+            // a negative calculation layer implies calculation for all layers
             actualLineFamily = lineFamily;
             if (lineFamily == "Ka")
             {
