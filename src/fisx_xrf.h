@@ -215,7 +215,6 @@ public:
                 const int & useGeometricEfficiency = 1, const int & useMassFractions = 0, \
                 const double & secondaryCalculationLimit = 0.0);
     /*!
-    Basis method called by all the other convenience methods.
     \param elementFamilyLayer - Vector of strings. Each string represents the information we are interested on.\n
     "Cr"     - We want the information for Cr, for all line families and sample layers\n
     "Cr K"   - We want the information for Cr, for the family of K-shell emission lines, in all layers.\n
@@ -250,6 +249,35 @@ public:
                 const int & useMassFractions = 0, \
                 const double & secondaryCalculationLimit = 0.0);
 
+    /*!
+    Basis method called by all the other convenience methods.
+    \param elementList - Vector of strings. Each string represents one element.\n
+    \param layerList - Vector of integers representing the sample layers where the calculation for the elements in
+    the elements list takes place. Either a length of 1 or of the same length as the element list.
+    \param familyList - Vector of strings. Each string represents one peak family.\n
+    The vector has to be of the same size as the elements list.
+    \param elementsLibrary - Instance of library to be used for all the Physical constants
+    \param secondary - Flag to indicate different levels of secondary excitation to be considered.\n
+                0 Means not considered\n
+                1 Consider secondary excitation\n
+                2 Consider tertiary excitation\n
+    \param useGeometricEfficiency - Take into account solid angle or not. Default is 1 (yes)
+
+    \param useMassFractions - If 0 (default) the output corresponds to the requested information if the mass
+    fraction of the element would be one on each calculated sample layer. To get the actual signal, one
+    has to multiply the rates by the actual mass fraction of the element on each sample layer.
+                       If set to 1, the rate will be already corrected by the actual mass fraction.
+
+    \return Return a complete output of the form:\n
+    [Element Family][Layer][line]["energy"] - Energy in keV of the emission line\n
+    [Element Family][Layer][line]["primary"] - Primary rate prior to correct for detection efficiency\n
+    [Element Family][Layer][line]["secondary"] - Secondary rate prior to correct for detection efficiency\n
+    [Element Family][Layer][line]["rate"] - Overall rate\n
+    [Element Family][Layer][line]["efficiency"] - Detection efficiency\n
+    [Element Family][Layer][line][element line layer] - Secondary rate (prior to correct for detection efficiency)
+    due to the fluorescence from the given element, line and layer index composing the map key.\n
+    [Element Family][Layer][line]["massFraction"] - Mass fraction of the element in the considered layer
+    */
     std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, double> > > > \
                 getMultilayerFluorescence(const std::vector<std::string> & elementList,
                                           const Elements & elementsLibrary, \
