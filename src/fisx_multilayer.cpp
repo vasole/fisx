@@ -45,7 +45,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                                const int & secondary, \
                                                const int & useGeometricEfficiency,
                                                const int & useMassFractions, \
-                                               const double & secondaryCalculationLimit)
+                                               const double & secondaryCalculationLimit) const
 {
     // get all the needed configuration
     const Beam & beam = this->configuration.getBeam();

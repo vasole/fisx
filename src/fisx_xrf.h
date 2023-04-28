@@ -286,7 +286,7 @@ public:
                                           const int & secondary = 0, \
                                           const int & useGeometricEfficiency = 1, \
                                           const int & useMassFractions = 0, \
-                                          const double & secondaryCalculationLimit = 0.0);
+                                          const double & secondaryCalculationLimit = 0.0) const;
 
 
     double getEnergyThreshold(const std::string & elementName, const std::string & family, \
