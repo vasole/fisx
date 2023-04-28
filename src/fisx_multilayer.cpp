@@ -425,6 +425,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                 calculationLayer = layerList[iElement];
             else
                 calculationLayer = layerList[0];
+            // a negative calculation layer implies calculation for all layers
             actualLineFamily = lineFamily;
             if (lineFamily == "Ka")
             {

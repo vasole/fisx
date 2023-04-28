@@ -254,7 +254,7 @@ cdef class PyXRF:
                                     deref(layerInstance.thisptr), \
                                     energies, deref(elementsLibrary.thisptr), \
                                     composition)
-            
+
     def getLayerTransmission(self, PyLayer layerInstance, energies, \
                              PyElements elementsLibrary, angle=90.):
         if not hasattr(energies, "__len__"):
@@ -304,7 +304,7 @@ cdef class PyXRF:
 
     def getMultilayerFluorescence(self, elementFamilyLayer, PyElements elementsLibrary, \
                             int secondary = 0, int useGeometricEfficiency = 1, int useMassFractions = 0, \
-                            secondaryCalculationLimit = 0.0):
+                            double secondaryCalculationLimit = 0.0):
         """
         Input
         elementFamilyLayer - Vector of strings. Each string represents the information we are interested on.
@@ -332,32 +332,111 @@ cdef class PyXRF:
         [Element Family][Layer][line][element line layer] - Secondary rate (prior to correct for detection efficiency)
         due to the fluorescence from the given element, line and layer index composing the map key.
         """
+        cdef std_vector[std_string] elementFamilyLayerVector
+        cdef std_map[std_string, std_map[int, std_map[std_string, std_map[std_string, double]]]] result
         if sys.version > "3.0":
-            elementFamilyLayer = [toBytes(x) for x in elementFamilyLayer]
-            return toStringKeysAndValues(self.thisptr.getMultilayerFluorescence(elementFamilyLayer, \
+            for x in elementFamilyLayer:
+                elementFamilyLayerVector.push_back(toBytes(x))
+            with nogil:
+                result = self.thisptr.getMultilayerFluorescence( \
+                            elementFamilyLayerVector, \
                             deref(elementsLibrary.thisptr), \
                             secondary, useGeometricEfficiency, \
-                            useMassFractions, secondaryCalculationLimit))
+                            useMassFractions, secondaryCalculationLimit)
+            return toStringKeysAndValues(result)
         else:
             return self.thisptr.getMultilayerFluorescence(elementFamilyLayer, \
                             deref(elementsLibrary.thisptr), \
                             secondary, useGeometricEfficiency, \
                             useMassFractions, secondaryCalculationLimit)
 
-    def getFluorescence(self, elementName, PyElements elementsLibrary, \
-                            int sampleLayer = 0, lineFamily="K", int secondary = 0, \
+    def getFluorescence(self, elementNames, PyElements elementsLibrary, \
+                            sampleLayer = 0, lineFamily="K", int secondary = 0, \
                             int useGeometricEfficiency = 1, int useMassFractions = 0, \
                             double secondaryCalculationLimit = 0.0):
-        if sys.version > "3.0":
-            elementName = toBytes(elementName)
-            lineFamily = toBytes(lineFamily)
-            return toStringKeysAndValues(self.thisptr.getMultilayerFluorescence(elementName, deref(elementsLibrary.thisptr), \
-                            sampleLayer, lineFamily, secondary, useGeometricEfficiency, useMassFractions, \
-                            secondaryCalculationLimit))
+
+        """
+        Input
+        elementNames - Single string or Vector of strings. Each string represents the information we are interested on.
+        "Cr"         - We want the information for Cr
+        ["Cr", "Fe"] - We want the information for Cr and Fe.
+        elementsLibrary - Instance of library to be used for all the Physical constants
+        sampleLayer - Single integer or vector of integers representing the layers where the calculation has to take place.
+                      A negative value implies the calculation will take places in all layers
+                      0 Means calculation on top layer, 1 the second, and so on
+                      The program expects either a single index or as many indices as element names provided.
+        lineFamily - Single string or Vector of strings representing the peak families to calculate.
+                     The program expects as many peak families as element names provided.
+        secondary  - Flag to indicate different levels of secondary excitation to be considered.
+                     0 Means not considered
+                     1 Consider only intralayer secondary excitation
+                     2 Consider intralayer and interlayer secondary excitation
+        useGeometricEfficiency - Take into account solid angle or not. Default is 1 (yes)
+
+        useMassFractions - If 0 (default) the output corresponds to the requested information if the mass
+        fraction of the element would be one on each calculated sample layer. To get the actual signal, one
+        has to multiply bthe rates by the actual mass fraction of the element on each sample layer.
+                           If set to 1 the rate will be already corrected by the actual mass fraction.
+
+        Return a complete output of the form
+        [Element Family][Layer][line]["energy"] - Energy in keV of the emission line
+        [Element Family][Layer][line]["primary"] - Primary rate prior to correct for detection efficiency
+        [Element Family][Layer][line]["secondary"] - Secondary rate prior to correct for detection efficiency
+        [Element Family][Layer][line]["rate"] - Overall rate
+        [Element Family][Layer][line]["efficiency"] - Detection efficiency
+        [Element Family][Layer][line][element line layer] - Secondary rate (prior to correct for detection efficiency)
+        due to the fluorescence from the given element, line and layer index composing the map key.
+        """
+        cdef std_vector[std_string] elementNamesVector
+        cdef std_vector[int] sampleLayerIndicesVector
+        cdef std_vector[std_string] lineFamiliesVector
+        cdef std_map[std_string, std_map[int, std_map[std_string, std_map[std_string, double]]]] result
+
+        if hasattr(elementNames[0], "__len__"):
+            # we have received a list of elements
+            pass
         else:
-            return self.thisptr.getMultilayerFluorescence(elementName, deref(elementsLibrary.thisptr), \
-                            sampleLayer, lineFamily, secondary, useGeometricEfficiency, useMassFractions, \
+            # we have a single element, convert to list
+            elementNames = [elementNames]
+
+        if hasattr(sampleLayer, "__len__"):
+            # we have received a list of layer indices
+            pass
+        else:
+            # we should have received an integer, convert to list
+            sampleLayer = [sampleLayer]
+
+        if len(lineFamily) and hasattr(lineFamily, "__len__"):
+            # we have received a list of peak families
+            pass
+        else:
+            # we should have a peak family, convert to list
+            lineFamily = [lineFamily]
+
+        # check the sizes match
+        if len(lineFamily) != len(elementNames):
+            raise IndexError("Number of elements should match the number of requested peak families")
+
+        if len(sampleLayer) > 1:
+            if len(sampleLayer) != len(elementNames):
+                raise IndexError("Provide a single layer index or as many indices as elements")
+
+        # fill the vectors
+        for x in elementNames:
+            elementNamesVector.push_back(toBytes(x))
+
+        for x in sampleLayer:
+            sampleLayerIndicesVector.push_back(x)
+
+        for x in lineFamily:
+            lineFamiliesVector.push_back(toBytes(x))
+
+        with nogil:
+            result = self.thisptr.getMultilayerFluorescence(elementNamesVector, deref(elementsLibrary.thisptr), \
+                            sampleLayerIndicesVector, lineFamiliesVector, secondary, useGeometricEfficiency, useMassFractions, \
                             secondaryCalculationLimit)
+
+        return toStringKeysAndValues(result)
 
     def getGeometricEfficiency(self, int layerIndex = 0):
         return self.thisptr.getGeometricEfficiency(layerIndex)
