@@ -45,11 +45,13 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                                const int & secondary, \
                                                const int & useGeometricEfficiency,
                                                const int & useMassFractions, \
-                                               const double & secondaryCalculationLimit) const
+                                               const double & secondaryCalculationLimit, \
+                                               const Beam & overwritingBeam) const
 {
     // get all the needed configuration
-    const Beam & beam = this->configuration.getBeam();
-    std::vector<std::vector<double> >actualRays = beam.getBeamAsDoubleVectors();
+    std::vector<std::vector<double> >actualRays = overwritingBeam.getBeamAsDoubleVectors();
+    if (actualRays.size() < 1)
+        actualRays = this->configuration.getBeam().getBeamAsDoubleVectors();
     std::vector<double>::size_type iRay;
     const std::vector<Layer> & filters = this->configuration.getBeamFilters();
     const std::vector<TransmissionTable> & userFilters = this->configuration.getUserBeamFilters();

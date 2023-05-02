@@ -268,6 +268,8 @@ public:
     has to multiply the rates by the actual mass fraction of the element on each sample layer.
                        If set to 1, the rate will be already corrected by the actual mass fraction.
 
+    \param overwritingBeam - Optional parameter to use a different beam than the one in the configuration.
+
     \return Return a complete output of the form:\n
     [Element Family][Layer][line]["energy"] - Energy in keV of the emission line\n
     [Element Family][Layer][line]["primary"] - Primary rate prior to correct for detection efficiency\n
@@ -277,6 +279,7 @@ public:
     [Element Family][Layer][line][element line layer] - Secondary rate (prior to correct for detection efficiency)
     due to the fluorescence from the given element, line and layer index composing the map key.\n
     [Element Family][Layer][line]["massFraction"] - Mass fraction of the element in the considered layer
+
     */
     std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, double> > > > \
                 getMultilayerFluorescence(const std::vector<std::string> & elementList,
@@ -286,7 +289,8 @@ public:
                                           const int & secondary = 0, \
                                           const int & useGeometricEfficiency = 1, \
                                           const int & useMassFractions = 0, \
-                                          const double & secondaryCalculationLimit = 0.0) const;
+                                          const double & secondaryCalculationLimit = 0.0,
+                                          const Beam & overwritingBeam = Beam()) const;
 
 
     double getEnergyThreshold(const std::string & elementName, const std::string & family, \
