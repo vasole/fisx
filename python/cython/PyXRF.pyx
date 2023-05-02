@@ -353,7 +353,8 @@ cdef class PyXRF:
     def getFluorescence(self, elementNames, PyElements elementsLibrary, \
                             sampleLayer = 0, lineFamily="K", int secondary = 0, \
                             int useGeometricEfficiency = 1, int useMassFractions = 0, \
-                            double secondaryCalculationLimit = 0.0):
+                            double secondaryCalculationLimit = 0.0,
+                            beam = None):
 
         """
         Input
@@ -391,6 +392,7 @@ cdef class PyXRF:
         cdef std_vector[int] sampleLayerIndicesVector
         cdef std_vector[std_string] lineFamiliesVector
         cdef std_map[std_string, std_map[int, std_map[std_string, std_map[std_string, double]]]] result
+        cdef Beam beamInstance = Beam();
 
         if hasattr(elementNames[0], "__len__"):
             # we have received a list of elements
@@ -434,7 +436,7 @@ cdef class PyXRF:
         with nogil:
             result = self.thisptr.getMultilayerFluorescence(elementNamesVector, deref(elementsLibrary.thisptr), \
                             sampleLayerIndicesVector, lineFamiliesVector, secondary, useGeometricEfficiency, useMassFractions, \
-                            secondaryCalculationLimit)
+                            secondaryCalculationLimit, beam)
 
         return toStringKeysAndValues(result)
 
