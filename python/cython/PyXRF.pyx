@@ -305,7 +305,7 @@ cdef class PyXRF:
 
     def getMultilayerFluorescence(self, elementFamilyLayer, PyElements elementsLibrary, \
                             int secondary = 0, int useGeometricEfficiency = 1, int useMassFractions = 0, \
-                            double secondaryCalculationLimit = 0.0):
+                            double secondaryCalculationLimit = 0.0, PyBeam overwritingBeam=PyBeam()):
         """
         Input
         elementFamilyLayer - Vector of strings. Each string represents the information we are interested on.
@@ -343,19 +343,20 @@ cdef class PyXRF:
                             elementFamilyLayerVector, \
                             deref(elementsLibrary.thisptr), \
                             secondary, useGeometricEfficiency, \
-                            useMassFractions, secondaryCalculationLimit)
+                            useMassFractions, secondaryCalculationLimit, \
+                            deref(overwritingBeam.thisptr))
             return toStringKeysAndValues(result)
         else:
             return self.thisptr.getMultilayerFluorescence(elementFamilyLayer, \
                             deref(elementsLibrary.thisptr), \
                             secondary, useGeometricEfficiency, \
-                            useMassFractions, secondaryCalculationLimit)
+                            useMassFractions, secondaryCalculationLimit, deref(overwritingBeam.thisptr))
 
     def getFluorescence(self, elementNames, PyElements elementsLibrary, \
                             sampleLayer = 0, lineFamily="K", int secondary = 0, \
                             int useGeometricEfficiency = 1, int useMassFractions = 0, \
                             double secondaryCalculationLimit = 0.0,
-                            beam = None):
+                            PyBeam overwritingBeam=PyBeam()):
 
         """
         Input
@@ -420,23 +421,6 @@ cdef class PyXRF:
             # we should have a peak family, convert to list
             lineFamily = [lineFamily]
 
-        if beam:
-            # for the time being only a list expected
-            if not hasattr(beam, "__len__"):
-                # assume a single energy
-                beamEnergies.push_back(beam)
-            elif len(beam):
-                if hasattr(beam[0], "__len__"):
-                    # at the very least have energies and weights
-                    for item in beam:
-                        beamEnergies.push_back(item[0])
-                        beamWeights.push_back(item[1])
-                else:
-                    # we have a list of energies
-                    for item in beam:
-                        beamEnergies.push_back(item)
-            beamInstance.setBeam(beamEnergies, beamWeights, dummyIntVec, dummyDoubleVec)
-
         # check the sizes match
         if len(lineFamily) != len(elementNames):
             raise IndexError("Number of elements should match the number of requested peak families")
@@ -458,7 +442,7 @@ cdef class PyXRF:
         with nogil:
             result = self.thisptr.getMultilayerFluorescence(elementNamesVector, deref(elementsLibrary.thisptr), \
                             sampleLayerIndicesVector, lineFamiliesVector, secondary, useGeometricEfficiency, useMassFractions, \
-                            secondaryCalculationLimit, beamInstance)
+                            secondaryCalculationLimit, deref(overwritingBeam.thisptr))
 
         return toStringKeysAndValues(result)
 
