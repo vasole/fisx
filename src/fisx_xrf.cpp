@@ -77,10 +77,10 @@ void XRF::setBeam(const Beam & beam)
     this->configuration.setBeam(beam);
 }
 
-void XRF::setBeam(const double & energy, const double & divergency)
+void XRF::setSingleEnergyBeam(const double & energy, const double & divergency)
 {
     this->recentBeam = true;
-    this->configuration.setBeam(energy, divergency);
+    this->configuration.setSingleEnergyBeam(energy, divergency);
 }
 
 void XRF::setBeam(const std::vector<double> & energies, \

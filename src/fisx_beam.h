@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2016 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2023 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -91,7 +91,7 @@ public:
     void setBeam(const int & nValues, const double *energy, const double *weight = NULL,
                  const double *characteristic = NULL, const double *divergency = NULL);
 
-    void setBeam(const double & energy, const double divergency = 0.0);
+    void setSingleEnergyBeam(const double & energy, const double divergency = 0.0);
 
     /*!
     Returns a constant reference to the internal beam.

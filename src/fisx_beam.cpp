@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2016 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2023 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -118,7 +118,7 @@ void Beam::setBeam(const std::vector<double> & energy, \
     this->normalizeBeam();
 }
 
-void Beam::setBeam(const double & energy, const double divergency)
+void Beam::setSingleEnergyBeam(const double & energy, const double divergency)
 {
     this->normalized = false;
     this->rays.clear();

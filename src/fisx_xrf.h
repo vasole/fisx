@@ -80,7 +80,7 @@ public:
     Funtion to set a single energy excitation beam
     \param energy Energy of the incoming beam
     */
-    void setBeam(const double & energy, const double & divergency = 0.0);
+    void setSingleEnergyBeam(const double & energy, const double & divergency = 0.0);
 
 
     /*!
