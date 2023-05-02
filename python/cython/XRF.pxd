@@ -33,6 +33,7 @@ from libcpp.string cimport string as std_string
 from libcpp.vector cimport vector as std_vector
 from libcpp.map cimport map as std_map
 
+from Beam cimport *
 from Detector cimport *
 from Elements cimport *
 from Layer cimport *
@@ -80,7 +81,8 @@ cdef extern from "fisx_xrf.h" namespace "fisx":
                                           int, \
                                           int, \
                                           int, \
-                                          double) nogil except +
+                                          double, \
+                                          Beam) nogil except +
 
         std_map[std_string, std_map[int, std_map[std_string, std_map[std_string, double]]]] \
                 getMultilayerFluorescence(std_vector[std_string], Elements, int, int, int, double) nogil except +
