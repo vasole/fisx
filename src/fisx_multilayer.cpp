@@ -50,7 +50,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
 {
     // get all the needed configuration
     std::vector<std::vector<double> >actualRays = overwritingBeam.getBeamAsDoubleVectors();
-    if (actualRays.size() < 1)
+    if (actualRays[0].size() < 1)
         actualRays = this->configuration.getBeam().getBeamAsDoubleVectors();
     std::vector<double>::size_type iRay;
     const std::vector<Layer> & filters = this->configuration.getBeamFilters();
