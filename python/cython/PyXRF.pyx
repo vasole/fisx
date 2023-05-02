@@ -75,7 +75,7 @@ cdef class PyXRF:
             self._setBeam(energies, weights, characteristic, divergency)
 
     def _setSingleEnergyBeam(self, double energy, double divergency):
-        self.thisptr.setBeam(energy, divergency)
+        self.thisptr.setSingleEnergyBeam(energy, divergency)
 
     def _setBeam(self, std_vector[double] energies, std_vector[double] weights, \
                        std_vector[int] characteristic, std_vector[double] divergency):
