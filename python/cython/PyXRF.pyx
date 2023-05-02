@@ -37,6 +37,7 @@ from libcpp.map cimport map as std_map
 from XRF cimport *
 from Layer cimport *
 from TransmissionTable cimport *
+from Beam cimport *
 
 cdef class PyXRF:
     cdef XRF *thisptr
@@ -393,6 +394,10 @@ cdef class PyXRF:
         cdef std_vector[std_string] lineFamiliesVector
         cdef std_map[std_string, std_map[int, std_map[std_string, std_map[std_string, double]]]] result
         cdef Beam beamInstance = Beam();
+        cdef std_vector[double] beamEnergies
+        cdef std_vector[double] beamWeights
+        cdef std_vector[int] dummyIntVec
+        cdef std_vector[double] dummyDoubleVec
 
         if hasattr(elementNames[0], "__len__"):
             # we have received a list of elements
@@ -415,6 +420,23 @@ cdef class PyXRF:
             # we should have a peak family, convert to list
             lineFamily = [lineFamily]
 
+        if beam:
+            # for the time being only a list expected
+            if not hasattr(beam, "__len__"):
+                # assume a single energy
+                beamEnergies.push_back(beam)
+            elif len(beam):
+                if hasattr(beam[0], "__len__"):
+                    # at the very least have energies and weights
+                    for item in beam:
+                        beamEnergies.push_back(item[0])
+                        beamWeights.push_back(item[1])
+                else:
+                    # we have a list of energies
+                    for item in beam:
+                        beamEnergies.push_back(item)
+            beamInstance.setBeam(beamEnergies, beamWeights, dummyIntVec, dummyDoubleVec)
+
         # check the sizes match
         if len(lineFamily) != len(elementNames):
             raise IndexError("Number of elements should match the number of requested peak families")
@@ -436,7 +458,7 @@ cdef class PyXRF:
         with nogil:
             result = self.thisptr.getMultilayerFluorescence(elementNamesVector, deref(elementsLibrary.thisptr), \
                             sampleLayerIndicesVector, lineFamiliesVector, secondary, useGeometricEfficiency, useMassFractions, \
-                            secondaryCalculationLimit, beam)
+                            secondaryCalculationLimit, beamInstance)
 
         return toStringKeysAndValues(result)
 
