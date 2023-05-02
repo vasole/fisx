@@ -101,7 +101,7 @@ public:
     /*!
     Currently it returns a vector of "elements" in which each element is a vector of
     doubles with length equal to the number of energies.
-    The first four elements are warranteed to exist and they are:
+    The first four elements are warranted to exist and they are:
     [energy0, energy1, energy2, ...]
     [weight0, weight1, weight2, ...]
     [characteristic0, characteristic1, charactersitic2, ...]
