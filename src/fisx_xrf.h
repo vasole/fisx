@@ -213,7 +213,8 @@ public:
                 const Elements & elementsLibrary, const int & sampleLayerIndex = 0, \
                 const std::string & lineFamily = "", const int & secondary = 0, \
                 const int & useGeometricEfficiency = 1, const int & useMassFractions = 0, \
-                const double & secondaryCalculationLimit = 0.0);
+                const double & secondaryCalculationLimit = 0.0, \
+                const Beam & overwritingBeam = Beam());
     /*!
     \param elementFamilyLayer - Vector of strings. Each string represents the information we are interested on.\n
     "Cr"     - We want the information for Cr, for all line families and sample layers\n
@@ -247,7 +248,8 @@ public:
                 const int & secondary = 0, \
                 const int & useGeometricEfficiency = 1, \
                 const int & useMassFractions = 0, \
-                const double & secondaryCalculationLimit = 0.0);
+                const double & secondaryCalculationLimit = 0.0,
+                const Beam & overwritingBeam = Beam());
 
     /*!
     Basis method called by all the other convenience methods.

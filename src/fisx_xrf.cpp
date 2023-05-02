@@ -198,7 +198,8 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                 const Elements & elementsLibrary, const int & sampleLayerIndex, \
                 const std::string & lineFamily, const int & secondary, \
                 const int & useGeometricEfficiency, const int & useMassFractions, \
-                const double & optimizationFactor )
+                const double & optimizationFactor, \
+                const Beam & overwritingBeam )
 {
     std::vector<std::string> elementList;
     std::vector<std::string> familyList;
@@ -220,7 +221,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
     layerList.push_back(sampleLayerIndex);
     return this->getMultilayerFluorescence(elementList, elementsLibrary, layerList, familyList, \
                                            secondary, useGeometricEfficiency, useMassFractions, \
-                                           optimizationFactor);
+                                           optimizationFactor, overwritingBeam);
 }
 
 double XRF::getEnergyThreshold(const std::string & elementName, const std::string & family, \
@@ -395,7 +396,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                 XRF::getMultilayerFluorescence(const std::vector<std::string> & elementFamilyLayer, \
                 const Elements & elementsLibrary, const int & secondary, \
                 const int & useGeometricEfficiency, const int & useMassFractions, \
-                const double & secondaryCalculationLimit)
+                const double & secondaryCalculationLimit, const Beam & overwritingBeam)
 {
     std::vector<std::string> elementList;
     std::vector<std::string> familyList;
@@ -441,7 +442,7 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
     }
     return this->getMultilayerFluorescence(elementList, elementsLibrary, \
                                            layerList, familyList, secondary, useGeometricEfficiency, \
-                                           useMassFractions, secondaryCalculationLimit);
+                                           useMassFractions, secondaryCalculationLimit, overwritingBeam);
 }
 
 void XRF::printConfiguration() const
