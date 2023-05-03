@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2020 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2023 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -48,12 +48,12 @@ public:
     /*!
     Set the excitation beam
     */
-    void setBeam(const double & energy, const double & divergency);
     void setBeam(const std::vector<double> & energies, \
                  const std::vector<double> & weight, \
                  const std::vector<int> & characteristic = std::vector<int>(), \
                  const std::vector<double> & divergency = std::vector<double>());
     void setBeam(const Beam & beam);
+    void setSingleEnergyBeam(const double & energy, const double & divergency);
 
     /*!
     Set the beam filters to be applied to the beam

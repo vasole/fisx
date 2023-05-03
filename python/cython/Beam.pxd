@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2020 European Synchrotron Radiation Facility
+# Copyright (c) 2023 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -25,22 +25,20 @@
 # THE SOFTWARE.
 #
 #############################################################################*/
-from ._fisx import PySimpleIni as SimpleIni
-from ._fisx import PySimpleSpecfile as SimpleSpecfile
-from ._fisx import PyEPDL97 as EPDL97
-from ._fisx import PyShell as Shell
-from ._fisx import PyBeam as Beam
-from ._fisx import PyElement as Element
-from ._fisx import PyElements as Elements
-from ._fisx import PyLayer as Layer
-from ._fisx import PyDetector as Detector
-from ._fisx import PyXRF as XRF
-from ._fisx import PyMath as Math
-from ._fisx import PyMaterial as Material
-from ._fisx import PyTransmissionTable as TransmissionTable
-from ._fisx import fisxVersion
+#import numpy as np
+#cimport numpy as np
+cimport cython
 
-__version__ = fisxVersion()
+from libcpp.string cimport string as std_string
+from libcpp.vector cimport vector as std_vector
+from libcpp.map cimport map as std_map
 
-def version():
-    return __version__
+from Beam cimport *
+
+cdef extern from "fisx_beam.h" namespace "fisx":
+    cdef cppclass Beam:
+        Beam()
+
+        void setBeam(std_vector[double], std_vector[double], std_vector[int], std_vector[double]) except +
+
+        std_vector[std_vector[double]] getBeamAsDoubleVectors()

@@ -45,11 +45,13 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                                const int & secondary, \
                                                const int & useGeometricEfficiency,
                                                const int & useMassFractions, \
-                                               const double & secondaryCalculationLimit)
+                                               const double & secondaryCalculationLimit, \
+                                               const Beam & overwritingBeam) const
 {
     // get all the needed configuration
-    const Beam & beam = this->configuration.getBeam();
-    std::vector<std::vector<double> >actualRays = beam.getBeamAsDoubleVectors();
+    std::vector<std::vector<double> >actualRays = overwritingBeam.getBeamAsDoubleVectors();
+    if (actualRays[0].size() < 1)
+        actualRays = this->configuration.getBeam().getBeamAsDoubleVectors();
     std::vector<double>::size_type iRay;
     const std::vector<Layer> & filters = this->configuration.getBeamFilters();
     const std::vector<TransmissionTable> & userFilters = this->configuration.getUserBeamFilters();
@@ -722,7 +724,12 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                     tmpStringStream.clear();
                                     tmpStringStream << std::setfill('0') << std::setw(2) << jLayer;
                                     tmpString = sampleLayerEnergyNames[jLayer][iLambda] + " " + tmpStringStream.str();
-                                    actualResult[elementName + " " + lineFamily][iLayer][c_it->first][tmpString] = \
+                                    if (actualResult[elementName + " " + lineFamily][iLayer][c_it->first].find(tmpString) == \
+                                        actualResult[elementName + " " + lineFamily][iLayer][c_it->first].end())
+                                    {
+                                        actualResult[elementName + " " + lineFamily][iLayer][c_it->first][tmpString] = 0.0;
+                                    }
+                                    actualResult[elementName + " " + lineFamily][iLayer][c_it->first][tmpString] += \
                                                                                                     tmpDouble;
                                     result[c_it->first]["secondary"] += tmpDouble;
                                     result[c_it->first]["rate"] += tmpDouble * \
@@ -873,7 +880,12 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                         tmpStringStream.clear();
                                         tmpStringStream << std::setfill('0') << std::setw(2) << jLayer;
                                         tmpString = sampleLayerEnergyNames[jLayer][iLambda] + " " + tmpStringStream.str();
-                                        actualResult[elementName + " " + lineFamily][iLayer][c_it->first][tmpString] = \
+                                        if (actualResult[elementName + " " + lineFamily][iLayer][c_it->first].find(tmpString) == \
+                                            actualResult[elementName + " " + lineFamily][iLayer][c_it->first].end())
+                                        {
+                                            actualResult[elementName + " " + lineFamily][iLayer][c_it->first][tmpString] = 0.0;
+                                        }
+                                        actualResult[elementName + " " + lineFamily][iLayer][c_it->first][tmpString] += \
                                                                                                         tmpDouble;
                                         result[c_it->first]["secondary"] += tmpDouble;
                                         result[c_it->first]["rate"] += tmpDouble * \
@@ -1006,7 +1018,12 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
                                         tmpStringStream.clear();
                                         tmpStringStream << std::setfill('0') << std::setw(2) << jLayer;
                                         tmpString = sampleLayerEnergyNames[jLayer][iLambda] + " " + tmpStringStream.str();
-                                        actualResult[elementName + " " + lineFamily][iLayer][c_it->first][tmpString] = \
+                                        if (actualResult[elementName + " " + lineFamily][iLayer][c_it->first].find(tmpString) == \
+                                            actualResult[elementName + " " + lineFamily][iLayer][c_it->first].end())
+                                        {
+                                            actualResult[elementName + " " + lineFamily][iLayer][c_it->first][tmpString] = 0.0;
+                                        }
+                                        actualResult[elementName + " " + lineFamily][iLayer][c_it->first][tmpString] += \
                                                                                                         tmpDouble;
                                         result[c_it->first]["secondary"] += tmpDouble;
                                         result[c_it->first]["rate"] += tmpDouble * \
@@ -1080,6 +1097,8 @@ std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, 
         // std::cout << "WARNING: Tertiary excitation under development " << std::endl;
         // approximate tertiary excitation
         // we ignore the case of excitation after double rayleigh/coherent scattering
+        // Tertiary will not be correct if the peaks of the sample elements are not
+        // included in the list of peaks
         std::map<std::string, std::map<int, std::map<std::string, std::map<std::string, double> > > >::iterator actualResultIt;
         std::map<std::string, std::map<std::string, double> >::iterator c_it;
         std::map<std::string, std::map<std::string, double> >::iterator it;

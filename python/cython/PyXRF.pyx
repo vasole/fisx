@@ -37,6 +37,7 @@ from libcpp.map cimport map as std_map
 from XRF cimport *
 from Layer cimport *
 from TransmissionTable cimport *
+from Beam cimport *
 
 cdef class PyXRF:
     cdef XRF *thisptr
@@ -74,7 +75,7 @@ cdef class PyXRF:
             self._setBeam(energies, weights, characteristic, divergency)
 
     def _setSingleEnergyBeam(self, double energy, double divergency):
-        self.thisptr.setBeam(energy, divergency)
+        self.thisptr.setSingleEnergyBeam(energy, divergency)
 
     def _setBeam(self, std_vector[double] energies, std_vector[double] weights, \
                        std_vector[int] characteristic, std_vector[double] divergency):
@@ -304,7 +305,7 @@ cdef class PyXRF:
 
     def getMultilayerFluorescence(self, elementFamilyLayer, PyElements elementsLibrary, \
                             int secondary = 0, int useGeometricEfficiency = 1, int useMassFractions = 0, \
-                            double secondaryCalculationLimit = 0.0):
+                            double secondaryCalculationLimit = 0.0, PyBeam overwritingBeam=PyBeam()):
         """
         Input
         elementFamilyLayer - Vector of strings. Each string represents the information we are interested on.
@@ -342,18 +343,20 @@ cdef class PyXRF:
                             elementFamilyLayerVector, \
                             deref(elementsLibrary.thisptr), \
                             secondary, useGeometricEfficiency, \
-                            useMassFractions, secondaryCalculationLimit)
+                            useMassFractions, secondaryCalculationLimit, \
+                            deref(overwritingBeam.thisptr))
             return toStringKeysAndValues(result)
         else:
             return self.thisptr.getMultilayerFluorescence(elementFamilyLayer, \
                             deref(elementsLibrary.thisptr), \
                             secondary, useGeometricEfficiency, \
-                            useMassFractions, secondaryCalculationLimit)
+                            useMassFractions, secondaryCalculationLimit, deref(overwritingBeam.thisptr))
 
     def getFluorescence(self, elementNames, PyElements elementsLibrary, \
                             sampleLayer = 0, lineFamily="K", int secondary = 0, \
                             int useGeometricEfficiency = 1, int useMassFractions = 0, \
-                            double secondaryCalculationLimit = 0.0):
+                            double secondaryCalculationLimit = 0.0,
+                            PyBeam overwritingBeam=PyBeam()):
 
         """
         Input
@@ -391,6 +394,11 @@ cdef class PyXRF:
         cdef std_vector[int] sampleLayerIndicesVector
         cdef std_vector[std_string] lineFamiliesVector
         cdef std_map[std_string, std_map[int, std_map[std_string, std_map[std_string, double]]]] result
+        cdef Beam beamInstance = Beam();
+        cdef std_vector[double] beamEnergies
+        cdef std_vector[double] beamWeights
+        cdef std_vector[int] dummyIntVec
+        cdef std_vector[double] dummyDoubleVec
 
         if hasattr(elementNames[0], "__len__"):
             # we have received a list of elements
@@ -434,7 +442,7 @@ cdef class PyXRF:
         with nogil:
             result = self.thisptr.getMultilayerFluorescence(elementNamesVector, deref(elementsLibrary.thisptr), \
                             sampleLayerIndicesVector, lineFamiliesVector, secondary, useGeometricEfficiency, useMassFractions, \
-                            secondaryCalculationLimit)
+                            secondaryCalculationLimit, deref(overwritingBeam.thisptr))
 
         return toStringKeysAndValues(result)
 

@@ -519,9 +519,9 @@ void XRFConfig::setBeam(const std::vector<double> & energy, \
     this->beam.setBeam(energy, weight, characteristic, divergency);
 }
 
-void XRFConfig::setBeam(const double & energy, const double & divergency)
+void XRFConfig::setSingleEnergyBeam(const double & energy, const double & divergency)
 {
-    this->beam.setBeam(energy, divergency);
+    this->beam.setSingleEnergyBeam(energy, divergency);
 }
 
 void XRFConfig::setBeam(const Beam & beam)
