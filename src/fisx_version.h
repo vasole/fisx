@@ -29,7 +29,7 @@
 #define FISX_VERSION_H
 #include <string>
 
-#define FISX_VERSION_STR "1.3.0"
+#define FISX_VERSION_STR "1.3.1"
 
 namespace fisx
 {
