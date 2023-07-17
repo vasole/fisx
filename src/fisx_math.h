@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2016 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2023 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -27,6 +27,7 @@
 #############################################################################*/
 #ifndef FISX_DEBOER_H
 #define FISX_DEBOER_H
+#include <vector>
 
 namespace fisx
 {
@@ -152,6 +153,32 @@ class Math
         static double getFWHM(const double & energy, const double & noise, \
                               const double & fano, const double & quantumEnergy = 0.00385);
 
+
+        static double fwhm2sigma(const double fwhm) { return fwhm / 2.3548200450309493; };
+
+        static double sigma2fwhm(const double sigma) { return 2.3548200450309493 * sigma; };
+
+        /*!
+        Gaussian function
+        */
+        static double gaussian(const double & x, const double & height, const double & position, const double & fwhm);
+
+        /*!
+        Gaussian function
+        */
+        static std::vector<double> gaussian(const std::vector<double> & x, const double & height, const double & position, const double & fwhm);
+
+
+        /*!
+        Area Gaussian function
+        */
+        static double agaussian(const double & x, const double & area, const double & position, const double & fwhm);
+
+        /*!
+        Area Gaussian function
+        */
+        static std::vector<double> agaussian(const std::vector<double> & x, const double & area, const double & position, const double & fwhm);
+
         /*!
         Error function
         */
@@ -162,6 +189,7 @@ class Math
         Complementary error function
         */
         static double erfc(const double & x);
+
 
     private:
         /*!

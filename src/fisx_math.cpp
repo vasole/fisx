@@ -558,7 +558,67 @@ double Math::_deBoerD(const double &x, const double & epsilon, const int & maxIt
 double Math::getFWHM(const double & energy, const double & noise, \
                      const double & fano, const double & quantumEnergy)
 {
-    return sqrt(noise * noise + energy * fano * 2.3548 * 2.3548 * quantumEnergy);
+    return sqrt(noise * noise + energy * fano * 2.3548200450309493 * 2.3548200450309493 * quantumEnergy);
+}
+
+double Math::gaussian(const double & x, const double & height, const double & position, const double & fwhm)
+{
+    double tmpDouble;
+
+    tmpDouble = (x - position) / fwhm2sigma(fwhm);
+    if (tmpDouble <= 35)
+    {
+        return height * exp (-0.5 * tmpDouble * tmpDouble);
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+std::vector< double> Math::gaussian(const std::vector<double> & x, const double & height, const double & position, const double & fwhm)
+{
+    std::vector<double> result;
+    std::vector<double>::size_type i, length;
+
+    length = x.size();
+    result.resize(length);
+    for ( i = 0; i < length; ++i)
+    {
+        result[i] = Math::gaussian(x[i], height, position, fwhm);
+    }
+    return result;
+}
+
+
+double Math::agaussian(const double & x, const double & area, const double & position, const double & fwhm)
+{
+    double sigma;
+    double tmpDouble;
+
+    sigma = Math::fwhm2sigma(fwhm);
+    tmpDouble = (x - position) / sigma;
+    if (tmpDouble <= 35){
+        return (area/(sigma * 2.5066282746310002))* exp (-0.5 * tmpDouble * tmpDouble);
+    }
+    else
+    {
+        return 0.0;
+    }
+}
+
+std::vector<double> Math::agaussian(const std::vector<double> & x, const double & area, const double & position, const double & fwhm)
+{
+    std::vector<double> result;
+    std::vector<double>::size_type i, length;
+
+    length = x.size();
+    result.resize(length);
+    for ( i = 0; i < length; ++i)
+    {
+        result[i] = Math::agaussian(x[i], area, position, fwhm);
+    }
+    return result;
 }
 
 
