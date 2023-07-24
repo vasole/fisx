@@ -176,7 +176,7 @@ public:
     /*!
     Set the configuration
     */
-    void setConfiguration(const XRFConfig & configuration);
+    void setConfiguration(const XRFConfig configuration);
 
     /*!
     Get the expected fluorescence emission coming from primary excitation per unit photon.

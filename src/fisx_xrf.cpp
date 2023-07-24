@@ -40,9 +40,20 @@ namespace fisx
 
 XRF::XRF()
 {
-    // initialize geometry with default parameters
+    // initialize setup with default parameters
+
+    // Single 100 keV energy excitation beam
+    // 1 microgram/cm2 H2O sample
+    // at 45 degrees incident and outgoing beams
+    std::vector<double> energy{100.};
+    std::vector<double> weight{1.0};
+    std::vector<int> characteristic{1};
+    std::vector<double> divergency{0.0};
+
     this->configuration = XRFConfig();
+    this->configuration.setBeam(energy, weight, characteristic, divergency);
     this->setGeometry(45., 45.);
+    this->setSample("H2O", 1.0, 1.0e-6);
     //this->elements = NULL;
 };
 
@@ -56,6 +67,12 @@ void XRF::readConfigurationFromFile(const std::string & fileName)
 {
     this->recentBeam = true;
     this->configuration.readConfigurationFromFile(fileName);
+}
+
+void XRF::setConfiguration(const XRFConfig configuration)
+{
+    this->recentBeam = true;
+    this->configuration = configuration;
 }
 
 void XRF::setGeometry(const double & alphaIn, const double & alphaOut, const double & scatteringAngle)
