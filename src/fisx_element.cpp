@@ -329,7 +329,8 @@ std::map<std::string, double> Element::getMassAttenuationCoefficients(const doub
     std::pair<long, long> indices;
     long i1, i2;
     double A, B, x0, x1, y0, y1;
-    //std::string shellList[10] = {"K", "L1", "L2", "L3", "M1", "M2", "M3", "M4", "M5", "all other"};
+    double totalPhotoelectricByShells;
+    std::string shellList[10] = {"K", "L1", "L2", "L3", "M1", "M2", "M3", "M4", "M5", "all other"};
     std::map<std::string, std::vector<double> >::const_iterator c_it;
     std::string key;
     std::map< double, std::map< std::string, double> >::const_iterator c_it2;
@@ -402,7 +403,7 @@ std::map<std::string, double> Element::getMassAttenuationCoefficients(const doub
         for (c_it = this->mu.begin(); c_it != this->mu.end(); ++c_it)
         {
             key = c_it->first;
-            if ((key == "coherent") || (key == "compton") || (key == "pair"))
+            if ((key == "coherent") || (key == "compton") || (key == "pair") || (key == "photoelectric"))
             {
                 result[key] = c_it->second[i1];
             }
@@ -419,7 +420,7 @@ std::map<std::string, double> Element::getMassAttenuationCoefficients(const doub
         {
             key = c_it->first;
             //std::cout << "key " << key << std::endl;
-            if ((key == "coherent") || (key == "compton") || (key == "pair"))
+            if ((key == "coherent") || (key == "compton") || (key == "pair") || (key == "photoelectric"))
             {
                 // we are left with coherent, compton and pair
                 y0 = c_it->second[i1];
@@ -445,9 +446,19 @@ std::map<std::string, double> Element::getMassAttenuationCoefficients(const doub
             }
         }
     }
-    result["photoelectric"] = result["K"] + result["L1"] + result["L2"] + result["L3"] +\
+
+    // normalize the partial photoelectric cross section to respect the supplied total photoelectric
+    totalPhotoelectricByShells = result["K"] + result["L1"] + result["L2"] + result["L3"] +\
                 (result["M1"] + result["M2"] + result["M3"] + result["M4"] + result["M5"] +\
                 result["all other"]);
+
+    if (totalPhotoelectricByShells > 0.0)
+    {
+        for (i1 = 0; i1 < 10; ++i1)
+        {
+            result[shellList[i1]] *= (result["photoelectric"] / totalPhotoelectricByShells);
+        }
+    }
 
     result["total"] = result["photoelectric"] + result["coherent"] + result["compton"] + result["pair"];
     if (!Math::isFiniteNumber(result["total"]))
