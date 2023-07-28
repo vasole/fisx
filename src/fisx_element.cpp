@@ -452,6 +452,16 @@ std::map<std::string, double> Element::getMassAttenuationCoefficients(const doub
                 (result["M1"] + result["M2"] + result["M3"] + result["M4"] + result["M5"] +\
                 result["all other"]);
 
+    // if we normalize to the total photoelectric, there is a problem if the total photoelectric does
+    // not respect the binding energies while the totalPhotoelectricByShells does it.
+    // the normalization makes PyMca and fisx give the same total mass attenuation coefficients and to
+    // respect the total mass attenuation coefficients from the configuration files.
+    // If not, it is equivalent to using EPDL97 mass attenuation coefficients + Binding energies because
+    // there is agreement among different compilations for the cross sections for the other processes.
+    // TODO: Find a solution
+    //  - Enforce self-consistency between binding energies and total mass attenuation coefficients
+    //  - or check if a big discrepancy between the two totals can be explained by a shell excited or not
+    //    and extrapolate the total to respect the binding energies.
     if (totalPhotoelectricByShells > 0.0)
     {
         for (i1 = 0; i1 < 10; ++i1)
