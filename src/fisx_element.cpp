@@ -222,7 +222,9 @@ void Element::setMassAttenuationCoefficients(const std::vector<double> & energie
     std::vector<double>::const_iterator c_it;
     std::vector<double>::size_type length, i, pairLength;
     std::map<std::string, std::vector<double> >::iterator mu_it;
+    std::vector<double> bindingEnergiesFromTable;
 
+    bindingEnergiesFromTable.clear();
     // energies are expected in keV and ordered
     length = energies.size();
 
@@ -265,8 +267,23 @@ void Element::setMassAttenuationCoefficients(const std::vector<double> & energie
                 std::cout << energies[i] << " < " << energies[i-1] << std::endl;
                 throw std::invalid_argument("Energies have to be supplied in ascending order");
             }
+            if ((energies[i] - energies[i-1]) < 1.0e-6)
+            {
+                // less than 0.2 eV between two input energies
+                bindingEnergiesFromTable.push_back(energies[i]);
+            }
         }
     }
+
+    i = bindingEnergiesFromTable.size();
+   std::cout << this->name;
+    while (i > 0)
+    {
+        std::cout << " ";
+        std::cout << bindingEnergiesFromTable[i - 1];
+        i--;
+    }
+    std::cout << std::endl;
     this->clearCache();
 
     if (this->mu.size() > 0)
@@ -462,14 +479,36 @@ std::map<std::string, double> Element::getMassAttenuationCoefficients(const doub
     //  - Enforce self-consistency between binding energies and total mass attenuation coefficients
     //  - or check if a big discrepancy between the two totals can be explained by a shell excited or not
     //    and extrapolate the total to respect the binding energies.
+/*
     if (totalPhotoelectricByShells > 0.0)
     {
+        double delta;
+        std::vector<std::string> excitedShells;
+        delta = totalPhotoelectricByShells - result["photoelectric"];
+        if (fabs(delta) > (0.10 * totalPhotoelectricByShells))
+        {
+            // big discrepancy try to figure out involved shells
+            excitedShells = this->getExcitedShells(energy);
+            if (delta > 0)
+            {
+                // total considers a shell not excited that in fact it is
+                // can we assume it is the last one? It could be more than one shell
+                // but that would be a big difference in energy
+                result["photoelectric"] *= (1.0 + result[excitedShells[excitedShells.size() - 1]] / totalPhotoelectricByShells);
+                std::cout << " delta before " << delta << "delta after " << totalPhotoelectricByShells - result["photoelectric"] << std::endl;
+            }
+            else
+            {
+
+            }
+            // for the other case, the standard scaling should be fine
+        }
         for (i1 = 0; i1 < 10; ++i1)
         {
             result[shellList[i1]] *= (result["photoelectric"] / totalPhotoelectricByShells);
         }
     }
-
+*/
     result["total"] = result["photoelectric"] + result["coherent"] + result["compton"] + result["pair"];
     if (!Math::isFiniteNumber(result["total"]))
     {
@@ -529,7 +568,7 @@ std::map<std::string, std::pair<double, int> > \
     // This function tries to figure out the energies used by the set of photoelectric mass
     // attenuation coefficients in order to be able to calculate the partial photoelectric
     // cross sections of the K, Li and Mi shells.
-    // It is based on the supplied mass attenuation coefficents having duplicated energies
+    // It is based on the supplied mass attenuation coefficients having duplicated energies
     // corresponding at the edge energies. That is the common approach used by the XCOM and
     // the EPDL97 compilations among others.
 

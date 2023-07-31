@@ -388,10 +388,12 @@ private:
     double density;
     std::string longName;
 
-
+    // element binding energies
     std::map<std::string, double> bindingEnergy;
+
     // Mass attenuation coefficients and energies
     std::vector<double> muEnergy;
+    std::vector<double> muBindingEnergies;
     std::map< std::string, std::vector<double> >mu;
 
     // Partial photoelectric mass attenuation coefficients
