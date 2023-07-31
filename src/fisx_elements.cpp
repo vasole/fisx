@@ -742,8 +742,8 @@ void Elements::setMassAttenuationCoefficients(const std::string & name,
     }
 
 
-    // we have to make sure the partial mass attenuation photoelectric coefficients and the total
-    // photoelectric mass attenuation coefficients are self-consistent
+    // we have to make sure the partial photoelectric cross sections and the total
+    // photoelectric cross sections are self-consistent
     // we are doing this because the only compilation providing subshell photoelectric cross sections
     // is EPDL97
 
@@ -782,7 +782,7 @@ void Elements::setMassAttenuationCoefficients(const std::string & name,
 
     // partial cross sections
     // we extract the edges from supplied mass attenuation coefficients
-    // the result contains the indices of the first instance of the energy
+    // the result contains the index of the first instance of the energy
     extractedEdgeEnergies = (*element).extractEdgeEnergiesFromMassAttenuationCoefficients(energy, \
                                                                                           photoelectric);
 
