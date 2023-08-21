@@ -117,6 +117,10 @@ cdef extern from "fisx_elements.h" namespace "fisx":
 
         std_map[std_string, double] getShellConstants(std_string, std_string) except +
 
+        std_map[std_string, double] getPartialPhotoelectricCrossSections(\
+                                                                std_string,
+                                                                double) except +
+
         std_map[std_string, double] getInitialPhotoelectricVacancyDistribution(\
                                                                 std_string,
                                                                 double) except +

@@ -450,6 +450,15 @@ cdef class PyElements:
     def removeMaterials(self):
         self.thisptr.removeMaterials()
 
+    def getPartialPhotoelectricCrossSections(self, elementName, energy):
+        """
+        Given one energy, give back the partial photoelectric effect cross sections in cm2/g.
+        The output map keys correspond to the different subshells and the values are just
+        mu_photoelectric(shell, E).
+        """
+        return toStringKeys(self.thisptr.getInitialPhotoelectricVacancyDistribution( \
+                                    toBytes(elementName), energy))
+
     def getInitialPhotoelectricVacancyDistribution(self, elementName, energy):
         """
         Given one energy, give the initial distribution of vacancies (before cascade) due to
@@ -459,7 +468,7 @@ cdef class PyElements:
         """
         return toStringKeys(self.thisptr.getInitialPhotoelectricVacancyDistribution( \
                                     toBytes(elementName), energy))
-    
+
     def getCascadeModifiedVacancyDistribution(self, elementName, distribution):
         return self._getCascadeModifiedVacancyDistribution(toBytes(elementName),
                                                     toBytesKeys(distribution))

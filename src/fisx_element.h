@@ -156,7 +156,7 @@ public:
 
     // This methods overwrites any totals given
     /*!
-    Set the photon mass attenuation coefficcients (in cm2/g) of the element at the given
+    Set the photon mass attenuation coefficients (in cm2/g) of the element at the given
     energies (in keV).
     */
     void setMassAttenuationCoefficients(const std::vector<double> & energies, \

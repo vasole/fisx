@@ -1572,6 +1572,14 @@ std::map<std::string, std::map<std::string, double> > Elements::getExcitationFac
     return this->getExcitationFactors(element, energies, weights)[0];
 }
 
+std::map<std::string, double> Elements::getPartialPhotoelectricCrossSections(\
+                                                                    const std::string & elementName,
+                                                                    const double & energy) const
+{
+    const Element & elementObject = this->getElement(elementName);
+    return elementObject.getPartialPhotoelectricMassAttenuationCoefficients(energy);
+}
+
 std::map<std::string, std::vector <double> > Elements::getInitialPhotoelectricVacancyDistribution(\
                                                 const std::string & elementName,
                                                 const std::vector<double> & energies) const

@@ -157,6 +157,15 @@ public:
     /*!
     Convenience method to simplify access to element calculations from binding (ex. python)
 
+    Retrieves the internal table of partial photoelectric cross sections (in cm2/g)  at the given energy.
+    */
+    std::map<std::string, double> getPartialPhotoelectricCrossSections(\
+                                                                    const std::string & elementName,
+                                                                    const double & energy) const;
+
+    /*!
+    Convenience method to simplify access to element calculations from binding (ex. python)
+
     Given one energy, give the initial distribution of vacancies (before cascade) due to
     photoelectric effect.
     The output map keys correspond to the different subshells and the values are just
