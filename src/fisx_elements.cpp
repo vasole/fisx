@@ -1577,6 +1577,7 @@ std::map<std::string, double> Elements::getPartialPhotoelectricCrossSections(\
                                                                     const double & energy) const
 {
     const Element & elementObject = this->getElement(elementName);
+    std::cout << "WARNING: This is returning photoelectric weights at this point!" << std::endl;
     return elementObject.getPartialPhotoelectricMassAttenuationCoefficients(energy);
 }
 
