@@ -82,8 +82,8 @@ cdef extern from "fisx_xrf.h" namespace "fisx":
                                           int, \
                                           int, \
                                           double, \
-                                          Beam) nogil except +
+                                          Beam) except + nogil
 
         std_map[std_string, std_map[int, std_map[std_string, std_map[std_string, double]]]] \
-                getMultilayerFluorescence(std_vector[std_string], Elements, int, int, int, double, Beam) nogil except +
+                getMultilayerFluorescence(std_vector[std_string], Elements, int, int, int, double, Beam) except + nogil
 
