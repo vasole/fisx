@@ -187,6 +187,7 @@ void EPDL97::loadCrossSections(std::string fileName)
     SimpleSpecfile sf;
     int    nScans;
     int i, n;
+    double interestingShellsPhotoelectric;
     std::vector<std::string> tmpLabels;
     std::vector<std::string>::size_type nLabels;
     std::vector<std::vector<double> >::size_type j;
@@ -289,9 +290,37 @@ void EPDL97::loadCrossSections(std::string fileName)
             pVec = &(this->muInputValues[i][j]);
             this->muEnergy[i][j] = (*pVec)[this->muLabelToIndex["energy"]];
             // recalculate the photoelectric effect of the non considered shells
-            (*pVec)[this->muLabelToIndex["photoelectric"]] = (*pVec)[this->muLabelToIndex["total"]]-\
-                                         (*pVec)[this->muLabelToIndex["compton"]]-\
-                                         (*pVec)[this->muLabelToIndex["coherent"]];
+            interestingShellsPhotoelectric = (*pVec)[this->muLabelToIndex["K"]] + \
+                                             (*pVec)[this->muLabelToIndex["L1"]] + \
+                                             (*pVec)[this->muLabelToIndex["L2"]] + \
+                                             (*pVec)[this->muLabelToIndex["L3"]] + \
+                                             (*pVec)[this->muLabelToIndex["M1"]] + \
+                                             (*pVec)[this->muLabelToIndex["M2"]] + \
+                                             (*pVec)[this->muLabelToIndex["M3"]] + \
+                                             (*pVec)[this->muLabelToIndex["M4"]] + \
+                                             (*pVec)[this->muLabelToIndex["M5"]];
+            if ((*pVec)[this->muLabelToIndex["photoelectric"]] - interestingShellsPhotoelectric < 0.0)
+            {
+                if (std::fabs(((*pVec)[this->muLabelToIndex["photoelectric"]] - interestingShellsPhotoelectric)/ interestingShellsPhotoelectric) > 0.001)
+                {
+                    std::cout << "Z = " << i + 1 << "Energy = " << this->muEnergy[i][j];
+                    std::cout << "total = " << (*pVec)[this->muLabelToIndex["photoelectric"]];
+                    std::cout << "parts = " << interestingShellsPhotoelectric;
+                    std::cout << "delta = " << (*pVec)[this->muLabelToIndex["photoelectric"]] - interestingShellsPhotoelectric << std::endl;
+                    throw std::runtime_error("Total photoelectric cross section smaller than sum of shells");
+                }
+                else
+                {
+                    (*pVec)[this->muLabelToIndex["photoelectric"]] = interestingShellsPhotoelectric;
+                }
+            }
+            else
+            {
+                // calculate the photoelectric for all other shells above M5
+                (*pVec)[this->muLabelToIndex["photoelectric"]] = (*pVec)[this->muLabelToIndex["total"]]-\
+                                             (*pVec)[this->muLabelToIndex["compton"]]-\
+                                             (*pVec)[this->muLabelToIndex["coherent"]];
+            }
 
             if ((*pVec)[this->muLabelToIndex["photoelectric"]] > 0.0)
             {
@@ -299,16 +328,7 @@ void EPDL97::loadCrossSections(std::string fileName)
                 {
 
                     // there are higher shells than the M5 excited
-                    (*pVec)[this->muLabelToIndex["all other"]] = (*pVec)[this->muLabelToIndex["photoelectric"]]-\
-                                             (*pVec)[this->muLabelToIndex["K"]]-\
-                                             (*pVec)[this->muLabelToIndex["L1"]]-\
-                                             (*pVec)[this->muLabelToIndex["L2"]]-\
-                                             (*pVec)[this->muLabelToIndex["L3"]]-\
-                                             (*pVec)[this->muLabelToIndex["M1"]]-\
-                                             (*pVec)[this->muLabelToIndex["M2"]]-\
-                                             (*pVec)[this->muLabelToIndex["M3"]]-\
-                                             (*pVec)[this->muLabelToIndex["M4"]]-\
-                                             (*pVec)[this->muLabelToIndex["M5"]];
+                    (*pVec)[this->muLabelToIndex["all other"]] = (*pVec)[this->muLabelToIndex["photoelectric"]] - interestingShellsPhotoelectric;
                 }
                 else
                 {
@@ -318,13 +338,18 @@ void EPDL97::loadCrossSections(std::string fileName)
             else
             {
                 // take care of rounding
-                (*pVec)[this->muLabelToIndex["photoelectric"]] = 0.0;
+                (*pVec)[this->muLabelToIndex["photoelectric"]] = interestingShellsPhotoelectric;
             }
             // take care of rounding
             if((*pVec)[this->muLabelToIndex["all other"]] < 0.0)
             {
                 (*pVec)[this->muLabelToIndex["all other"]] = 0.0;
             }
+
+            // ensure consistency
+            (*pVec)[this->muLabelToIndex["total"]] = (*pVec)[this->muLabelToIndex["photoelectric"]] + \
+                                                     (*pVec)[this->muLabelToIndex["compton"]] + \
+                                                     (*pVec)[this->muLabelToIndex["coherent"]];
         }
     }
     this->crossSectionsFile = fileName;
