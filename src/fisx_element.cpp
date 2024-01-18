@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2014-2023 European Synchrotron Radiation Facility
+# Copyright (c) 2014-2024 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -627,13 +627,9 @@ std::map<std::string, std::pair<double, int> > \
             energy = c_it->first;
             key = shellList[shellIndex];
             if (this->bindingEnergy[key] > 0.0)
-                {
-                // check the energy is correct within 100 eV
-                if(fabs(energy - this->bindingEnergy[key]) < 0.100)
-                {
-                    result[key].first = energy;
-                    result[key].second = (int) c_it->second;
-                }
+            {
+                result[key].first = energy;
+                result[key].second = (int) c_it->second;
             }
             if (c_it == candidates.begin())
             {
