@@ -267,10 +267,12 @@ void Element::setMassAttenuationCoefficients(const std::vector<double> & energie
                 std::cout << energies[i] << " < " << energies[i-1] << std::endl;
                 throw std::invalid_argument("Energies have to be supplied in ascending order");
             }
-            if ((energies[i] - energies[i-1]) < 1.0e-6)
+            if (energies[i] == energies[i-1])
             {
-                // less than 0.2 eV between two input energies
-                bindingEnergiesFromTable.push_back(energies[i]);
+                if (photoelectric[i] > photoelectric[i-1])
+                {
+                    bindingEnergiesFromTable.push_back(energies[i]);
+                }
             }
         }
     }
@@ -584,7 +586,6 @@ std::map<std::string, std::pair<double, int> > \
 
     int    shellIndex;
 
-
     if(muPhotoelectric.size() < 1)
     {
         throw std::runtime_error("Empty photoelectric mass attenuation vector");
@@ -641,8 +642,7 @@ std::map<std::string, std::pair<double, int> > \
         }
     }
 
-    /*
-    if (false)
+    if (true)
     {
         for (result_it = result.begin(); result_it != result.end(); ++result_it)
         {
@@ -651,7 +651,6 @@ std::map<std::string, std::pair<double, int> > \
             std::cout << this->name << " Found shell " << key << " at " << energy << std::endl;
         }
     }
-    */
     return result;
 }
 
