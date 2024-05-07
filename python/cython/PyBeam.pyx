@@ -2,7 +2,7 @@
 #
 # The fisx library for X-Ray Fluorescence
 #
-# Copyright (c) 2023 European Synchrotron Radiation Facility
+# Copyright (c) 2023-2024 European Synchrotron Radiation Facility
 #
 # This file is part of the fisx X-ray developed by V.A. Sole
 #
@@ -53,12 +53,12 @@ cdef class PyBeam:
         if not hasattr(energies, "__len__"):
             energies = numpy.array([energies], dtype=numpy.float64)
         else:
-            energies = numpy.array(energies, dtype=numpy.float64, copy=False)
+            energies = numpy.asarray(energies, dtype=numpy.float64)
         if weights:
             if not hasattr(weights, "__len__"):
                 weights = numpy.array([weights], numpy.float64)
             else:
-                weights = numpy.array(weights, dtype=numpy.float64, copy=False)
+                weights = numpy.asarray(weights, dtype=numpy.float64)
         else:
             weights = numpy.ones(energies.shape, dtype=numpy.float64)
         return self.thisptr.setBeam(energies,
