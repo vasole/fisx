@@ -18,7 +18,7 @@ environment:
         # - PYTHON_DIR: "C:\\Python36-x64"
 
         # Python 3.11
-        - PYTHON_DIR: "C:\\Python311-x64"
+        - PYTHON_DIR: "C:\\Python312-x64"
 
 branches:
     only:
