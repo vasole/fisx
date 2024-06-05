@@ -52,6 +52,7 @@ build_script:
     - "pip freeze"
 
     # Build
+    - "pip install build"
     - "python -m build"
     - ps: "ls dist"
 
