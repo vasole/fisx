@@ -32,7 +32,7 @@ This code is relased under the MIT license as detailed in the LICENSE file.
 Installation
 ------------
 
-To install the library for Python just use ``pip install fisx``. If you want build the library for python use from the code source repository, just use one of the ``pip install .`` or the ``python setup.py install`` approaches. It is convenient (but not mandatory) to have cython >= 0.17 installed for it.
+To install the library for Python just use ``pip install fisx``. If you want build the library for python use from the code source repository, just use the ``pip install .`` approach.
 
 Testing
 -------
