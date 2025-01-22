@@ -83,7 +83,7 @@ jobs:
 
       - name: Install 
         run: |
-          pip install --pre "$(ls dist/fisx*.*)"filename
+          pip install --pre "$(ls dist/fisx*.*)"
 
       - name: Run the tests
         run:
