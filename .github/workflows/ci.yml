@@ -24,16 +24,20 @@ jobs:
         include:
           - name-suffix: "(Minimum Versions)"
             os: ubuntu-latest
-            python-version: 3.7
-            BUILD_COMMAND: sdist
+            python-version: 3.9
+            BUILD_COMMAND: --sdist
           - name-suffix: "sdist"
             os: ubuntu-latest
-            python-version: 3.8
-            BUILD_COMMAND: sdist
+            python-version: "3.11"
+            BUILD_COMMAND: --sdist
           - name-suffix: "bdist_wheel"
             os: macos-latest
-            python-version: 3.8
-            BUILD_COMMAND: bdist_wheel
+            python-version: "3.12"
+            BUILD_COMMAND: --wheel
+          - name-suffix: "bdist_wheel"
+            os: windows-latest
+            python-version: "3.13"
+            BUILD_COMMAND: --wheel
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -63,6 +67,7 @@ jobs:
         run: |
           pip install --upgrade wheel
           pip install --upgrade numpy
+          pip install --upgrade build
 
       - name: Print python info
         run: |
@@ -70,16 +75,15 @@ jobs:
            pip list
 
       - name: Generate source package or wheel
+        env:
+          MACOS_DEPLOYMENT_TARGET: "10.9"
         run: |
-          python setup.py ${{ matrix.BUILD_COMMAND }}
+          python -m build ${{ matrix.BUILD_COMMAND }}
           ls dist
 
-      - name: Install from source package
+      - name: Install 
         run: |
-          for filename in dist/fisx*.*; do
-            echo "\nInstall $filename"
-            pip install --pre $filename
-          done
+          pip install --pre "$(ls /dist/fisx*.*)"filename
 
       - name: Run the tests
         run:
